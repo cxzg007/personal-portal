@@ -27,7 +27,6 @@
 
 ```text
 .
-├── .openai/hosting.json                 # 网站托管配置，执行时由 Sites 流程维护
 ├── content/
 │   ├── site-content.json                # 经用户确认的身份、教育、实习、案例和联系信息
 │   └── posts/
@@ -701,21 +700,20 @@ git commit -m "test: enforce accessibility and responsive quality"
 
 ---
 
-### Task 9: 托管配置、部署前审计与交付
+### Task 9: Vercel 部署准备、审计与交付
 
 **Files:**
-- Create or Modify: `.openai/hosting.json`
 - Create: `README.md`
 - Create: `.env.example`
 - Modify: `package.json`
 
 **Interfaces:**
 - Consumes: 完整应用、用户确认的域名或临时托管 URL。
-- Produces: 可复现本地运行文档、环境变量合同、托管配置和部署前审计记录。
+- Produces: 可复现本地运行文档、环境变量合同、Vercel 部署配置和部署前审计记录。
 
-- [ ] **Step 1: 使用 Sites 构建与托管流程检查项目**
+- [ ] **Step 1: 检查 Vercel 部署前提**
 
-在执行此任务前读取并使用 `sites:sites-building`；若用户要求发布或托管，再读取并使用 `sites:sites-hosting`。由该流程创建或维护 `.openai/hosting.json`，不要手写与托管系统冲突的配置。
+保持原生 Next.js 项目结构，不创建 `.openai/hosting.json`，不引入 vinext 或 Cloudflare Workers 适配层。确认 `pnpm build` 使用标准 Next.js 构建，生产环境提供真实的 `NEXT_PUBLIC_SITE_URL`。部署时优先连接 Git 仓库与 Vercel 项目；如尚未取得 Vercel 授权，交付可复现的导入步骤而不伪造上线结果。
 
 - [ ] **Step 2: 编写 README 和环境变量合同**
 
@@ -746,8 +744,8 @@ Expected: lint、typecheck、单元测试、生产构建和全部 E2E 通过，�
 - [ ] **Step 6: 提交托管与文档**
 
 ```bash
-git add .openai/hosting.json README.md .env.example package.json pnpm-lock.yaml
-git commit -m "docs: add portfolio operations and hosting"
+git add README.md .env.example package.json pnpm-lock.yaml
+git commit -m "docs: add portfolio operations and vercel deployment"
 ```
 
 - [ ] **Step 7: 交付摘要**
@@ -757,6 +755,7 @@ git commit -m "docs: add portfolio operations and hosting"
 ## Plan Self-Review Checklist
 
 - 每项设计要求均映射到 Task 2–9 中的实现或验收步骤。
+- 托管决策固定为 Next.js + Vercel，不创建 Sites/vinext/Cloudflare 专属配置。
 - 个人真实信息和简历是明确的外部输入，不以虚构内容代替。
 - 首页核心内容和博客内容保持服务端可读，3D 是可移除的增强层。
 - 博客、RSS、SEO、可访问性、移动端、减少动态效果和 WebGL 失败均有自动测试。
