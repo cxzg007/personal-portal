@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">江俊杰 - AI Agent / 后端开发</title>
+  <desc id="description">以节点网络和工程面板构成的个人求职门户分享卡片。</desc>
+  <defs>
+    <radialGradient id="glow" cx="72%" cy="32%" r="72%">
+      <stop offset="0" stop-color="#183f66" stop-opacity=".9"/>
+      <stop offset=".55" stop-color="#09182c" stop-opacity=".82"/>
+      <stop offset="1" stop-color="#050b16"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#68d8ff" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#9c7cff" stop-opacity=".28"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g fill="none" stroke="url(#line)" stroke-width="2" opacity=".62">
+    <path d="M790 178 985 108 1082 259 930 405 1110 508"/>
+    <path d="M790 178 720 360 930 405"/>
+    <path d="M720 360 846 525 1110 508"/>
+  </g>
+  <g fill="#09182c" stroke="#78deff" stroke-width="3">
+    <circle cx="790" cy="178" r="20"/>
+    <circle cx="985" cy="108" r="11"/>
+    <circle cx="1082" cy="259" r="14"/>
+    <circle cx="930" cy="405" r="18"/>
+    <circle cx="720" cy="360" r="12"/>
+    <circle cx="846" cy="525" r="10"/>
+    <circle cx="1110" cy="508" r="12"/>
+  </g>
+  <text x="86" y="154" fill="#68d8ff" font-family="ui-monospace, monospace" font-size="22" letter-spacing="4">PORTFOLIO / 2027</text>
+  <text x="82" y="285" fill="#f2f8ff" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="82" font-weight="700">江俊杰</text>
+  <text x="86" y="358" fill="#c6d7e8" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="34">AI Agent / 后端开发</text>
+  <rect x="86" y="420" width="480" height="1" fill="#68d8ff" opacity=".5"/>
+  <text x="86" y="475" fill="#8299ae" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="24">可靠 AI 应用 · 后端系统设计 · 开源协作</text>
+  <text x="86" y="548" fill="#68d8ff" font-family="ui-monospace, monospace" font-size="20">github.com/cxzg007</text>
+</svg>
