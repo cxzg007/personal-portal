@@ -1,3 +1,4 @@
+import { SceneLoader } from "@/components/scene/scene-loader";
 import type { SiteContent } from "@/content/schema";
 
 type HeroProps = {
@@ -52,18 +53,8 @@ export function Hero({ profile }: HeroProps) {
         </div>
       </div>
 
-      <div aria-hidden="true" className="hero-visual">
-        <div className="visual-orbit visual-orbit-outer" />
-        <div className="visual-orbit visual-orbit-inner" />
-        <div className="visual-core">
-          <span>AGENT</span>
-          <strong>∞</strong>
-          <small>REASON · ACT · VERIFY</small>
-        </div>
-        <span className="visual-node visual-node-one" />
-        <span className="visual-node visual-node-two" />
-        <span className="visual-node visual-node-three" />
-        <p className="visual-caption">SYSTEMS / KNOWLEDGE / INFRA</p>
+      <div className="hero-visual">
+        <SceneLoader />
       </div>
     </section>
   );
