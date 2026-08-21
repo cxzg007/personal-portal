@@ -4,6 +4,7 @@ const siteOrigin = "https://portfolio.example.test";
 const articleSlug = "first-agent-system";
 const articleTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
 const articleDescription = "江俊杰基于 Semantica 公开 PR 快照，对 Agent 项目中的数据契约、回归测试与开源协作进行工程复盘。";
+const blogDescription = "关于 AI Agent、后端系统、知识图谱与工程协作的公开技术文章。";
 
 test("homepage publishes canonical, share metadata, and validated ProfilePage JSON-LD", async ({ page }) => {
   await page.goto("/");
@@ -45,6 +46,44 @@ test("public resume and share card are stable, sanitized assets", async ({ reque
   const socialCard = await request.get("/social-card.svg");
   expect(socialCard.ok()).toBe(true);
   expect(await socialCard.text()).not.toContain("jiangjunjie_tj@foxmail.com");
+});
+
+test("blog index publishes independent canonical and social metadata", async ({ page }) => {
+  await page.goto("/blog");
+
+  await expect(page).toHaveTitle("技术博客｜江俊杰");
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    "content",
+    blogDescription,
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    `${siteOrigin}/blog`,
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    "content",
+    `${siteOrigin}/blog`,
+  );
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+    "content",
+    "技术博客｜江俊杰",
+  );
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
+    "content",
+    blogDescription,
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    `${siteOrigin}/social-card.svg`,
+  );
+  await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
+    "content",
+    "技术博客｜江俊杰",
+  );
+  await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute(
+    "content",
+    blogDescription,
+  );
 });
 
 test("sitemap, robots, and RSS expose every public article with absolute URLs", async ({ request }) => {
