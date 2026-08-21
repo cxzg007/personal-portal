@@ -1268,7 +1268,7 @@ main {
 .blog-hero::after {
   position: absolute;
   top: 30%;
-  left: min(68vw, 48rem);
+  right: 0;
   width: clamp(12rem, 28vw, 22rem);
   aspect-ratio: 1;
   border: 1px solid rgba(104, 216, 255, 0.09);

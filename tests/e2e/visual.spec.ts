@@ -1,9 +1,13 @@
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }, testInfo) => {
-  const viewport = testInfo.project.name === "mobile"
-    ? { width: 390, height: 844 }
-    : { width: 1440, height: 900 };
+  const visualViewports: Record<string, { width: number; height: number }> = {
+    chromium: { width: 1440, height: 900 },
+    tablet: { width: 768, height: 1024 },
+    mobile: { width: 390, height: 844 },
+  };
+  const viewport = visualViewports[testInfo.project.name];
+  if (!viewport) throw new Error(`Missing visual viewport for ${testInfo.project.name}`);
 
   await page.setViewportSize(viewport);
   await page.emulateMedia({ reducedMotion: "reduce" });
