@@ -4,16 +4,41 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import type { Group, Points } from "three";
 
-import type { SceneMode } from "@/lib/webgl";
+import { createFrameSample, recordFrame } from "@/lib/scene-performance";
 
 type AgentNetworkSceneProps = {
-  mode: Exclude<SceneMode, "static">;
+  nodeLimit: number;
+  onPerformanceDecline: () => void;
+  particleLimit: number;
 };
 
-const NODE_LIMITS = {
-  full: 48,
-  lite: 18,
-} as const;
+type ScenePerformanceMonitorProps = {
+  onPerformanceDecline: () => void;
+};
+
+export function ScenePerformanceMonitor({
+  onPerformanceDecline,
+}: ScenePerformanceMonitorProps) {
+  const frameSampleRef = useRef(createFrameSample());
+  const performanceDegradedRef = useRef(false);
+
+  useFrame(({ performance }, delta) => {
+    if (performanceDegradedRef.current) {
+      return;
+    }
+
+    const result = recordFrame(frameSampleRef.current, delta);
+    frameSampleRef.current = result.sample;
+
+    if (result.shouldDegrade) {
+      performanceDegradedRef.current = true;
+      performance.regress();
+      onPerformanceDecline();
+    }
+  });
+
+  return null;
+}
 
 function createNodePositions(count: number): Array<[number, number, number]> {
   return Array.from({ length: count }, (_, index) => {
@@ -61,16 +86,16 @@ function createParticlePositions(count: number): Float32Array {
   return positions;
 }
 
-export function AgentNetworkScene({ mode }: AgentNetworkSceneProps) {
+export function AgentNetworkScene({
+  nodeLimit,
+  onPerformanceDecline,
+  particleLimit,
+}: AgentNetworkSceneProps) {
   const groupRef = useRef<Group>(null);
   const particlesRef = useRef<Points>(null);
-  const nodeCount = NODE_LIMITS[mode];
-  const nodes = useMemo(() => createNodePositions(nodeCount), [nodeCount]);
+  const nodes = useMemo(() => createNodePositions(nodeLimit), [nodeLimit]);
   const lines = useMemo(() => createLinePositions(nodes), [nodes]);
-  const particles = useMemo(
-    () => createParticlePositions(mode === "full" ? 30 : 10),
-    [mode],
-  );
+  const particles = useMemo(() => createParticlePositions(particleLimit), [particleLimit]);
 
   useFrame(({ pointer, performance }, delta) => {
     if (groupRef.current) {
@@ -88,36 +113,41 @@ export function AgentNetworkScene({ mode }: AgentNetworkSceneProps) {
   });
 
   return (
-    <group ref={groupRef} rotation={[0.08, -0.2, -0.08]}>
-      <ambientLight intensity={0.55} />
-      <pointLight color="#68d8ff" intensity={14} position={[1.8, 2.4, 3]} />
-      <pointLight color="#9c7cff" intensity={8} position={[-2.5, -1.2, 1]} />
+    <>
+      <ScenePerformanceMonitor onPerformanceDecline={onPerformanceDecline} />
+      <group ref={groupRef} rotation={[0.08, -0.2, -0.08]}>
+        <ambientLight intensity={0.55} />
+        <pointLight color="#68d8ff" intensity={14} position={[1.8, 2.4, 3]} />
+        <pointLight color="#9c7cff" intensity={8} position={[-2.5, -1.2, 1]} />
 
-      <lineSegments>
-        <bufferGeometry>
-          <bufferAttribute args={[lines, 3]} attach="attributes-position" />
-        </bufferGeometry>
-        <lineBasicMaterial color="#68d8ff" opacity={0.23} transparent />
-      </lineSegments>
+        <lineSegments>
+          <bufferGeometry>
+            <bufferAttribute args={[lines, 3]} attach="attributes-position" />
+          </bufferGeometry>
+          <lineBasicMaterial color="#68d8ff" opacity={0.23} transparent />
+        </lineSegments>
 
-      {nodes.map((position, index) => (
-        <mesh key={`${position.join("-")}-${index}`} position={position}>
-          <sphereGeometry args={[index === 0 ? 0.22 : index % 7 === 0 ? 0.09 : 0.055, 10, 10]} />
-          <meshStandardMaterial
-            color={index % 7 === 0 ? "#9c7cff" : "#68d8ff"}
-            emissive={index === 0 ? "#68d8ff" : "#223e55"}
-            emissiveIntensity={index === 0 ? 1.2 : 0.55}
-            roughness={0.38}
-          />
-        </mesh>
-      ))}
+        {nodes.map((position, index) => (
+          <mesh key={`${position.join("-")}-${index}`} position={position}>
+            <sphereGeometry
+              args={[index === 0 ? 0.22 : index % 7 === 0 ? 0.09 : 0.055, 10, 10]}
+            />
+            <meshStandardMaterial
+              color={index % 7 === 0 ? "#9c7cff" : "#68d8ff"}
+              emissive={index === 0 ? "#68d8ff" : "#223e55"}
+              emissiveIntensity={index === 0 ? 1.2 : 0.55}
+              roughness={0.38}
+            />
+          </mesh>
+        ))}
 
-      <points ref={particlesRef}>
-        <bufferGeometry>
-          <bufferAttribute args={[particles, 3]} attach="attributes-position" />
-        </bufferGeometry>
-        <pointsMaterial color="#d9f7ff" opacity={0.48} size={0.025} transparent />
-      </points>
-    </group>
+        <points ref={particlesRef}>
+          <bufferGeometry>
+            <bufferAttribute args={[particles, 3]} attach="attributes-position" />
+          </bufferGeometry>
+          <pointsMaterial color="#d9f7ff" opacity={0.48} size={0.025} transparent />
+        </points>
+      </group>
+    </>
   );
 }

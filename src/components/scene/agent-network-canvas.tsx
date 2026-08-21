@@ -1,9 +1,11 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
+import { useCallback, useState } from "react";
 
 import { AgentNetworkScene } from "@/components/scene/agent-network-scene";
 import { StaticNetwork } from "@/components/scene/static-network";
+import { getSceneRenderBudget } from "@/lib/scene-performance";
 import type { SceneMode } from "@/lib/webgl";
 
 type AgentNetworkCanvasProps = {
@@ -15,10 +17,16 @@ export default function AgentNetworkCanvas({
   mode,
   onReady,
 }: AgentNetworkCanvasProps) {
+  const [degraded, setDegraded] = useState(false);
+  const budget = getSceneRenderBudget(mode, degraded);
+  const handlePerformanceDecline = useCallback(() => {
+    setDegraded(true);
+  }, []);
+
   return (
     <Canvas
       camera={{ fov: 48, position: [0, 0, 6.8] }}
-      dpr={[1, mode === "full" ? 1.5 : 1.15]}
+      dpr={[1, budget.maxDpr]}
       fallback={<StaticNetwork />}
       flat
       gl={{
@@ -30,7 +38,11 @@ export default function AgentNetworkCanvas({
       onCreated={onReady}
       performance={{ debounce: 250, max: 1, min: 0.5 }}
     >
-      <AgentNetworkScene mode={mode} />
+      <AgentNetworkScene
+        nodeLimit={budget.nodeLimit}
+        onPerformanceDecline={handlePerformanceDecline}
+        particleLimit={budget.particleLimit}
+      />
     </Canvas>
   );
 }
