@@ -4,6 +4,7 @@ import { getSiteUrl } from "./site-url";
 describe("getSiteUrl", () => {
   beforeEach(() => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "");
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "");
   });
 
   afterEach(() => {
@@ -21,6 +22,18 @@ describe("getSiteUrl", () => {
     vi.stubEnv("NODE_ENV", "production");
 
     expect(() => getSiteUrl()).toThrow(/NEXT_PUBLIC_SITE_URL.*required.*production/i);
+  });
+
+  it("uses Vercel's stable production hostname when the public URL is not configured", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv(
+      "VERCEL_PROJECT_PRODUCTION_URL",
+      "jiangjunjie-personal-portal-junjie1467-6343s-projects.vercel.app",
+    );
+
+    expect(getSiteUrl().origin).toBe(
+      "https://jiangjunjie-personal-portal-junjie1467-6343s-projects.vercel.app",
+    );
   });
 
   it("rejects a non-HTTPS production URL", () => {

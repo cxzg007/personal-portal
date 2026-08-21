@@ -8,7 +8,7 @@
 
 - Node.js `^22.22.2 || ^24.15.0 || ^26.0.0`。这是基于当前锁文件约束收紧后的偶数主版本支持范围：`jsdom@30.0.1` 要求 Node 22.22.2+、24.15.0+ 或 26+；Vite 等工具的 22.12/22.13 要求已被它覆盖。项目不接受奇数主版本。Vercel 当前推荐选择 24.x，并在构建日志确认实际版本至少为 24.15.0。
 - pnpm `10.34.5`，由 `package.json#packageManager` 固定。`pnpm-lock.yaml` 必须随依赖变化一起提交。
-- 应用唯一必需的公开生产变量是 `NEXT_PUBLIC_SITE_URL`。Vercel 构建还必须在 Preview 和 Production 中设置 `ENABLE_EXPERIMENTAL_COREPACK=1`，让平台按 `packageManager` 使用精确的 pnpm 10.34.5。
+- 非 Vercel 生产构建必须配置 `NEXT_PUBLIC_SITE_URL`。Vercel 会用系统变量 `VERCEL_PROJECT_PRODUCTION_URL` 作为稳定 canonical Origin；绑定自定义域名时再用 `NEXT_PUBLIC_SITE_URL` 显式覆盖。Vercel 构建还必须在 Preview 和 Production 中设置 `ENABLE_EXPERIMENTAL_COREPACK=1`，让平台按 `packageManager` 使用精确的 pnpm 10.34.5。
 
 `.env.example` 中的 `https://portfolio.example.com` **仅是非生产格式示例**，不是站点默认值，也不能直接用于真实部署。生产值必须是最终公开站点的 HTTPS Origin：只包含协议、域名和可选端口，不包含路径、查询参数或片段，例如 `https://name.example.com`。
 
@@ -151,7 +151,7 @@ pnpm test:e2e -- tests/e2e/visual.spec.ts --update-snapshots
 3. 确认 Framework Preset 为 **Next.js**、Root Directory 为仓库根目录。Install Command 和 Build Command 都保留自动检测，不填写手工 Install Command；Vercel 应从 `pnpm-lock.yaml` 和 `packageManager` 识别 pnpm，项目构建脚本为 `pnpm build`。
 4. 在 **Settings → Build and Deployment** 选择 Node.js 24.x。当前锁定依赖要求 24.15.0+（项目也支持 22.22.2+ 和 26.x），因此部署日志必须显示满足 `^22.22.2 || ^24.15.0 || ^26.0.0` 的实际 Node 版本。
 5. 在 **Settings → Environment Variables** 为 Preview 和 Production 都配置 `ENABLE_EXPERIMENTAL_COREPACK=1`；否则 `packageManager` 字段本身不保证 Vercel 使用精确 pnpm 版本。构建日志必须显示 `pnpm 10.34.5`，不一致时停止发布并检查 Corepack 变量和自动安装设置。
-6. 同样为 Preview 和 Production 配置 `NEXT_PUBLIC_SITE_URL`。它是 canonical Origin，两个环境应先使用项目稳定的生产 Origin（如 Vercel 分配的 `https://project.vercel.app`），不要使用 `.env.example` 的占位域名，也不要使用带路径的 URL。
+6. 首次部署可直接使用 Vercel 提供的 `VERCEL_PROJECT_PRODUCTION_URL` 作为 canonical Origin。绑定自定义域名后，为 Preview 和 Production 配置 `NEXT_PUBLIC_SITE_URL` 显式覆盖；不要使用 `.env.example` 的占位域名，也不要使用带路径的 URL。
 7. 推送非生产分支创建 Preview Deployment。检查构建日志，并在 Preview URL 完成下方验收；Preview URL 用于访问测试，页面 canonical 仍指向配置的稳定 Origin。
 8. Preview 通过后合并到 Production Branch 触发 Production Deployment。发布前再次确认 Production 环境变量，并检查生产构建日志与公开 URL。
 
@@ -169,7 +169,7 @@ pnpm test:e2e -- tests/e2e/visual.spec.ts --update-snapshots
 - `/resume.pdf` 返回成功且内容正确；站内链接、邮箱、GitHub 和所有 `target="_blank"` 外链目标正确；
 - 浏览器 Console 与 Network 中没有未解释的页面错误。
 
-还要访问 `/robots.txt`、`/sitemap.xml` 和 `/rss.xml`，确认其中的 Origin 与 `NEXT_PUBLIC_SITE_URL` 一致。
+还要访问 `/robots.txt`、`/sitemap.xml` 和 `/rss.xml`，确认其中的 Origin 与当前 canonical Origin（`NEXT_PUBLIC_SITE_URL` 或 Vercel 的生产 URL）一致。
 
 ### 绑定自定义域名
 
