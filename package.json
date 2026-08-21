@@ -17,7 +17,9 @@
     "@mdx-js/react": "latest",
     "@next/mdx": "latest",
     "@react-three/fiber": "latest",
+    "github-slugger": "latest",
     "gray-matter": "latest",
+    "mdast-util-to-string": "latest",
     "motion": "latest",
     "next": "latest",
     "react": "latest",
@@ -25,7 +27,9 @@
     "rehype-slug": "latest",
     "remark-frontmatter": "latest",
     "remark-gfm": "latest",
-    "three": "latest"
+    "remark-parse": "latest",
+    "three": "latest",
+    "unified": "11.0.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "latest",

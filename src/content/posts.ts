@@ -1,7 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
+import GithubSlugger from "github-slugger";
+import { toString } from "mdast-util-to-string";
 import type { ComponentType } from "react";
 import matter from "gray-matter";
+import remarkParse from "remark-parse";
+import { unified } from "unified";
 
 export type PostHeading = {
   id: string;
@@ -89,21 +93,30 @@ function readDate(source: string, slug: string, field: "publishedAt" | "updatedA
   return raw;
 }
 
-function headingId(text: string) {
-  return text
-    .toLocaleLowerCase("zh-CN")
-    .replace(/[`*_~]/g, "")
-    .replace(/[^\p{Letter}\p{Number}\s-]/gu, "")
-    .trim()
-    .replace(/\s+/g, "-");
-}
-
 function extractHeadings(content: string): PostHeading[] {
-  return Array.from(content.matchAll(/^(##|###)\s+(.+)$/gm), ([, marks, rawText]) => ({
-    id: headingId(rawText),
-    text: rawText.replace(/[`*_~]/g, "").trim(),
-    level: marks.length as 2 | 3,
-  })).filter((heading) => heading.id.length > 0);
+  type MarkdownNode = {
+    type: string;
+    depth?: number;
+    children?: MarkdownNode[];
+  };
+
+  const tree = unified().use(remarkParse).parse(content) as MarkdownNode;
+  const slugger = new GithubSlugger();
+  const headings: PostHeading[] = [];
+
+  const visit = (node: MarkdownNode) => {
+    if (node.type === "heading" && (node.depth === 2 || node.depth === 3)) {
+      const text = toString(node).trim();
+      if (text) {
+        headings.push({ id: slugger.slug(text), text, level: node.depth });
+      }
+    }
+
+    node.children?.forEach(visit);
+  };
+
+  visit(tree);
+  return headings;
 }
 
 function parsePost({ slug, source }: PostSource): PostMeta {

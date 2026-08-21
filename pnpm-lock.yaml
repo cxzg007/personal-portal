@@ -20,9 +20,15 @@ importers:
       '@react-three/fiber':
         specifier: latest
         version: 9.7.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)
+      github-slugger:
+        specifier: latest
+        version: 2.0.0
       gray-matter:
         specifier: latest
         version: 4.0.3
+      mdast-util-to-string:
+        specifier: latest
+        version: 4.0.0
       motion:
         specifier: latest
         version: 13.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -44,9 +50,15 @@ importers:
       remark-gfm:
         specifier: latest
         version: 4.0.1(supports-color@7.1.0)
+      remark-parse:
+        specifier: latest
+        version: 11.0.0(supports-color@7.1.0)
       three:
         specifier: latest
         version: 0.185.1
+      unified:
+        specifier: 11.0.0
+        version: 11.0.0
     devDependencies:
       '@axe-core/playwright':
         specifier: latest

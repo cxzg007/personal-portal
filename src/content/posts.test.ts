@@ -105,6 +105,25 @@ describe("buildPostIndex", () => {
 
     expect(posts.map((post) => post.slug)).toEqual(["public"]);
   });
+
+  it("extracts rendered headings, skips fenced code, and deduplicates ids like rehype-slug", () => {
+    const markdown = `${validFrontmatter}
+## 重复标题
+
+\`\`\`md
+## 代码块中的伪标题
+\`\`\`
+
+### 重复标题
+`;
+    const [post] = buildPostIndex([source("heading-semantics", markdown)]);
+
+    expect(post.headings).toEqual([
+      { id: "第一节", level: 2, text: "第一节" },
+      { id: "重复标题", level: 2, text: "重复标题" },
+      { id: "重复标题-1", level: 3, text: "重复标题" },
+    ]);
+  });
 });
 
 describe("post loading", () => {
