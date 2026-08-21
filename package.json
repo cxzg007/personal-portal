@@ -1,6 +1,10 @@
 {
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "tsx scripts/validate-content.ts && next build",
