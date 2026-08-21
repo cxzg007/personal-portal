@@ -174,9 +174,9 @@ export function validateSiteContent(input: unknown): ValidationResult {
       ["id", "company", "team", "role", "period", "context", "ownership"].forEach((field) =>
         checkText(value[field], `internships[${index}].${field}`),
       );
-      checkStringArray(value.actions, `internships[${index}].actions`);
-      checkStringArray(value.results, `internships[${index}].results`);
-      checkStringArray(value.stack, `internships[${index}].stack`);
+      checkStringArray(value.actions, `internships[${index}].actions`, 1);
+      checkStringArray(value.results, `internships[${index}].results`, 1);
+      checkStringArray(value.stack, `internships[${index}].stack`, 1);
       if (typeof value.status !== "string" || !INTERNSHIP_STATUSES.has(value.status as Internship["status"])) {
         errors.push(`internships[${index}].status must be Shipped, Optimized, or Deployed`);
       }
@@ -194,10 +194,10 @@ export function validateSiteContent(input: unknown): ValidationResult {
       ["id", "title", "problem", "contribution", "result"].forEach((field) =>
         checkText(value[field], `caseStudies[${index}].${field}`),
       );
-      checkStringArray(value.constraints, `caseStudies[${index}].constraints`);
-      checkStringArray(value.decisions, `caseStudies[${index}].decisions`);
-      checkStringArray(value.tradeoffs, `caseStudies[${index}].tradeoffs`);
-      checkStringArray(value.stack, `caseStudies[${index}].stack`);
+      checkStringArray(value.constraints, `caseStudies[${index}].constraints`, 1);
+      checkStringArray(value.decisions, `caseStudies[${index}].decisions`, 1);
+      checkStringArray(value.tradeoffs, `caseStudies[${index}].tradeoffs`, 1);
+      checkStringArray(value.stack, `caseStudies[${index}].stack`, 1);
       if (!Array.isArray(value.links)) {
         errors.push(`caseStudies[${index}].links must be an array`);
       } else {

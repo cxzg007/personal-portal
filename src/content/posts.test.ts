@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { ComponentType } from "react";
 import { describe, expect, it } from "vitest";
 import {
@@ -153,6 +155,28 @@ describe("post loading", () => {
 
   it("indexes the repository's first public article", () => {
     expect(getAllPosts().map((post) => post.slug)).toContain("first-agent-system");
+  });
+
+  it("binds each Semantica PR number to its public link, topic, and snapshot status", () => {
+    const article = fs.readFileSync(
+      path.join(process.cwd(), "content/posts/first-agent-system.mdx"),
+      "utf8",
+    );
+    const expectedRows = [
+      ["已合并", "1081", "ContextGraph 标准适配器"],
+      ["已合并", "1094", "SHACL 真实约束解释"],
+      ["开放或审阅中", "1077", "RETE alpha/beta Token 模型"],
+      ["开放或审阅中", "1096", "规则 Action 与 provenance"],
+      ["开放或审阅中", "1113", "RDF name→label 规范化"],
+      ["开放或审阅中", "1143", "时间图指标"],
+      ["开放或审阅中", "1153", "决策模型契约"],
+    ] as const;
+
+    for (const [status, number, topic] of expectedRows) {
+      expect(article).toContain(
+        `| ${status} | [#${number}](https://github.com/semantica-agi/semantica/pull/${number}) | ${topic} |`,
+      );
+    }
   });
 
   it("returns null from the public reader for an unknown slug", async () => {

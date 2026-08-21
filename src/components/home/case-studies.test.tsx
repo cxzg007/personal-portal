@@ -45,6 +45,11 @@ describe("system case studies", () => {
       });
       const architectureNodes = within(architecture).getAllByRole("listitem");
       expect(architectureNodes).toHaveLength(3);
+      expect(architectureNodes.map((node) => node.getAttribute("data-chain-step"))).toEqual([
+        "1",
+        "2",
+        "3",
+      ]);
       expect(within(architectureNodes[0]).getByText("输入约束")).toBeVisible();
       expect(within(architectureNodes[1]).getByText("工程决策")).toBeVisible();
       expect(within(architectureNodes[2]).getByText("可验证结果")).toBeVisible();

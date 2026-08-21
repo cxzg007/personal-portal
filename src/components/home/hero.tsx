@@ -20,7 +20,7 @@ export function Hero({ profile }: HeroProps) {
         <p className="hero-positioning">{profile.positioning}</p>
 
         <ul aria-label="教育经历" className="education-summary">
-          {profile.education.map((education) => (
+          {profile.education.slice(0, 2).map((education) => (
             <li key={`${education.school}-${education.degree}-${education.graduationYear}`}>
               <span>{education.school}</span>
               <span aria-hidden="true">/</span>

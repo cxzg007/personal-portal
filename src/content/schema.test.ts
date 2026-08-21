@@ -33,6 +33,46 @@ describe("validateSiteContent", () => {
     });
   });
 
+  it.each(["actions", "results", "stack"] as const)(
+    "rejects an internship with an empty %s array",
+    (field) => {
+      const input = {
+        ...validSiteContent,
+        internships: [
+          { ...validSiteContent.internships[0], [field]: [] },
+          ...validSiteContent.internships.slice(1),
+        ],
+      };
+
+      expect(validateSiteContent(input)).toEqual({
+        ok: false,
+        errors: expect.arrayContaining([
+          `internships[0].${field} must contain at least 1 entry`,
+        ]),
+      });
+    },
+  );
+
+  it.each(["constraints", "decisions", "tradeoffs", "stack"] as const)(
+    "rejects a case study with an empty %s array",
+    (field) => {
+      const input = {
+        ...validSiteContent,
+        caseStudies: [
+          { ...validSiteContent.caseStudies[0], [field]: [] },
+          ...validSiteContent.caseStudies.slice(1),
+        ],
+      };
+
+      expect(validateSiteContent(input)).toEqual({
+        ok: false,
+        errors: expect.arrayContaining([
+          `caseStudies[0].${field} must contain at least 1 entry`,
+        ]),
+      });
+    },
+  );
+
   it("rejects a metric whose value is not a number", () => {
     const input = {
       ...validSiteContent,

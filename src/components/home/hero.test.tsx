@@ -41,6 +41,26 @@ describe("recruiting hero and navigation", () => {
     );
   });
 
+  it("limits the hero education summary to two rows", () => {
+    const thirdEducation = {
+      ...profile.education[0],
+      school: "不会显示的第三所学校",
+      graduationYear: 2030,
+    };
+
+    render(
+      <Hero
+        profile={{
+          ...profile,
+          education: [...profile.education, thirdEducation],
+        }}
+      />,
+    );
+
+    expect(screen.getByRole("list", { name: "教育经历" }).children).toHaveLength(2);
+    expect(screen.queryByText(thirdEducation.school)).not.toBeInTheDocument();
+  });
+
   it("uses the fixed navigation without an education destination", () => {
     render(<Header />);
 

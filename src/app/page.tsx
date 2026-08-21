@@ -4,6 +4,7 @@ import { FeaturedWriting } from "@/components/home/featured-writing";
 import { Hero } from "@/components/home/hero";
 import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { InternshipTimeline } from "@/components/home/internship-timeline";
+import { ScrollEnhancements } from "@/components/home/scroll-enhancements";
 import { Header } from "@/components/shell/header";
 import { Section } from "@/components/shell/section";
 import { loadSiteContent } from "@/content/load-site-content";
@@ -48,6 +49,7 @@ export default function HomePage() {
   return (
     <div className="page-shell">
       <Header />
+      <ScrollEnhancements />
       <main id="main-content" tabIndex={-1}>
         <script
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}

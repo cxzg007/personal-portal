@@ -76,21 +76,24 @@ export function CaseStudies({ caseStudies }: CaseStudiesProps) {
                 aria-label={`${caseStudy.title} 静态架构链路`}
                 className="architecture-flow"
               >
-                <li className="architecture-node">
+                <li className="architecture-node" data-chain-step="1">
                   <span>输入约束</span>
                   <p>{caseStudy.constraints[0]}</p>
                 </li>
                 <li aria-hidden="true" className="architecture-connector-item">
                   <ArchitectureConnector />
                 </li>
-                <li className="architecture-node architecture-node-primary">
+                <li
+                  className="architecture-node architecture-node-primary"
+                  data-chain-step="2"
+                >
                   <span>工程决策</span>
                   <p>{caseStudy.decisions[0]}</p>
                 </li>
                 <li aria-hidden="true" className="architecture-connector-item">
                   <ArchitectureConnector />
                 </li>
-                <li className="architecture-node">
+                <li className="architecture-node" data-chain-step="3">
                   <span>可验证结果</span>
                   <p>{caseStudy.result}</p>
                 </li>

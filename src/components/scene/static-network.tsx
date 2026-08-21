@@ -25,17 +25,22 @@ export function StaticNetwork() {
 
       <circle cx="320" cy="320" fill="none" r="248" stroke="#68d8ff" strokeDasharray="3 12" strokeOpacity="0.2" />
       <circle cx="320" cy="320" fill="none" r="172" stroke="#9c7cff" strokeOpacity="0.2" />
-      <g fill="none" stroke="url(#static-network-line)" strokeWidth="1.4">
+      <g
+        data-network-links="true"
+        fill="none"
+        stroke="url(#static-network-line)"
+        strokeWidth="1.4"
+      >
         <path d="M320 320 170 144 92 318 196 493 320 320 472 130 554 294 465 500 320 320" />
         <path d="M170 144 472 130M92 318 196 493M554 294 465 500" strokeOpacity="0.45" />
       </g>
       <g fill="#68d8ff">
-        <circle cx="170" cy="144" r="5" />
-        <circle cx="92" cy="318" r="4" />
-        <circle cx="196" cy="493" r="5" />
-        <circle cx="472" cy="130" r="4" />
-        <circle cx="554" cy="294" r="5" />
-        <circle cx="465" cy="500" fill="#9c7cff" r="5" />
+        <circle cx="170" cy="144" data-network-node="north-west" r="5" />
+        <circle cx="92" cy="318" data-network-node="west" r="4" />
+        <circle cx="196" cy="493" data-network-node="south-west" r="5" />
+        <circle cx="472" cy="130" data-network-node="north-east" r="4" />
+        <circle cx="554" cy="294" data-network-node="east" r="5" />
+        <circle cx="465" cy="500" data-network-node="south-east" fill="#9c7cff" r="5" />
       </g>
       <circle cx="320" cy="320" fill="#68d8ff" filter="url(#static-network-glow)" opacity="0.46" r="62" />
       <circle cx="320" cy="320" fill="url(#static-network-core)" r="54" />
