@@ -185,6 +185,10 @@ button {
   cursor: pointer;
 }
 
+.mobile-menu-shell {
+  display: none;
+}
+
 main {
   width: min(calc(100% - 3rem), var(--content-width));
   min-width: 0;
@@ -604,6 +608,7 @@ main {
 
   .mobile-menu-shell {
     position: absolute;
+    display: block;
     top: 0.5rem;
     right: 1rem;
     left: 1rem;

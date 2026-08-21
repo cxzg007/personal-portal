@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const navigation = [
   { label: "首页", href: "/#top" },
@@ -28,6 +28,38 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
+
+  const closeMenu = useCallback(() => {
+    setIsOpen(false);
+    menuToggleRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMenu();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [closeMenu, isOpen]);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+
+    const desktopBreakpoint = window.matchMedia("(min-width: 761px)");
+    const handleBreakpointChange = (event: MediaQueryListEvent) => {
+      if (event.matches) setIsOpen(false);
+    };
+
+    desktopBreakpoint.addEventListener("change", handleBreakpointChange);
+    return () => desktopBreakpoint.removeEventListener("change", handleBreakpointChange);
+  }, []);
 
   return (
     <header className="site-header" id="top">
@@ -47,6 +79,7 @@ export function Header() {
           aria-label="打开导航菜单"
           className="menu-toggle"
           onClick={() => setIsOpen(true)}
+          ref={menuToggleRef}
           type="button"
         >
           <span aria-hidden="true" />
@@ -61,14 +94,14 @@ export function Header() {
             <button
               aria-label="关闭导航菜单"
               className="menu-close"
-              onClick={() => setIsOpen(false)}
+              onClick={closeMenu}
               type="button"
             >
               <span aria-hidden="true">×</span>
             </button>
           </div>
           <nav aria-label="移动导航" id="mobile-navigation">
-            <NavigationLinks onNavigate={() => setIsOpen(false)} />
+            <NavigationLinks onNavigate={closeMenu} />
           </nav>
         </div>
       ) : null}

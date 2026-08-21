@@ -41,3 +41,22 @@ test("homepage navigation remains usable without horizontal overflow", async ({ 
   );
   expect(hasHorizontalOverflow).toBe(false);
 });
+
+test("mobile navigation resets cleanly across the desktop breakpoint", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  const menuToggle = page.getByRole("button", { name: "打开导航菜单" });
+  await menuToggle.click();
+  await expect(menuToggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("navigation", { name: "移动导航" })).toBeVisible();
+
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await expect(page.getByRole("navigation", { name: "主导航" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "移动导航" })).toBeHidden();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(menuToggle).toBeVisible();
+  await expect(menuToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByRole("navigation", { name: "移动导航" })).toHaveCount(0);
+});

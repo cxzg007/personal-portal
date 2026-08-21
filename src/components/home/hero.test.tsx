@@ -45,30 +45,45 @@ describe("recruiting hero and navigation", () => {
     render(<Header />);
 
     const navigation = screen.getByRole("navigation", { name: "主导航" });
-    expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual([
-      "首页",
-      "实习",
-      "系统设计",
-      "博客",
-      "关于",
-      "简历",
+    expect(
+      within(navigation)
+        .getAllByRole("link")
+        .map((link) => [link.textContent, link.getAttribute("href")]),
+    ).toEqual([
+      ["首页", "/#top"],
+      ["实习", "/#internships"],
+      ["系统设计", "/#case-studies"],
+      ["博客", "/blog"],
+      ["关于", "/#about"],
+      ["简历", "/resume.pdf"],
     ]);
     expect(screen.queryByRole("link", { name: "教育" })).not.toBeInTheDocument();
   });
 
-  it("exposes an accessible, closeable mobile menu", async () => {
+  it("restores trigger focus when the mobile menu closes", async () => {
     const user = userEvent.setup();
     render(<Header />);
 
     const toggle = screen.getByRole("button", { name: "打开导航菜单" });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
-    await user.click(toggle);
+    toggle.focus();
+    await user.keyboard("{Enter}");
     expect(toggle).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByRole("navigation", { name: "移动导航" })).toBeVisible();
 
-    await user.click(screen.getByRole("button", { name: "关闭导航菜单" }));
+    await user.tab();
+    expect(screen.getByRole("button", { name: "关闭导航菜单" })).toHaveFocus();
+    await user.keyboard("{Enter}");
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("navigation", { name: "移动导航" })).not.toBeInTheDocument();
+    expect(toggle).toHaveFocus();
+
+    await user.keyboard("{Enter}");
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await user.keyboard("{Escape}");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("navigation", { name: "移动导航" })).not.toBeInTheDocument();
+    expect(toggle).toHaveFocus();
   });
 });
