@@ -1,0 +1,270 @@
+{
+  "profile": {
+    "name": "江俊杰",
+    "technicalId": "cxzg007",
+    "targetRole": "AI Agent / 后端开发",
+    "positioning": "具备本体语义层、Agent 执行链路、流式回放与知识图谱系统实习经验，关注可靠 AI 应用与后端系统设计。",
+    "recruitingStatus": "2027 届校招｜AI Agent / 后端开发",
+    "education": [
+      {
+        "school": "同济大学电子与信息工程学院",
+        "major": "电子信息",
+        "degree": "硕士（推免）",
+        "graduationYear": 2027,
+        "highlights": [
+          "推免",
+          "研究方向为多无人机场景通感一体化（ISAC）联合优化。"
+        ]
+      },
+      {
+        "school": "同济大学电子与信息工程学院",
+        "major": "通信工程",
+        "degree": "本科",
+        "graduationYear": 2024,
+        "highlights": [
+          "排名 12/62",
+          "国家励志奖学金",
+          "大唐杯上海市二等奖"
+        ]
+      }
+    ],
+    "email": "jiangjunjie_tj@foxmail.com",
+    "github": "https://github.com/cxzg007"
+  },
+  "metrics": [
+    {
+      "label": "实习经历",
+      "value": 3,
+      "suffix": "段",
+      "evidence": "简历列出京东、智元机器人、中国船舶集团 722 研究所三段实习。"
+    },
+    {
+      "label": "Semantica PR",
+      "value": 7,
+      "suffix": "个",
+      "evidence": "GitHub authenticated-user repository query on 2026-08-21 returned PR #1077、#1081、#1094、#1096、#1113、#1143、#1153；其中 #1081、#1094 已合并。"
+    },
+    {
+      "label": "本科专业排名",
+      "value": 12,
+      "suffix": "/62",
+      "evidence": "简历教育背景。"
+    },
+    {
+      "label": "V2X 方案性能",
+      "value": 90,
+      "suffix": "%",
+      "evidence": "简历科研经历称所提 GNN-D3QN 方案平均性能达到最优方案约 90%，随机方案约 60%。"
+    }
+  ],
+  "internships": [
+    {
+      "id": "jd-ontology-platform",
+      "company": "京东",
+      "team": "AI 数据智能平台",
+      "role": "后端开发实习生",
+      "period": "2026-07 – 至今",
+      "context": "面向内部数据分析与业务自动化场景，建设以本体语义层为核心的 AI 数据智能平台，为 LLM 和 Agent 提供统一语义上下文与可控业务执行链路。",
+      "actions": [
+        "建设业务实体、属性、关系与物理表字段的映射治理，完善绑定校验、失效检测、Schema 同步、反向引用与绑定修正。",
+        "将字符串 JOIN 条件改造为结构化 joinKeys，设计内存 OntologyGraph，并基于 BFS 推导跨实体最短关联路径。",
+        "通过实体相关性评分和 TopK 召回筛选 LLM 查询上下文，生成语义 SQL 后由确定性映射转换为物理 SQL。",
+        "参与“场景理解—本体匹配—规则生成—Action 编排—预览确认—发布调度”链路，设计规则输出 Schema 编译与版本化。",
+        "引入 Caffeine 域级缓存与主动失效，治理本体查询 N+1 和规则重复编译。"
+      ],
+      "results": [
+        "形成“建立—校验—同步—修正”的本体绑定生命周期。",
+        "将语义查询从单跳关系扩展到多跳 JOIN，并支持关系变更后的失效与重建。",
+        "通过确定性字段校验、类型转换、SQL 构建和批量写入控制 AI 直接操作业务数据的风险。"
+      ],
+      "ownership": "负责本体映射治理、多跳关系推导和查询性能治理，并参与 Agent 规则执行链路建设。",
+      "stack": [
+        "Java",
+        "Spring Boot",
+        "Spring Data JPA",
+        "MySQL",
+        "Caffeine",
+        "LLM",
+        "NL2SQL",
+        "Ontology",
+        "规则引擎"
+      ],
+      "status": "Shipped"
+    },
+    {
+      "id": "agibot-agent",
+      "company": "智元机器人",
+      "team": "机器人 Agent",
+      "role": "机器人 Agent 开发实习生",
+      "period": "2026-06 – 2026-07",
+      "context": "参与机器人多传感器数据回放，以及面向企业 AI Agent 的知识检索和长期记忆管理系统建设。",
+      "actions": [
+        "为 clip-player 建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制和共享会话。",
+        "设计本地持久化、远端 IndexedReader 与 S3 RangeReader 三级读取链路，加入 tail cache、顺序读窗口和 singleflight 去重。",
+        "使用虚拟时钟和原子世代计数器实现播放状态一致性，修复 bufio.Writer 并发 data race，并通过有界队列和慢消费者隔离保障稳定性。",
+        "为 agibot_retriever 设计“SQL 精确匹配—向量 TopK—LLM 消歧”三级实体去重和 Redis 分布式锁创建临界区。",
+        "通过 MySQL CAS 状态机、dead-letter、异步补偿和 Reaper 实现幂等抽取与故障自愈。",
+        "通过关系合法集、latest-wins、跨 Chunk 滚动上下文和文档锚点增强知识图谱连通性。"
+      ],
+      "results": [
+        "将 MCAP 解析、转码和错误处理收敛到服务端，并提供功能对等的 HTTP 与 WebSocket 回放通道。",
+        "降低对象存储往返和重复解析开销，隔离高并发下的慢消费者与写入竞争。",
+        "建立跨 MySQL、Milvus、Redis 的实体一致性和可恢复知识抽取链路。"
+      ],
+      "ownership": "负责流式回放后端的读取、会话与并发稳定性设计，并承担知识图谱实体去重、幂等任务和关系约束模块。",
+      "stack": [
+        "Go",
+        "Python",
+        "GoFrame",
+        "FastAPI",
+        "MySQL",
+        "Redis",
+        "Milvus",
+        "S3/TOS",
+        "Docker",
+        "K8s"
+      ],
+      "status": "Shipped"
+    },
+    {
+      "id": "cssc-722",
+      "company": "中国船舶集团 722 研究所",
+      "team": "总体部",
+      "role": "算法实习生",
+      "period": "2025-07 – 2026-05",
+      "context": "面向海上通信节点组建、节点受损后的快速恢复和大规模无人机集群通信方案论证。",
+      "actions": [
+        "围绕链路建立、波束匹配、网络重构与通信恢复开展算法设计。",
+        "开发仿真脚本，评估通信建立成功率、恢复时延与链路稳定性。",
+        "参与研究所与高校合作项目论证，负责无人机集群智能通信方案设计和技术文档编写。"
+      ],
+      "results": [
+        "完成通信网络重构算法验证、结果整理和项目交付。",
+        "完成工程问题抽象与大规模无人机集群通信算法路径梳理。"
+      ],
+      "ownership": "负责算法建模、仿真验证、结果整理与方案文档。",
+      "stack": [
+        "Python",
+        "MATLAB",
+        "无线通信仿真",
+        "算法建模"
+      ],
+      "status": "Deployed"
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "ontology-agent-platform",
+      "title": "本体驱动的 Agent 数据智能平台",
+      "problem": "LLM 缺乏稳定的业务语义上下文，直接面向物理表生成 SQL 容易产生字段幻觉，并难以安全执行和回写业务动作。",
+      "constraints": [
+        "物理 Schema 持续变化",
+        "实体关系存在多跳连接",
+        "AI 输出不可信",
+        "规则需要版本兼容",
+        "查询和编译存在重复开销"
+      ],
+      "decisions": [
+        "用本体语义层隔离业务概念与物理数据模型。",
+        "用 OntologyGraph + BFS 推导多跳关联路径。",
+        "用相关性评分与 TopK 控制 LLM 上下文，再通过确定性映射生成物理 SQL。",
+        "对规则输出进行 Schema 编译、版本化和确定性回写。"
+      ],
+      "tradeoffs": [
+        "将部分灵活性收敛到受控语义模型和规则 Schema，以换取可验证性、兼容性和业务数据安全。"
+      ],
+      "contribution": "负责本体映射治理、多跳关系推导、缓存与失效治理，并参与 Agent 执行链路设计。",
+      "result": "形成可校验、可同步、可修正的本体生命周期，以及受控的 Agent 业务执行链路。",
+      "stack": [
+        "Java",
+        "Spring Boot",
+        "MySQL",
+        "Caffeine",
+        "LLM",
+        "NL2SQL",
+        "Ontology"
+      ],
+      "links": []
+    },
+    {
+      "id": "clip-player",
+      "title": "机器人多传感器数据流式回放平台",
+      "problem": "MCAP 录制数据体量大，在线检索困难，多人协同分析时需要可靠的 seek、播放控制和共享会话。",
+      "constraints": [
+        "对象存储随机读取成本高",
+        "HTTP 与 WebSocket 需功能对等",
+        "并发 seek 和慢消费者会破坏会话一致性",
+        "服务端存在共享写入竞争"
+      ],
+      "decisions": [
+        "复用同一 MCAP 解码与流式写入内核，提供 HTTP 分段流和 WebSocket 双通道。",
+        "设计本地、IndexedReader、S3 RangeReader 三级读取链路和自适应缓存。",
+        "使用虚拟时钟、原子世代计数器、请求取消和 requestId 过滤管理播放状态。",
+        "以有界队列、并发信号量和慢消费者隔离控制资源。"
+      ],
+      "tradeoffs": [
+        "增加服务端状态与缓存复杂度，以降低客户端复杂度、对象存储往返和多人协作时的不一致。"
+      ],
+      "contribution": "负责读取链路、双通道回放、会话控制、并发安全与稳定性治理。",
+      "result": "支持任意时间点 seek、播放控制和多视图共享会话，并修复主写入链路 data race。",
+      "stack": [
+        "Go",
+        "MCAP",
+        "HTTP",
+        "WebSocket",
+        "S3/TOS",
+        "Docker",
+        "K8s"
+      ],
+      "links": []
+    },
+    {
+      "id": "semantica-open-source",
+      "title": "Semantica 知识图谱与推理基础设施开源贡献",
+      "problem": "项目中的知识图谱导出、上下文图适配、SHACL 解释、时间稳定性和规则推理存在缺失能力或边界缺陷。",
+      "constraints": [
+        "需要保持序列化兼容和既有调用行为",
+        "可选依赖可能不存在",
+        "推理与图结构修改需要回归测试覆盖"
+      ],
+      "decisions": [
+        "通过正式 to_kg_dict() 适配器统一 ContextGraph 与下游 RDF/时间查询的数据形状。",
+        "从 sh:sourceShape 回溯真实 SHACL 约束值，替代硬编码解释。",
+        "为时间稳定性使用真实有效期时长，并跳过无界区间。",
+        "使用 InitVar 修复 decision model 的 auto_generate_id 不可达分支。",
+        "为规则推理增加结构化 Action 与 provenance，并为 RETE 匹配补齐 Token 传播和多条件连接。"
+      ],
+      "tradeoffs": [
+        "以显式适配器和更严格的数据契约增加少量维护成本，换取跨模块一致性、向后兼容和可测试性。"
+      ],
+      "contribution": "以 GitHub 用户 cxzg007 向 semantica-agi/semantica 提交 7 个 PR；截至 2026-08-21，#1081 与 #1094 已合并，其余处于审阅或开放状态。",
+      "result": "已合并 ContextGraph 标准适配器与 SHACL 真实约束解释修复；其他贡献覆盖 RDF 导出、规则 Action、RETE、时间图指标和决策模型契约。",
+      "stack": [
+        "Python",
+        "Knowledge Graph",
+        "RDF",
+        "SHACL",
+        "RETE",
+        "pytest"
+      ],
+      "links": [
+        {
+          "label": "GitHub repository",
+          "url": "https://github.com/semantica-agi/semantica"
+        },
+        {
+          "label": "PR #1081",
+          "url": "https://github.com/semantica-agi/semantica/pull/1081"
+        },
+        {
+          "label": "PR #1094",
+          "url": "https://github.com/semantica-agi/semantica/pull/1094"
+        }
+      ]
+    }
+  ],
+  "about": [
+    "同济大学电子信息硕士，研究方向为多无人机场景通感一体化联合优化，具备强化学习、无线资源分配与系统级仿真背景。",
+    "实习与开源工作聚焦可靠 AI 应用和后端系统设计，覆盖本体语义层、Agent 执行链路、知识图谱、流式数据处理、跨存储一致性和故障恢复。"
+  ]
+}
