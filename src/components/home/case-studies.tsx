@@ -72,32 +72,29 @@ export function CaseStudies({ caseStudies }: CaseStudiesProps) {
 
             <section className="architecture-section">
               <h4>架构链路</h4>
-              <div
+              <ol
                 aria-label={`${caseStudy.title} 静态架构链路`}
-                className="architecture-diagram"
-                role="img"
+                className="architecture-flow"
               >
-                <ol className="architecture-flow">
-                  <li className="architecture-node">
-                    <span>输入约束</span>
-                    <p>{caseStudy.constraints[0]}</p>
-                  </li>
-                  <li aria-hidden="true" className="architecture-connector-item">
-                    <ArchitectureConnector />
-                  </li>
-                  <li className="architecture-node architecture-node-primary">
-                    <span>工程决策</span>
-                    <p>{caseStudy.decisions[0]}</p>
-                  </li>
-                  <li aria-hidden="true" className="architecture-connector-item">
-                    <ArchitectureConnector />
-                  </li>
-                  <li className="architecture-node">
-                    <span>可验证结果</span>
-                    <p>{caseStudy.result}</p>
-                  </li>
-                </ol>
-              </div>
+                <li className="architecture-node">
+                  <span>输入约束</span>
+                  <p>{caseStudy.constraints[0]}</p>
+                </li>
+                <li aria-hidden="true" className="architecture-connector-item">
+                  <ArchitectureConnector />
+                </li>
+                <li className="architecture-node architecture-node-primary">
+                  <span>工程决策</span>
+                  <p>{caseStudy.decisions[0]}</p>
+                </li>
+                <li aria-hidden="true" className="architecture-connector-item">
+                  <ArchitectureConnector />
+                </li>
+                <li className="architecture-node">
+                  <span>可验证结果</span>
+                  <p>{caseStudy.result}</p>
+                </li>
+              </ol>
             </section>
 
             {caseStudy.links.length > 0 ? (

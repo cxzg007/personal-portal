@@ -40,13 +40,14 @@ describe("system case studies", () => {
         expect(within(article).getByText(tradeoff)).toBeVisible();
       });
 
-      const architecture = within(article).getByRole("img", {
+      const architecture = within(article).getByRole("list", {
         name: `${caseStudy.title} 静态架构链路`,
       });
-      expect(within(architecture).getByText("输入约束")).toBeVisible();
-      expect(within(architecture).getByText("工程决策")).toBeVisible();
-      expect(within(architecture).getByText("可验证结果")).toBeVisible();
-      expect(architecture.querySelectorAll("ol > li.architecture-node")).toHaveLength(3);
+      const architectureNodes = within(architecture).getAllByRole("listitem");
+      expect(architectureNodes).toHaveLength(3);
+      expect(within(architectureNodes[0]).getByText("输入约束")).toBeVisible();
+      expect(within(architectureNodes[1]).getByText("工程决策")).toBeVisible();
+      expect(within(architectureNodes[2]).getByText("可验证结果")).toBeVisible();
       expect(architecture.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(2);
     });
   });

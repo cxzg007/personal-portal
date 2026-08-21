@@ -35,20 +35,29 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(internships.getByText("智元机器人", { exact: true })).toBeVisible();
   await expect(internships.getByText("中国船舶集团 722 研究所", { exact: true })).toBeVisible();
 
-  const firstToggle = internshipArticles.first().getByRole("button", { name: "查看技术细节" });
-  for (let step = 0; step < 20; step += 1) {
-    if (await firstToggle.evaluate((button) => document.activeElement === button)) break;
-    await page.keyboard.press("Tab");
+  const internshipToggles = internships.getByRole("button", { name: "查看技术细节" });
+  await expect(internshipToggles).toHaveCount(3);
+
+  for (let index = 0; index < 3; index += 1) {
+    const toggle = internshipToggles.nth(index);
+    for (let step = 0; step < 20; step += 1) {
+      if (await toggle.evaluate((button) => document.activeElement === button)) break;
+      await page.keyboard.press("Tab");
+    }
+    await expect(toggle).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+
+    if (index === 0) {
+      await expect(internshipArticles.first().getByRole("heading", { name: "业务背景" })).toBeVisible();
+      await expect(internshipArticles.first().getByRole("heading", { name: "关键行动" })).toBeVisible();
+      await expect(internshipArticles.first().getByRole("heading", { name: "个人贡献" })).toBeVisible();
+      await expect(internshipArticles.first().getByRole("heading", { name: "交付结果" })).toBeVisible();
+    }
+
+    await page.keyboard.press("Space");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
   }
-  await expect(firstToggle).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(firstToggle).toHaveAttribute("aria-expanded", "true");
-  await expect(internshipArticles.first().getByRole("heading", { name: "业务背景" })).toBeVisible();
-  await expect(internshipArticles.first().getByRole("heading", { name: "关键行动" })).toBeVisible();
-  await expect(internshipArticles.first().getByRole("heading", { name: "个人贡献" })).toBeVisible();
-  await expect(internshipArticles.first().getByRole("heading", { name: "交付结果" })).toBeVisible();
-  await page.keyboard.press("Space");
-  await expect(firstToggle).toHaveAttribute("aria-expanded", "false");
 
   const cases = page.locator("#case-studies");
   await expect(cases.getByRole("article")).toHaveCount(3);
