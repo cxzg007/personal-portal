@@ -6,9 +6,9 @@
 
 ## 环境合同
 
-- Node.js `>=20.9.0`。Vercel 当前可选择的 20.x、22.x、24.x 均满足项目最低要求；部署时在构建日志确认实际版本。
+- Node.js `^22.22.2 || ^24.15.0 || >=26.0.0`。这是当前锁文件中最严格的运行时交集：`jsdom@30.0.1` 要求 Node 22.22.2+、24.15.0+ 或 26+；Vite 等工具的 22.12/22.13 要求已被它覆盖。Vercel 当前推荐选择 24.x，并在构建日志确认实际版本至少为 24.15.0。
 - pnpm `10.34.5`，由 `package.json#packageManager` 固定。`pnpm-lock.yaml` 必须随依赖变化一起提交。
-- 唯一必需的生产环境变量是 `NEXT_PUBLIC_SITE_URL`。
+- 应用唯一必需的公开生产变量是 `NEXT_PUBLIC_SITE_URL`。Vercel 构建还必须在 Preview 和 Production 中设置 `ENABLE_EXPERIMENTAL_COREPACK=1`，让平台按 `packageManager` 使用精确的 pnpm 10.34.5。
 
 `.env.example` 中的 `https://portfolio.example.com` **仅是非生产格式示例**，不是站点默认值，也不能直接用于真实部署。生产值必须是最终公开站点的 HTTPS Origin：只包含协议、域名和可选端口，不包含路径、查询参数或片段，例如 `https://name.example.com`。
 
@@ -148,11 +148,12 @@ pnpm test:e2e -- tests/e2e/visual.spec.ts --update-snapshots
 
 1. 把功能分支合并到准备作为 Production Branch 的 Git 分支，并推送远端。
 2. 在 Vercel Dashboard 选择 **Add New → Project**，授权 Git 提供商并导入该仓库。
-3. 确认 Framework Preset 为 **Next.js**、Root Directory 为仓库根目录。保留 Install Command 与 Build Command 的自动检测；Vercel 会从 `pnpm-lock.yaml` 和 `packageManager` 识别 pnpm，项目构建脚本为 `pnpm build`。若必须手动覆盖，Install Command 使用 `pnpm install --frozen-lockfile`，Build Command 使用 `pnpm build`。
-4. 在 **Settings → Build and Deployment** 确认 Node.js 为当前受支持且满足 `>=20.9.0` 的版本（当前推荐 24.x），并在构建日志核对 Node 与 pnpm 实际版本。
-5. 在 **Settings → Environment Variables** 为 Preview 和 Production 都配置 `NEXT_PUBLIC_SITE_URL`。它是 canonical Origin，两个环境应先使用项目稳定的生产 Origin（如 Vercel 分配的 `https://project.vercel.app`），不要使用 `.env.example` 的占位域名，也不要使用带路径的 URL。
-6. 推送非生产分支创建 Preview Deployment。检查构建日志，并在 Preview URL 完成下方验收；Preview URL 用于访问测试，页面 canonical 仍指向配置的稳定 Origin。
-7. Preview 通过后合并到 Production Branch 触发 Production Deployment。发布前再次确认 Production 环境变量，并检查生产构建日志与公开 URL。
+3. 确认 Framework Preset 为 **Next.js**、Root Directory 为仓库根目录。Install Command 和 Build Command 都保留自动检测，不填写手工 Install Command；Vercel 应从 `pnpm-lock.yaml` 和 `packageManager` 识别 pnpm，项目构建脚本为 `pnpm build`。
+4. 在 **Settings → Build and Deployment** 选择 Node.js 24.x。当前锁定依赖要求 24.15.0+（或 22.22.2+、26+），因此部署日志必须显示满足 `^22.22.2 || ^24.15.0 || >=26.0.0` 的实际 Node 版本。
+5. 在 **Settings → Environment Variables** 为 Preview 和 Production 都配置 `ENABLE_EXPERIMENTAL_COREPACK=1`；否则 `packageManager` 字段本身不保证 Vercel 使用精确 pnpm 版本。构建日志必须显示 `pnpm 10.34.5`，不一致时停止发布并检查 Corepack 变量和自动安装设置。
+6. 同样为 Preview 和 Production 配置 `NEXT_PUBLIC_SITE_URL`。它是 canonical Origin，两个环境应先使用项目稳定的生产 Origin（如 Vercel 分配的 `https://project.vercel.app`），不要使用 `.env.example` 的占位域名，也不要使用带路径的 URL。
+7. 推送非生产分支创建 Preview Deployment。检查构建日志，并在 Preview URL 完成下方验收；Preview URL 用于访问测试，页面 canonical 仍指向配置的稳定 Origin。
+8. Preview 通过后合并到 Production Branch 触发 Production Deployment。发布前再次确认 Production 环境变量，并检查生产构建日志与公开 URL。
 
 首次导入前应先在本地运行完整门禁。Vercel 环境变量的修改只影响后续部署，修改后要 Redeploy；不要把 `.env.local`、Vercel token 或 `.vercel/` 项目标识提交到仓库。
 
