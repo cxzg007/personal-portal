@@ -23,6 +23,7 @@
     "react": "latest",
     "react-dom": "latest",
     "rehype-slug": "latest",
+    "remark-frontmatter": "latest",
     "remark-gfm": "latest",
     "three": "latest"
   },
