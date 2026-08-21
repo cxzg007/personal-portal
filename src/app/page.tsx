@@ -48,7 +48,7 @@ export default function HomePage() {
   return (
     <div className="page-shell">
       <Header />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <script
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
           type="application/ld+json"

@@ -34,7 +34,7 @@ export default function BlogPage() {
   return (
     <div className="page-shell blog-page-shell">
       <Header />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <header className="blog-hero">
           <p className="eyebrow">ENGINEERING NOTES / {posts.length.toString().padStart(2, "0")}</p>
           <h1>技术博客</h1>
