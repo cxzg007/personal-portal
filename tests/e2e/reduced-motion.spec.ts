@@ -8,7 +8,8 @@ test("uses the static scene without hiding core hero content", async ({
 
   await expect(page.getByTestId("static-network")).toBeVisible();
   await expect(page.locator("canvas")).toHaveCount(0);
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+  await expect(page.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute(
     "data-scroll-enhancement",
     "disabled",
@@ -51,5 +52,5 @@ test("uses the lite scene on a narrow viewport", async ({ page }) => {
     "data-scene-mode",
     "lite",
   );
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
 });

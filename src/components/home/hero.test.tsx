@@ -15,7 +15,9 @@ describe("recruiting hero and navigation", () => {
   it("renders verified identity, education, contact details, and primary actions", () => {
     render(<Hero profile={profile} />);
 
-    expect(screen.getByRole("heading", { level: 1, name: profile.name })).toBeVisible();
+    expect(screen.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+    expect(screen.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
+    expect(screen.getByRole("region", { name: "江俊杰" })).toBeVisible();
     expect(screen.getByText(profile.targetRole)).toBeVisible();
     expect(screen.getByText(profile.recruitingStatus)).toBeVisible();
 

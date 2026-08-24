@@ -7,7 +7,7 @@ type HeroProps = {
 
 export function Hero({ profile }: HeroProps) {
   return (
-    <section aria-labelledby="hero-heading" className="hero">
+    <section aria-label={profile.name} className="hero">
       <div className="hero-copy">
         <div className="availability-badge">
           <span aria-hidden="true" className="availability-dot" />
@@ -15,7 +15,8 @@ export function Hero({ profile }: HeroProps) {
         </div>
 
         <p className="hero-kicker">BUILDING RELIABLE AGENT SYSTEMS</p>
-        <h1 id="hero-heading">{profile.name}</h1>
+        <h1>{profile.technicalId ?? profile.name}</h1>
+        <p className="hero-real-name">{profile.name} / Jiang Junjie</p>
         <p className="hero-role">{profile.targetRole}</p>
         <p className="hero-positioning">{profile.positioning}</p>
 

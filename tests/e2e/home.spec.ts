@@ -5,7 +5,8 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
 
   const hero = page.getByRole("region", { name: "江俊杰" });
 
-  await expect(page.getByRole("heading", { level: 1, name: "江俊杰" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+  await expect(hero.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
   await expect(hero.getByText("AI Agent / 后端开发", { exact: true })).toBeVisible();
   await expect(hero.getByText("2027 届校招｜AI Agent / 后端开发")).toBeVisible();
   await expect(hero.getByText("电子信息", { exact: true })).toBeVisible();

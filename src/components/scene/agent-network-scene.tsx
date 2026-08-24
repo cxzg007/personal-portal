@@ -117,14 +117,14 @@ export function AgentNetworkScene({
       <ScenePerformanceMonitor onPerformanceDecline={onPerformanceDecline} />
       <group ref={groupRef} rotation={[0.08, -0.2, -0.08]}>
         <ambientLight intensity={0.55} />
-        <pointLight color="#68d8ff" intensity={14} position={[1.8, 2.4, 3]} />
-        <pointLight color="#9c7cff" intensity={8} position={[-2.5, -1.2, 1]} />
+        <pointLight color="#ffb457" intensity={14} position={[1.8, 2.4, 3]} />
+        <pointLight color="#ff7a59" intensity={8} position={[-2.5, -1.2, 1]} />
 
         <lineSegments>
           <bufferGeometry>
             <bufferAttribute args={[lines, 3]} attach="attributes-position" />
           </bufferGeometry>
-          <lineBasicMaterial color="#68d8ff" opacity={0.23} transparent />
+          <lineBasicMaterial color="#ffb457" opacity={0.23} transparent />
         </lineSegments>
 
         {nodes.map((position, index) => (
@@ -133,8 +133,8 @@ export function AgentNetworkScene({
               args={[index === 0 ? 0.22 : index % 7 === 0 ? 0.09 : 0.055, 10, 10]}
             />
             <meshStandardMaterial
-              color={index % 7 === 0 ? "#9c7cff" : "#68d8ff"}
-              emissive={index === 0 ? "#68d8ff" : "#223e55"}
+              color={index % 7 === 0 ? "#ff7a59" : "#ffb457"}
+              emissive={index === 0 ? "#fff2dd" : "#4b2d1b"}
               emissiveIntensity={index === 0 ? 1.2 : 0.55}
               roughness={0.38}
             />
@@ -145,7 +145,7 @@ export function AgentNetworkScene({
           <bufferGeometry>
             <bufferAttribute args={[particles, 3]} attach="attributes-position" />
           </bufferGeometry>
-          <pointsMaterial color="#d9f7ff" opacity={0.48} size={0.025} transparent />
+          <pointsMaterial color="#fff2dd" opacity={0.48} size={0.025} transparent />
         </points>
       </group>
     </>
