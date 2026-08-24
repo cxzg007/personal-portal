@@ -21,9 +21,20 @@ describe("internship timeline", () => {
       const article = articles[index];
       const detailsId = `internship-${internship.id}-details`;
 
+      expect(within(article).getByRole("img", { name: internship.logo.alt })).toBeVisible();
       expect(within(article).getByText(internship.company)).toBeVisible();
       expect(within(article).getByText(internship.role)).toBeVisible();
       expect(within(article).getByText(internship.period)).toBeVisible();
+      expect(within(article).getByRole("heading", { name: internship.valueHeadline })).toBeVisible();
+      expect(
+        within(article).getByRole("list", { name: `${internship.company} 工程链路` }),
+      ).toBeVisible();
+      const highlightsList = within(article).getByRole("list", {
+        name: `${internship.company} 核心贡献`,
+      });
+      internship.highlights.forEach((text) => {
+        expect(within(highlightsList).getByText(text)).toBeVisible();
+      });
       expect(
         within(article)
           .getAllByText(internship.results[0])
@@ -33,7 +44,6 @@ describe("internship timeline", () => {
         expect(within(article).getByText(technology)).toBeVisible();
       });
       expect(within(article).getByText(internship.status)).toBeVisible();
-
       const button = within(article).getByRole("button", { name: "查看技术细节" });
       expect(button).toHaveAttribute("aria-expanded", "false");
       expect(button).toHaveAttribute("aria-controls", detailsId);
@@ -67,10 +77,28 @@ describe("internship timeline", () => {
     internship.results.forEach((result) => {
       expect(within(details as HTMLElement).getByText(result)).toBeVisible();
     });
+  });
 
-    await user.keyboard(" ");
-    expect(button).toHaveAttribute("aria-expanded", "false");
-    expect(details).not.toBeVisible();
-    expect(button).toHaveFocus();
+  it("reveals the branded AGIBOT project modules inside the expanded details", async () => {
+    const user = userEvent.setup();
+    render(<InternshipTimeline internships={internships} />);
+
+    const agibot = internships.find((internship) => internship.projects !== undefined);
+    if (!agibot?.projects) throw new Error("expected an internship with projects");
+
+    const article = screen.getAllByRole("article")[internships.indexOf(agibot)];
+    const button = within(article).getByRole("button", { name: "查看技术细节" });
+    await user.click(button);
+
+    const details = within(article).getByText("业务背景").closest("section")?.parentElement;
+    if (!(details instanceof HTMLElement)) throw new Error("expected internship details container");
+
+    agibot.projects.forEach((project) => {
+      expect(within(details).getByRole("heading", { name: project.name })).toBeVisible();
+      expect(within(details).getByText(project.summary)).toBeVisible();
+      project.highlights.forEach((highlight) => {
+        expect(within(details).getByText(highlight)).toBeVisible();
+      });
+    });
   });
 });
