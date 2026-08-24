@@ -2764,3 +2764,82 @@ html[data-scroll-enhancement="enabled"]
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Staged warm brand narrative: default SSR and html[data-brand-motion="static"]
+   render complete static content; stage transitions apply only under
+   html[data-brand-motion="enhanced"]. */
+
+html[data-brand-motion="enhanced"] .internship-card .internship-brand-header,
+html[data-brand-motion="enhanced"] .internship-card .engineering-journey,
+html[data-brand-motion="enhanced"] .internship-card .internship-highlights {
+  transition:
+    opacity 480ms ease,
+    transform 480ms ease;
+}
+
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="0"] .internship-brand-header,
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="0"] .engineering-journey,
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="0"] .internship-highlights {
+  opacity: 0.72;
+  transform: translateY(12px);
+}
+
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="1"] .internship-brand-header,
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="2"] .internship-brand-header,
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="2"] .engineering-journey,
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="3"] .internship-brand-header,
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="3"] .engineering-journey,
+html[data-brand-motion="enhanced"] .internship-card[data-story-stage="3"] .internship-highlights {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html[data-brand-motion="enhanced"] .metric-card .metric-value {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 420ms ease,
+    transform 420ms ease;
+}
+
+html[data-brand-motion="enhanced"] .metric-card[data-metric-visible="true"] .metric-value {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html[data-brand-motion="enhanced"] .open-source-spotlight .open-source-graph-node {
+  opacity: 0.55;
+  transform: translateY(8px);
+  transition:
+    opacity 420ms ease,
+    transform 420ms ease;
+}
+
+html[data-brand-motion="enhanced"] .open-source-spotlight[data-open-source-stage="1"] .open-source-graph-node:nth-child(-n + 2),
+html[data-brand-motion="enhanced"] .open-source-spotlight[data-open-source-stage="2"] .open-source-graph-node:nth-child(-n + 3),
+html[data-brand-motion="enhanced"] .open-source-spotlight[data-open-source-stage="3"] .open-source-graph-node {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html[data-brand-motion="static"] .internship-card .internship-brand-header,
+html[data-brand-motion="static"] .internship-card .engineering-journey,
+html[data-brand-motion="static"] .internship-card .internship-highlights,
+html[data-brand-motion="static"] .metric-card .metric-value,
+html[data-brand-motion="static"] .open-source-spotlight .open-source-graph-node {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce), (max-width: 760px) {
+  .internship-card .internship-brand-header,
+  .internship-card .engineering-journey,
+  .internship-card .internship-highlights,
+  .metric-card .metric-value,
+  .open-source-spotlight .open-source-graph-node {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
