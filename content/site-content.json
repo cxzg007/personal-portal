@@ -64,6 +64,18 @@
       "team": "AI 数据智能平台",
       "role": "后端开发实习生",
       "period": "2026-07 – 至今",
+      "logo": { "src": "/brands/jd.png", "alt": "京东品牌标志", "theme": "jd" },
+      "valueHeadline": "建设本体驱动的数据智能与 Agent 执行链路",
+      "journey": [
+        { "label": "语义治理", "detail": "建立业务实体、关系与物理字段的可校验映射。" },
+        { "label": "查询推导", "detail": "通过 OntologyGraph、BFS 与 TopK 生成受控语义查询。" },
+        { "label": "安全执行", "detail": "以规则 Schema、确定性映射和批量写入约束业务动作。" }
+      ],
+      "highlights": [
+        "形成“建立—校验—同步—修正”的本体绑定生命周期。",
+        "将语义查询从单跳关系扩展到多跳 JOIN，并支持关系变更后的失效与重建。",
+        "通过确定性字段校验、类型转换、SQL 构建和批量写入控制 AI 直接操作业务数据的风险。"
+      ],
       "context": "面向内部数据分析与业务自动化场景，建设以本体语义层为核心的 AI 数据智能平台，为 LLM 和 Agent 提供统一语义上下文与可控业务执行链路。",
       "actions": [
         "建设业务实体、属性、关系与物理表字段的映射治理，完善绑定校验、失效检测、Schema 同步、反向引用与绑定修正。",
@@ -97,6 +109,40 @@
       "team": "机器人 Agent",
       "role": "机器人 Agent 开发实习生",
       "period": "2026-06 – 2026-07",
+      "logo": { "src": "/brands/agibot.png", "alt": "智元机器人 AGIBOT 品牌标志", "theme": "agibot" },
+      "valueHeadline": "打通机器人流式回放与知识图谱可靠链路",
+      "journey": [
+        { "label": "流式读取", "detail": "构建本地、远端索引与对象存储 RangeReader 三级链路。" },
+        { "label": "会话一致性", "detail": "用虚拟时钟、世代计数和慢消费者隔离保障并发播放。" },
+        { "label": "知识自愈", "detail": "通过实体去重、幂等状态机与异步补偿恢复抽取任务。" }
+      ],
+      "highlights": [
+        "将 MCAP 解析、转码和错误处理收敛到服务端，并提供功能对等的 HTTP 与 WebSocket 回放通道。",
+        "降低对象存储往返和重复解析开销，隔离高并发下的慢消费者与写入竞争。",
+        "建立跨 MySQL、Milvus、Redis 的实体一致性和可恢复知识抽取链路。"
+      ],
+      "projects": [
+        {
+          "id": "clip-player",
+          "name": "clip-player",
+          "summary": "机器人多传感器数据流式回放平台",
+          "highlights": [
+            "建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制和共享会话。",
+            "设计本地持久化、远端 IndexedReader 与 S3 RangeReader 三级读取链路。",
+            "使用虚拟时钟、原子世代计数器、有界队列和慢消费者隔离保障并发稳定性。"
+          ]
+        },
+        {
+          "id": "agibot-retriever",
+          "name": "agibot_retriever",
+          "summary": "面向企业 AI Agent 的知识检索和长期记忆管理系统",
+          "highlights": [
+            "设计“SQL 精确匹配—向量 TopK—LLM 消歧”三级实体去重。",
+            "通过 Redis 分布式锁与 MySQL CAS 状态机实现幂等创建和抽取。",
+            "通过 dead-letter、异步补偿、Reaper 与关系约束实现故障自愈。"
+          ]
+        }
+      ],
       "context": "参与机器人多传感器数据回放，以及面向企业 AI Agent 的知识检索和长期记忆管理系统建设。",
       "actions": [
         "为 clip-player 建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制和共享会话。",
@@ -132,6 +178,18 @@
       "team": "总体部",
       "role": "算法实习生",
       "period": "2025-07 – 2026-05",
+      "logo": { "src": "/brands/cssc.png", "alt": "中国船舶集团 CSSC 品牌标志", "theme": "cssc" },
+      "valueHeadline": "验证海上通信网络重构与集群通信方案",
+      "journey": [
+        { "label": "问题建模", "detail": "抽象海上通信节点组建、节点受损与恢复约束。" },
+        { "label": "仿真验证", "detail": "评估通信建立成功率、恢复时延与链路稳定性。" },
+        { "label": "方案交付", "detail": "整理验证结果并完成无人机集群通信方案文档。" }
+      ],
+      "highlights": [
+        "围绕链路建立、波束匹配、网络重构与通信恢复开展算法设计。",
+        "开发仿真脚本，评估通信建立成功率、恢复时延与链路稳定性。",
+        "完成通信网络重构算法验证、结果整理和项目交付。"
+      ],
       "context": "面向海上通信节点组建、节点受损后的快速恢复和大规模无人机集群通信方案论证。",
       "actions": [
         "围绕链路建立、波束匹配、网络重构与通信恢复开展算法设计。",
@@ -152,6 +210,31 @@
       "status": "Deployed"
     }
   ],
+  "openSource": {
+    "name": "Semantica",
+    "logo": { "src": "/brands/semantica.png", "alt": "Semantica 项目标志", "theme": "semantica" },
+    "identity": "Open-source Contributor · cxzg007",
+    "background": "Semantica 是知识图谱与推理基础设施项目；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
+    "snapshotDate": "2026-08-21",
+    "honors": [
+      { "platform": "GitHub Trending", "rank": "#1 Repository of the Day", "period": "Daily", "evidence": "User-provided public ranking screenshot" },
+      { "platform": "Trendshift · Python", "rank": "#3 Repository of the Week", "period": "Weekly", "evidence": "User-provided public ranking screenshot" }
+    ],
+    "contributionCount": 7,
+    "mergedCount": 2,
+    "mergedHighlights": [
+      "#1081：通过正式 to_kg_dict() 适配器统一 ContextGraph 与下游 RDF/时间查询的数据形状。",
+      "#1094：从 sh:sourceShape 回溯真实 SHACL 约束值，替代硬编码解释。"
+    ],
+    "otherContributions": [
+      "知识图谱 RDF 导出与序列化兼容。",
+      "规则推理的结构化 Action、provenance 与 RETE 匹配。",
+      "时间图稳定性指标与决策模型 auto_generate_id 契约。"
+    ],
+    "graphNodes": ["ContextGraph", "RDF / SHACL", "Temporal Graph", "Rule Inference", "cxzg007 contributions"],
+    "repositoryUrl": "https://github.com/semantica-agi/semantica",
+    "articlePath": "/blog/first-agent-system"
+  },
   "caseStudies": [
     {
       "id": "ontology-agent-platform",

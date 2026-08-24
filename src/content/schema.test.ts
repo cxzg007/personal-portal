@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import type { SiteContent } from "@/content/schema";
 import { validSiteContent } from "@/test/fixtures/site-content";
 import { validateSiteContent } from "./schema";
 
@@ -126,5 +127,23 @@ describe("validateSiteContent", () => {
       ok: false,
       errors: expect.arrayContaining(["about[0] contains secret-like text"]),
     });
+  });
+  it.each([
+    ["empty logo alt", (copy: SiteContent) => { copy.internships[0].logo.alt = ""; }],
+    ["non-local logo", (copy: SiteContent) => { copy.internships[0].logo.src = "https://cdn.example/logo.png" as SiteContent["internships"][number]["logo"]["src"]; }],
+    ["two-node journey", (copy: SiteContent) => { copy.internships[0].journey.pop(); }],
+    ["empty highlights", (copy: SiteContent) => { copy.internships[0].highlights = []; }],
+    ["project with empty highlights", (copy: SiteContent) => { copy.internships[0].projects![0].highlights = []; }],
+    ["incomplete honor", (copy: SiteContent) => { copy.openSource.honors[0].rank = ""; }],
+    ["only one honor", (copy: SiteContent) => { copy.openSource.honors.pop(); }],
+    ["invalid snapshot date", (copy: SiteContent) => { copy.openSource.snapshotDate = "2026/08/21"; }],
+    ["merged count above contributions", (copy: SiteContent) => { copy.openSource.mergedCount = 8; }],
+    ["four graph nodes", (copy: SiteContent) => { copy.openSource.graphNodes.pop(); }],
+    ["non-HTTPS repository", (copy: SiteContent) => { copy.openSource.repositoryUrl = "http://github.com/semantica-agi/semantica"; }],
+    ["non-blog article path", (copy: SiteContent) => { copy.openSource.articlePath = "/articles/semantica" as SiteContent["openSource"]["articlePath"]; }],
+  ])("rejects %s", (_label, mutate) => {
+    const copy = structuredClone(validSiteContent) as SiteContent;
+    mutate(copy);
+    expect(validateSiteContent(copy)).toEqual(expect.objectContaining({ ok: false }));
   });
 });

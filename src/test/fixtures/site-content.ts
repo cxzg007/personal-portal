@@ -1,3 +1,5 @@
+import type { SiteContent } from "@/content/schema";
+
 export const validSiteContent = {
   profile: {
     name: "江俊杰",
@@ -43,9 +45,51 @@ export const validSiteContent = {
       results: ["形成绑定生命周期。"],
       ownership: "负责本体映射治理。",
       stack: ["Java"],
+      logo: {
+        src: "/brands/jd.png",
+        alt: "京东品牌标志",
+        theme: "jd",
+      },
+      valueHeadline: "建设本体驱动的数据智能与 Agent 执行链路",
+      journey: [
+        { label: "语义治理", detail: "建立业务实体、关系与物理字段的可校验映射。" },
+        { label: "查询推导", detail: "通过 OntologyGraph、BFS 与 TopK 生成受控语义查询。" },
+        { label: "安全执行", detail: "以规则 Schema、确定性映射和批量写入约束业务动作。" },
+      ],
+      highlights: ["形成“建立—校验—同步—修正”的本体绑定生命周期。"],
+      projects: [
+        {
+          id: "ontology-platform",
+          name: "ontology-platform",
+          summary: "本体驱动的数据智能平台",
+          highlights: ["建立可校验的本体绑定生命周期。"],
+        },
+      ],
       status: "Shipped",
     },
   ],
+  openSource: {
+    name: "Semantica",
+    logo: {
+      src: "/brands/semantica.png",
+      alt: "Semantica 项目标志",
+      theme: "semantica",
+    },
+    identity: "Open-source Contributor · cxzg007",
+    background: "Semantica 是知识图谱与推理基础设施项目。",
+    snapshotDate: "2026-08-21",
+    honors: [
+      { platform: "GitHub Trending", rank: "#1 Repository of the Day", period: "Daily", evidence: "Public screenshot" },
+      { platform: "Trendshift · Python", rank: "#3 Repository of the Week", period: "Weekly", evidence: "Public screenshot" },
+    ],
+    contributionCount: 7,
+    mergedCount: 2,
+    mergedHighlights: ["#1081 merged"],
+    otherContributions: ["RDF compatibility"],
+    graphNodes: ["ContextGraph", "RDF / SHACL", "Temporal Graph", "Rule Inference", "cxzg007 contributions"],
+    repositoryUrl: "https://github.com/semantica-agi/semantica",
+    articlePath: "/blog/first-agent-system",
+  },
   caseStudies: [
     {
       id: "ontology-agent-platform",
@@ -61,4 +105,4 @@ export const validSiteContent = {
     },
   ],
   about: ["同济大学电子信息硕士。"],
-};
+} satisfies SiteContent;
