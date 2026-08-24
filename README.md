@@ -45,6 +45,14 @@ pnpm start
 
 编辑 `content/site-content.json`，保持现有结构和字段类型。内容校验会拒绝空实习、无效 HTTPS 外链、内部地址、私钥和常见令牌样式文本。
 
+每段实习与开源板块都必须提供品牌 Logo 字段 `logo`：
+
+- `src` 必须是指向 `public/brands/` 下本地文件的路径（`/brands/<名称>.png|.svg|.webp`），不允许外链；
+- `alt` 必填，`theme` 限定为 `jd`、`agibot`、`cssc`、`semantica` 之一；
+- 对应文件必须真实存在于 `public/brands/` 且非空，替换 Logo 时同步更新文件与字段。
+
+内容校验命令同时校验结构化内容、品牌资产与简历 PDF：
+
 ```bash
 pnpm exec tsx scripts/validate-content.ts
 pnpm test -- src/content/schema.test.ts
