@@ -40,7 +40,14 @@ test("uses the static scene without hiding core hero content", async ({
   );
 });
 
-test("exposes deterministic scroll-linked states when motion is allowed", async ({ page }) => {
+test("exposes deterministic scroll-linked states when motion is allowed", async ({ page }, testInfo) => {
+  // Narrow viewports (<=760px) degrade both matchMedia enhancements to
+  // static/disabled by design; the static behavior there is covered
+  // authoritatively by the lite-scene test below.
+  test.skip(
+    testInfo.project.name === "mobile",
+    "narrow viewports use the static scene covered by the lite scene test",
+  );
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
 
