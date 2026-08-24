@@ -101,7 +101,7 @@ for (const viewport of viewports) {
     await page.goto("/");
 
     await expectNoHorizontalOverflow(page);
-    await expect(page.getByRole("heading", { level: 1, name: "江俊杰" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
     const hero = page.getByRole("region", { name: "江俊杰" });
     await expectHorizontallyContained(hero.locator(".hero-copy"));
     await expectHorizontallyContained(hero.locator(".hero-actions"));
@@ -125,6 +125,10 @@ for (const viewport of viewports) {
     for (const detailSection of await internshipDetails.locator(":scope > section").all()) {
       await expectHorizontallyContained(detailSection);
     }
+    await expectHorizontallyContained(firstInternship.getByRole("img", { name: /品牌标志/ }));
+    await expectHorizontallyContained(firstInternship.getByRole("list", { name: /工程链路/ }));
+    await expectHorizontallyContained(page.locator("#open-source .open-source-spotlight"));
+    await expectHorizontallyContained(page.getByRole("list", { name: "Semantica 图原生能力链路" }));
 
     const firstCaseStudy = page.locator("#case-studies").getByRole("article").first();
     await expectHorizontallyContained(firstCaseStudy);
@@ -183,3 +187,31 @@ for (const viewport of viewports) {
     await expectNoHiddenOffscreenContent(page);
   });
 }
+
+test("homepage brand narrative keeps visible geometry at 1920x1080", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "chromium-only 1920x1080 desktop acceptance");
+
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  await expectNoHorizontalOverflow(page);
+
+  const heroHeading = page.getByRole("heading", { level: 1, name: "cxzg007" });
+  const brandCards = page.locator("#internships").getByRole("article");
+  const openSourceCard = page.locator("#open-source .open-source-spotlight");
+  await expect(brandCards).toHaveCount(3);
+
+  const geometryTargets = [heroHeading, ...(await brandCards.all()), openSourceCard];
+  for (const target of geometryTargets) {
+    await expect(target).toBeVisible();
+    const box = await target.boundingBox();
+    expect(box, `expected visible geometry for ${await target.evaluate((element) => element.className)}`)
+      .not.toBeNull();
+    expect(box!.width).toBeGreaterThan(0);
+    expect(box!.height).toBeGreaterThan(0);
+  }
+
+  await expectNoHiddenOffscreenContent(page);
+  await expectNoHorizontalOverflow(page);
+});

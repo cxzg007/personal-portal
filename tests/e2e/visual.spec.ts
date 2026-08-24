@@ -46,3 +46,27 @@ test("article detail visual", async ({ page }) => {
 
   await expect(page.locator(".article-layout")).toHaveScreenshot("article-detail.png");
 });
+
+test("reduced motion internships visual", async ({ page }) => {
+  await prepareStablePage(page, "/");
+
+  await expect(page.locator("#internships")).toHaveScreenshot("reduced-motion-internships.png");
+});
+
+test("reduced motion open source visual", async ({ page }) => {
+  await prepareStablePage(page, "/");
+
+  await expect(page.locator("#open-source")).toHaveScreenshot("reduced-motion-open-source.png");
+});
+
+test("full homepage narrative visual at 1920x1080", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "chromium-only 1920x1080 narrative snapshot");
+
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.locator("canvas")).toHaveCount(0);
+
+  await expect(page).toHaveScreenshot("homepage-narrative-1920.png", { fullPage: true });
+});
