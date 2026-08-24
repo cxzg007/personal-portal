@@ -300,50 +300,6 @@
         "K8s"
       ],
       "links": []
-    },
-    {
-      "id": "semantica-open-source",
-      "title": "Semantica 知识图谱与推理基础设施开源贡献",
-      "problem": "项目中的知识图谱导出、上下文图适配、SHACL 解释、时间稳定性和规则推理存在缺失能力或边界缺陷。",
-      "constraints": [
-        "需要保持序列化兼容和既有调用行为",
-        "可选依赖可能不存在",
-        "推理与图结构修改需要回归测试覆盖"
-      ],
-      "decisions": [
-        "通过正式 to_kg_dict() 适配器统一 ContextGraph 与下游 RDF/时间查询的数据形状。",
-        "从 sh:sourceShape 回溯真实 SHACL 约束值，替代硬编码解释。",
-        "为时间稳定性使用真实有效期时长，并跳过无界区间。",
-        "使用 InitVar 修复 decision model 的 auto_generate_id 不可达分支。",
-        "为规则推理增加结构化 Action 与 provenance，并为 RETE 匹配补齐 Token 传播和多条件连接。"
-      ],
-      "tradeoffs": [
-        "以显式适配器和更严格的数据契约增加少量维护成本，换取跨模块一致性、向后兼容和可测试性。"
-      ],
-      "contribution": "以 GitHub 用户 cxzg007 向 semantica-agi/semantica 提交 7 个 PR；截至 2026-08-21，#1081 与 #1094 已合并，其余处于审阅或开放状态。",
-      "result": "已合并 ContextGraph 标准适配器与 SHACL 真实约束解释修复；其他贡献覆盖 RDF 导出、规则 Action、RETE、时间图指标和决策模型契约。",
-      "stack": [
-        "Python",
-        "Knowledge Graph",
-        "RDF",
-        "SHACL",
-        "RETE",
-        "pytest"
-      ],
-      "links": [
-        {
-          "label": "GitHub repository",
-          "url": "https://github.com/semantica-agi/semantica"
-        },
-        {
-          "label": "PR #1081",
-          "url": "https://github.com/semantica-agi/semantica/pull/1081"
-        },
-        {
-          "label": "PR #1094",
-          "url": "https://github.com/semantica-agi/semantica/pull/1094"
-        }
-      ]
     }
   ],
   "about": [

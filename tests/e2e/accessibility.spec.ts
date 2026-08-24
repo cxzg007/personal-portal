@@ -92,9 +92,9 @@ test("desktop keyboard order covers skip navigation, primary actions, disclosure
   const contact = page.locator("#about");
   const postTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
   const postInternshipSequence = [
-    ...["GitHub repository", "PR #1081", "PR #1094"].map((name) =>
-      page.locator("#case-studies").getByRole("link", { name }),
-    ),
+    page.locator("#open-source").locator("summary", { hasText: "更多贡献" }),
+    page.locator("#open-source").getByRole("link", { name: "查看 Semantica GitHub 项目" }),
+    page.locator("#open-source").getByRole("link", { name: "阅读 Semantica 贡献复盘" }),
     page.locator("#writing").getByRole("link", { name: "查看全部文章" }),
     page.locator("#writing").getByRole("link", { exact: true, name: postTitle }),
     page.locator("#writing").getByRole("link", { name: `阅读文章：${postTitle}` }),
@@ -193,7 +193,7 @@ test("reduced motion preserves content and removes Canvas", async ({ page }) => 
   await page.goto("/");
 
   await expect(page.locator("canvas")).toHaveCount(0);
-  await expect(page.getByRole("heading", { level: 1, name: "江俊杰" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
   await expect(page.getByRole("link", { name: "查看实习经历" })).toBeVisible();
   await expect(page.locator("#internships")).toBeVisible();
 });

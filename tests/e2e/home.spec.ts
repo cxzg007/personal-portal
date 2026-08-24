@@ -61,14 +61,18 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   }
 
   const cases = page.locator("#case-studies");
-  await expect(cases.getByRole("article")).toHaveCount(3);
-  await expect(
-    cases.getByRole("heading", { name: "Semantica 知识图谱与推理基础设施开源贡献" }),
-  ).toBeVisible();
-  await expect(cases.getByText(/截至 2026-08-21/)).toBeVisible();
-  await expect(cases.getByRole("link", { name: "PR #1081" })).toHaveAttribute(
+  await expect(cases.getByRole("article")).toHaveCount(2);
+
+  const openSource = page.locator("#open-source");
+  await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
+  await expect(openSource.getByText(/截至 2026-08-21/)).toBeVisible();
+  await expect(openSource.getByRole("link", { name: "查看 Semantica GitHub 项目" })).toHaveAttribute(
     "href",
-    "https://github.com/semantica-agi/semantica/pull/1081",
+    "https://github.com/semantica-agi/semantica",
+  );
+  await expect(openSource.getByRole("link", { name: "阅读 Semantica 贡献复盘" })).toHaveAttribute(
+    "href",
+    "/blog/first-agent-system",
   );
 
   const contact = page.locator("#about");

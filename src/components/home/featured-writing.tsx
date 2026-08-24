@@ -8,7 +8,7 @@ export function FeaturedWriting({ posts }: { posts: PostMeta[] }) {
   if (featuredPosts.length === 0) return null;
 
   return (
-    <Section eyebrow="03 / WRITING" id="writing" title="精选文章">
+    <Section eyebrow="04 / WRITING" id="writing" title="精选文章">
       <div className="featured-writing-header">
         <p>记录 Agent 工程、后端架构与可靠系统实践。</p>
         <Link href="/blog">查看全部文章 <span aria-hidden="true">↗</span></Link>

@@ -14,7 +14,7 @@ describe("system case studies", () => {
     render(<CaseStudies caseStudies={caseStudies} />);
 
     const articles = screen.getAllByRole("article");
-    expect(articles).toHaveLength(3);
+    expect(articles).toHaveLength(2);
 
     caseStudies.forEach((caseStudy, index) => {
       const article = articles[index];
@@ -54,24 +54,6 @@ describe("system case studies", () => {
       expect(within(architectureNodes[1]).getByText("工程决策")).toBeVisible();
       expect(within(architectureNodes[2]).getByText("可验证结果")).toBeVisible();
       expect(architecture.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(2);
-    });
-  });
-
-  it("preserves verified Semantica links and the dated contribution boundary", () => {
-    render(<CaseStudies caseStudies={caseStudies} />);
-
-    const semantica = caseStudies.find(({ id }) => id === "semantica-open-source");
-    expect(semantica).toBeDefined();
-
-    const article = screen.getByRole("article", { name: semantica?.title });
-    expect(within(article).getByText(/截至 2026-08-21/)).toBeVisible();
-    expect(within(article).getByText(/#1081 与 #1094 已合并/)).toBeVisible();
-
-    semantica?.links.forEach((link) => {
-      expect(within(article).getByRole("link", { name: link.label })).toHaveAttribute(
-        "href",
-        link.url,
-      );
     });
   });
 });

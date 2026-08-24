@@ -4,6 +4,7 @@ import { FeaturedWriting } from "@/components/home/featured-writing";
 import { Hero } from "@/components/home/hero";
 import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { InternshipTimeline } from "@/components/home/internship-timeline";
+import { OpenSourceSpotlight } from "@/components/home/open-source-spotlight";
 import { ScrollEnhancements } from "@/components/home/scroll-enhancements";
 import { Header } from "@/components/shell/header";
 import { Section } from "@/components/shell/section";
@@ -62,13 +63,17 @@ export default function HomePage() {
           <InternshipTimeline internships={content.internships} />
         </Section>
 
-        <Section eyebrow="02 / SYSTEM DESIGN" id="case-studies" title="后端工程与系统设计">
+        <Section eyebrow="02 / OPEN SOURCE" id="open-source" title="开源贡献">
+          <OpenSourceSpotlight project={content.openSource} />
+        </Section>
+
+        <Section eyebrow="03 / SYSTEM DESIGN" id="case-studies" title="后端工程与系统设计">
           <CaseStudies caseStudies={content.caseStudies} />
         </Section>
 
         <FeaturedWriting posts={featuredPosts} />
 
-        <Section eyebrow="04 / ABOUT" id="about" title="关于我">
+        <Section eyebrow="05 / ABOUT" id="about" title="关于我">
           <Contact about={content.about} profile={content.profile} />
         </Section>
       </main>
