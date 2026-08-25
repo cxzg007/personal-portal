@@ -21,6 +21,13 @@ export type InternshipProject = {
   highlights: string[];
 };
 
+export type OpenSourceContribution = {
+  number: number;
+  status: "merged" | "open" | "review";
+  summary: string;
+  url: string;
+};
+
 export type OpenSourceProject = {
   name: string;
   logo: BrandAsset;
@@ -28,10 +35,7 @@ export type OpenSourceProject = {
   background: string;
   snapshotDate: string;
   honors: Array<{ platform: string; rank: string; period: string; evidence: string }>;
-  contributionCount: number;
-  mergedCount: number;
-  mergedHighlights: string[];
-  otherContributions: string[];
+  contributions: OpenSourceContribution[];
   graphNodes: [string, string, string, string, string];
   repositoryUrl: string;
   articlePath: `/blog/${string}`;
@@ -56,8 +60,17 @@ export type Internship = {
   status: "Shipped" | "Optimized" | "Deployed";
 };
 
+export type AcademicHonor = {
+  title: string;
+  source: string;
+  period: string;
+  note: string;
+};
+
 export type CaseStudy = {
   id: string;
+  tabLabel: "Ontology Agent" | "Streaming Backend" | "Knowledge Memory" | "Semantica";
+  visualKind: "ontology" | "streaming" | "memory" | "graph";
   title: string;
   problem: string;
   constraints: string[];
@@ -72,7 +85,7 @@ export type CaseStudy = {
 export type SiteContent = {
   profile: {
     name: string;
-    technicalId?: string;
+    technicalId: string;
     targetRole: "AI Agent / 后端开发";
     positioning: string;
     recruitingStatus: string;
@@ -84,6 +97,7 @@ export type SiteContent = {
   internships: Internship[];
   openSource: OpenSourceProject;
   caseStudies: CaseStudy[];
+  academicHonors: AcademicHonor[];
   about: string[];
 };
 
@@ -98,6 +112,24 @@ const INTERNSHIP_STATUSES = new Set<Internship["status"]>([
   "Optimized",
   "Deployed",
 ]);
+const CASE_STUDY_TAB_LABELS = new Set<CaseStudy["tabLabel"]>([
+  "Ontology Agent",
+  "Streaming Backend",
+  "Knowledge Memory",
+  "Semantica",
+]);
+const CASE_STUDY_VISUAL_KINDS = new Set<CaseStudy["visualKind"]>([
+  "ontology",
+  "streaming",
+  "memory",
+  "graph",
+]);
+const CONTRIBUTION_STATUSES = new Set<OpenSourceContribution["status"]>([
+  "merged",
+  "open",
+  "review",
+]);
+const GITHUB_PR_URL_PATTERN = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+$/;
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -140,6 +172,18 @@ export function validateSiteContent(input: unknown): ValidationResult {
       errors.push(`${path} must be an https URL`);
     }
   };
+  const checkLinkUrl = (value: unknown, path: string) => {
+    const text = checkText(value, path);
+    if (!text) return;
+    if (text.startsWith("/")) return;
+    try {
+      if (new URL(text).protocol !== "https:") {
+        errors.push(`${path} must be an https URL`);
+      }
+    } catch {
+      errors.push(`${path} must be an https URL`);
+    }
+  };
   const checkRecord = (value: unknown, path: string): UnknownRecord | undefined => {
     if (!isRecord(value)) {
       errors.push(`${path} must be an object`);
@@ -154,7 +198,7 @@ export function validateSiteContent(input: unknown): ValidationResult {
   const profile = checkRecord(siteContent.profile, "profile");
   if (profile) {
     checkText(profile.name, "profile.name");
-    if (profile.technicalId !== undefined) checkText(profile.technicalId, "profile.technicalId");
+    checkText(profile.technicalId, "profile.technicalId");
     if (profile.targetRole !== "AI Agent / 后端开发") {
       errors.push("profile.targetRole must be AI Agent / 后端开发");
     }
@@ -278,14 +322,36 @@ export function validateSiteContent(input: unknown): ValidationResult {
         ["platform", "rank", "period", "evidence"].forEach((field) => checkText(value[field], `openSource.honors[${index}].${field}`));
       });
     }
-    for (const field of ["contributionCount", "mergedCount"] as const) {
-      if (!Number.isInteger(openSource[field]) || (openSource[field] as number) < 0) errors.push(`openSource.${field} must be a non-negative integer`);
+    if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 7) {
+      errors.push("openSource.contributions must contain exactly 7 entries");
+    } else {
+      const seenPrNumbers = new Set<number>();
+      let mergedCount = 0;
+      openSource.contributions.forEach((contribution, index) => {
+        const value = checkRecord(contribution, `openSource.contributions[${index}]`);
+        if (!value) return;
+        if (!Number.isInteger(value.number) || (value.number as number) <= 0) {
+          errors.push(`openSource.contributions[${index}].number must be a positive integer`);
+        } else if (seenPrNumbers.has(value.number as number)) {
+          errors.push("openSource.contributions must not contain duplicate PR numbers");
+        } else {
+          seenPrNumbers.add(value.number as number);
+        }
+        if (typeof value.status !== "string" || !CONTRIBUTION_STATUSES.has(value.status as OpenSourceContribution["status"])) {
+          errors.push(`openSource.contributions[${index}].status must be merged, open, or review`);
+        } else if (value.status === "merged") {
+          mergedCount += 1;
+        }
+        checkText(value.summary, `openSource.contributions[${index}].summary`);
+        const url = checkText(value.url, `openSource.contributions[${index}].url`);
+        if (url && !GITHUB_PR_URL_PATTERN.test(url)) {
+          errors.push(`openSource.contributions[${index}].url must be an HTTPS GitHub PR URL`);
+        }
+      });
+      if (mergedCount !== 2) {
+        errors.push("openSource.contributions must contain exactly 2 merged entries");
+      }
     }
-    if (Number.isInteger(openSource.mergedCount) && Number.isInteger(openSource.contributionCount) && (openSource.mergedCount as number) > (openSource.contributionCount as number)) {
-      errors.push("openSource.mergedCount must not exceed contributionCount");
-    }
-    checkStringArray(openSource.mergedHighlights, "openSource.mergedHighlights", 1);
-    checkStringArray(openSource.otherContributions, "openSource.otherContributions", 1);
     if (!Array.isArray(openSource.graphNodes) || openSource.graphNodes.length !== 5) errors.push("openSource.graphNodes must contain exactly 5 entries");
     else openSource.graphNodes.forEach((node, index) => checkText(node, `openSource.graphNodes[${index}]`));
     checkHttpsUrl(openSource.repositoryUrl, "openSource.repositoryUrl");
@@ -295,13 +361,33 @@ export function validateSiteContent(input: unknown): ValidationResult {
 
   if (!Array.isArray(siteContent.caseStudies)) {
     errors.push("caseStudies must be an array");
-  } else if (siteContent.caseStudies.length === 0) {
-    errors.push("caseStudies must contain at least one entry");
+  } else if (siteContent.caseStudies.length !== 4) {
+    errors.push("caseStudies must contain exactly 4 entries");
   } else {
+    const seenCaseStudyIds = new Set<string>();
+    const seenTabLabels = new Set<string>();
     siteContent.caseStudies.forEach((caseStudy, index) => {
       const value = checkRecord(caseStudy, `caseStudies[${index}]`);
       if (!value) return;
-      ["id", "title", "problem", "contribution", "result"].forEach((field) =>
+      const id = checkText(value.id, `caseStudies[${index}].id`);
+      if (id) {
+        if (seenCaseStudyIds.has(id)) {
+          errors.push("caseStudies must have unique ids");
+        } else {
+          seenCaseStudyIds.add(id);
+        }
+      }
+      if (typeof value.tabLabel !== "string" || !CASE_STUDY_TAB_LABELS.has(value.tabLabel as CaseStudy["tabLabel"])) {
+        errors.push(`caseStudies[${index}].tabLabel must be Ontology Agent, Streaming Backend, Knowledge Memory, or Semantica`);
+      } else if (seenTabLabels.has(value.tabLabel)) {
+        errors.push("caseStudies must have unique tab labels");
+      } else {
+        seenTabLabels.add(value.tabLabel);
+      }
+      if (typeof value.visualKind !== "string" || !CASE_STUDY_VISUAL_KINDS.has(value.visualKind as CaseStudy["visualKind"])) {
+        errors.push(`caseStudies[${index}].visualKind must be ontology, streaming, memory, or graph`);
+      }
+      ["title", "problem", "contribution", "result"].forEach((field) =>
         checkText(value[field], `caseStudies[${index}].${field}`),
       );
       checkStringArray(value.constraints, `caseStudies[${index}].constraints`, 1);
@@ -315,9 +401,21 @@ export function validateSiteContent(input: unknown): ValidationResult {
           const linkValue = checkRecord(link, `caseStudies[${index}].links[${linkIndex}]`);
           if (!linkValue) return;
           checkText(linkValue.label, `caseStudies[${index}].links[${linkIndex}].label`);
-          checkHttpsUrl(linkValue.url, `caseStudies[${index}].links[${linkIndex}].url`);
+          checkLinkUrl(linkValue.url, `caseStudies[${index}].links[${linkIndex}].url`);
         });
       }
+    });
+  }
+
+  if (!Array.isArray(siteContent.academicHonors) || siteContent.academicHonors.length !== 3) {
+    errors.push("academicHonors must contain exactly 3 entries");
+  } else {
+    siteContent.academicHonors.forEach((honor, index) => {
+      const value = checkRecord(honor, `academicHonors[${index}]`);
+      if (!value) return;
+      ["title", "source", "period", "note"].forEach((field) =>
+        checkText(value[field], `academicHonors[${index}].${field}`),
+      );
     });
   }
 

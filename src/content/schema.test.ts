@@ -94,6 +94,7 @@ describe("validateSiteContent", () => {
           ...validSiteContent.caseStudies[0],
           links: [{ label: "Repository", url: "http://github.com/cxzg007" }],
         },
+        ...validSiteContent.caseStudies.slice(1),
       ],
     };
 
@@ -137,10 +138,62 @@ describe("validateSiteContent", () => {
     ["incomplete honor", (copy: SiteContent) => { copy.openSource.honors[0].rank = ""; }],
     ["only one honor", (copy: SiteContent) => { copy.openSource.honors.pop(); }],
     ["invalid snapshot date", (copy: SiteContent) => { copy.openSource.snapshotDate = "2026/08/21"; }],
-    ["merged count above contributions", (copy: SiteContent) => { copy.openSource.mergedCount = 8; }],
     ["four graph nodes", (copy: SiteContent) => { copy.openSource.graphNodes.pop(); }],
     ["non-HTTPS repository", (copy: SiteContent) => { copy.openSource.repositoryUrl = "http://github.com/semantica-agi/semantica"; }],
     ["non-blog article path", (copy: SiteContent) => { copy.openSource.articlePath = "/articles/semantica" as SiteContent["openSource"]["articlePath"]; }],
+  ])("rejects %s", (_label, mutate) => {
+    const copy = structuredClone(validSiteContent) as SiteContent;
+    mutate(copy);
+    expect(validateSiteContent(copy)).toEqual(expect.objectContaining({ ok: false }));
+  });
+
+  it("rejects content without the required technical identity", () => {
+    const input = structuredClone(validSiteContent) as Record<string, unknown>;
+    delete (input.profile as Record<string, unknown>).technicalId;
+    expect(validateSiteContent(input)).toEqual({
+      ok: false,
+      errors: expect.arrayContaining(["profile.technicalId must be a non-empty string"]),
+    });
+  });
+
+  it("rejects an invalid structured open-source contribution", () => {
+    const input = structuredClone(validSiteContent);
+    input.openSource.contributions[0].status = "done" as "merged";
+    input.openSource.contributions[0].url = "http://github.com/example/pr/1";
+    expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
+  });
+
+  it("requires exactly four system projects", () => {
+    const input = structuredClone(validSiteContent);
+    input.caseStudies.pop();
+    expect(validateSiteContent(input)).toEqual({
+      ok: false,
+      errors: expect.arrayContaining(["caseStudies must contain exactly 4 entries"]),
+    });
+  });
+
+  it("rejects zero merged contributions", () => {
+    const input = structuredClone(validSiteContent);
+    input.openSource.contributions.forEach((contribution) => {
+      contribution.status = "open";
+    });
+    expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
+  });
+
+  it("rejects an academic honor missing its note", () => {
+    const input = structuredClone(validSiteContent);
+    delete (input.academicHonors[0] as { note?: string }).note;
+    expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
+  });
+
+  it.each([
+    ["duplicate PR numbers", (copy: SiteContent) => { copy.openSource.contributions[1].number = copy.openSource.contributions[0].number; }],
+    ["non-GitHub PR url", (copy: SiteContent) => { copy.openSource.contributions[0].url = "https://example.com/semantica/pull/1081"; }],
+    ["non-positive PR number", (copy: SiteContent) => { copy.openSource.contributions[0].number = 0; }],
+    ["six contributions", (copy: SiteContent) => { copy.openSource.contributions.pop(); }],
+    ["two academic honors", (copy: SiteContent) => { copy.academicHonors.pop(); }],
+    ["unsupported visual kind", (copy: SiteContent) => { copy.caseStudies[0].visualKind = "timeline" as SiteContent["caseStudies"][number]["visualKind"]; }],
+    ["duplicate tab labels", (copy: SiteContent) => { copy.caseStudies[1].tabLabel = copy.caseStudies[0].tabLabel; }],
   ])("rejects %s", (_label, mutate) => {
     const copy = structuredClone(validSiteContent) as SiteContent;
     mutate(copy);

@@ -42,7 +42,7 @@
       "label": "Semantica PR",
       "value": 7,
       "suffix": "个",
-      "evidence": "GitHub authenticated-user repository query on 2026-08-21 returned PR #1077、#1081、#1094、#1096、#1113、#1143、#1153；其中 #1081、#1094 已合并。"
+      "evidence": "Semantica 公开仓库 PR 快照（2026-08-21）：#1077、#1081、#1094、#1096、#1113、#1143、#1153，其中 #1081、#1094 已合并。"
     },
     {
       "label": "本科专业排名",
@@ -220,16 +220,49 @@
       { "platform": "GitHub Trending", "rank": "#1 Repository of the Day", "period": "Daily", "evidence": "User-provided public ranking screenshot" },
       { "platform": "Trendshift · Python", "rank": "#3 Repository of the Week", "period": "Weekly", "evidence": "User-provided public ranking screenshot" }
     ],
-    "contributionCount": 7,
-    "mergedCount": 2,
-    "mergedHighlights": [
-      "#1081：通过正式 to_kg_dict() 适配器统一 ContextGraph 与下游 RDF/时间查询的数据形状。",
-      "#1094：从 sh:sourceShape 回溯真实 SHACL 约束值，替代硬编码解释。"
-    ],
-    "otherContributions": [
-      "知识图谱 RDF 导出与序列化兼容。",
-      "规则推理的结构化 Action、provenance 与 RETE 匹配。",
-      "时间图稳定性指标与决策模型 auto_generate_id 契约。"
+    "contributions": [
+      {
+        "number": 1081,
+        "status": "merged",
+        "summary": "ContextGraph 标准适配器：通过正式的 to_kg_dict() 适配器，统一 ContextGraph 与下游 RDF、时间查询所消费的数据形状。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1081"
+      },
+      {
+        "number": 1094,
+        "status": "merged",
+        "summary": "SHACL 真实约束解释：从 sh:sourceShape 回溯真实约束值，替代硬编码解释。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1094"
+      },
+      {
+        "number": 1077,
+        "status": "open",
+        "summary": "RETE alpha/beta Token 模型：为规则匹配提供 alpha/beta Token 层级的模型支撑。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1077"
+      },
+      {
+        "number": 1096,
+        "status": "open",
+        "summary": "规则 Action 与 provenance：将规则执行的动作与来源追溯关联。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1096"
+      },
+      {
+        "number": 1113,
+        "status": "open",
+        "summary": "RDF name→label 规范化：统一 RDF 导出中 name 与 label 的命名。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1113"
+      },
+      {
+        "number": 1143,
+        "status": "open",
+        "summary": "时间图指标：补充时间稳定性相关的指标说明。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1143"
+      },
+      {
+        "number": 1153,
+        "status": "open",
+        "summary": "决策模型契约：补齐决策模型 auto_generate_id 相关契约。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1153"
+      }
     ],
     "graphNodes": ["ContextGraph", "RDF / SHACL", "Temporal Graph", "Rule Inference", "cxzg007 contributions"],
     "repositoryUrl": "https://github.com/semantica-agi/semantica",
@@ -238,6 +271,8 @@
   "caseStudies": [
     {
       "id": "ontology-agent-platform",
+      "tabLabel": "Ontology Agent",
+      "visualKind": "ontology",
       "title": "本体驱动的 Agent 数据智能平台",
       "problem": "LLM 缺乏稳定的业务语义上下文，直接面向物理表生成 SQL 容易产生字段幻觉，并难以安全执行和回写业务动作。",
       "constraints": [
@@ -270,7 +305,9 @@
       "links": []
     },
     {
-      "id": "clip-player",
+      "id": "streaming-backend",
+      "tabLabel": "Streaming Backend",
+      "visualKind": "streaming",
       "title": "机器人多传感器数据流式回放平台",
       "problem": "MCAP 录制数据体量大，在线检索困难，多人协同分析时需要可靠的 seek、播放控制和共享会话。",
       "constraints": [
@@ -300,6 +337,89 @@
         "K8s"
       ],
       "links": []
+    },
+    {
+      "id": "knowledge-memory",
+      "tabLabel": "Knowledge Memory",
+      "visualKind": "memory",
+      "title": "面向企业 AI Agent 的知识检索与长期记忆系统",
+      "problem": "企业 AI Agent 需要跨 MySQL、Milvus、Redis 的一致知识记忆，抽取任务失败后必须可恢复，否则知识图谱会持续劣化。",
+      "constraints": [
+        "实体存在重复与歧义",
+        "抽取任务需要幂等",
+        "故障后需要自愈",
+        "知识图谱需要关系约束"
+      ],
+      "decisions": [
+        "设计“SQL 精确匹配—向量 TopK—LLM 消歧”三级实体去重。",
+        "通过 Redis 分布式锁与 MySQL CAS 状态机实现幂等创建和抽取。",
+        "通过 dead-letter、异步补偿、Reaper 与关系约束实现故障自愈。",
+        "以 latest-wins、跨 Chunk 滚动上下文和文档锚点增强知识图谱连通性。"
+      ],
+      "tradeoffs": [
+        "以状态机与补偿机制的复杂度，换取知识链路的一致性与可恢复性。"
+      ],
+      "contribution": "负责知识库构建中的实体去重、幂等抽取、故障自愈与关系约束模块。",
+      "result": "建立跨 MySQL、Milvus、Redis 的实体一致性和可恢复知识抽取链路。",
+      "stack": [
+        "Python",
+        "FastAPI",
+        "MySQL",
+        "Redis",
+        "Milvus"
+      ],
+      "links": []
+    },
+    {
+      "id": "semantica-contributions",
+      "tabLabel": "Semantica",
+      "visualKind": "graph",
+      "title": "Semantica 开源贡献与工程复盘",
+      "problem": "知识图谱与推理基础设施需要可验证的工程加固，而作品集需要以可核查的方式呈现开源贡献。",
+      "constraints": [
+        "上游架构与既有实现约束",
+        "PR 状态需如实区分",
+        "改动需可测试、可复核"
+      ],
+      "decisions": [
+        "从 ContextGraph 标准适配器与 SHACL 真实约束解释切入。",
+        "以带回归测试的小型 PR 表达修改边界。",
+        "公开记录仓库、PR、快照日期与状态。"
+      ],
+      "tradeoffs": [
+        "以贡献粒度换取可验证性与沟通清晰度。"
+      ],
+      "contribution": "提交七个公开 PR，#1081 与 #1094 已合并。",
+      "result": "贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
+      "stack": [
+        "Python",
+        "RDF",
+        "SHACL",
+        "知识图谱"
+      ],
+      "links": [
+        { "label": "过程复盘", "url": "/blog/first-agent-system" }
+      ]
+    }
+  ],
+  "academicHonors": [
+    {
+      "title": "国家励志奖学金",
+      "source": "同济大学",
+      "period": "本科",
+      "note": "本科在校期间获得国家励志奖学金。"
+    },
+    {
+      "title": "大唐杯上海市二等奖",
+      "source": "“大唐杯”竞赛",
+      "period": "本科",
+      "note": "“大唐杯”竞赛上海市二等奖。"
+    },
+    {
+      "title": "本科专业排名 12/62",
+      "source": "同济大学",
+      "period": "本科",
+      "note": "本科专业综合排名 12/62。"
     }
   ],
   "about": [

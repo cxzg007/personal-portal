@@ -8,9 +8,13 @@ type OpenSourceSpotlightProps = {
 };
 
 export function OpenSourceSpotlight({ project }: OpenSourceSpotlightProps) {
-  const mergedIds = project.mergedHighlights.map((highlight) =>
-    highlight.slice(0, highlight.indexOf("：")),
+  const mergedContributions = project.contributions.filter(
+    (contribution) => contribution.status === "merged",
   );
+  const otherContributions = project.contributions.filter(
+    (contribution) => contribution.status !== "merged",
+  );
+  const mergedIds = mergedContributions.map((contribution) => `#${contribution.number}`);
 
   return (
     <article aria-labelledby="semantica-heading" className="open-source-spotlight">
@@ -37,11 +41,11 @@ export function OpenSourceSpotlight({ project }: OpenSourceSpotlightProps) {
       <dl className="contribution-metrics">
         <div className="contribution-metric">
           <dt>公开贡献</dt>
-          <dd>{project.contributionCount}</dd>
+          <dd>{project.contributions.length}</dd>
         </div>
         <div className="contribution-metric">
           <dt>已合并</dt>
-          <dd>{project.mergedCount}</dd>
+          <dd>{mergedContributions.length}</dd>
         </div>
       </dl>
 
@@ -59,8 +63,8 @@ export function OpenSourceSpotlight({ project }: OpenSourceSpotlightProps) {
       <section aria-labelledby="merged-contributions-heading" className="merged-contributions">
         <h4 id="merged-contributions-heading">已合并贡献</h4>
         <ul>
-          {project.mergedHighlights.map((highlight) => (
-            <li key={highlight}>{highlight}</li>
+          {mergedContributions.map((contribution) => (
+            <li key={contribution.number}>{contribution.summary}</li>
           ))}
         </ul>
         <p className="open-source-attribution">{`截至 ${project.snapshotDate}：${mergedIds.join(" 与 ")} 已合并，其余贡献处于开放或审阅状态。`}</p>
@@ -69,8 +73,8 @@ export function OpenSourceSpotlight({ project }: OpenSourceSpotlightProps) {
       <details className="open-source-more">
         <summary>更多贡献</summary>
         <ul>
-          {project.otherContributions.map((contribution) => (
-            <li key={contribution}>{contribution}</li>
+          {otherContributions.map((contribution) => (
+            <li key={contribution.number}>{contribution.summary}</li>
           ))}
         </ul>
       </details>
