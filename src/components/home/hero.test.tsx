@@ -63,7 +63,7 @@ describe("recruiting hero and navigation", () => {
     expect(screen.queryByText(thirdEducation.school)).not.toBeInTheDocument();
   });
 
-  it("uses the fixed navigation without an education destination", () => {
+  it("uses the fixed navigation with anchor destinations plus GitHub and resume links", () => {
     render(<Header />);
 
     const navigation = screen.getByRole("navigation", { name: "主导航" });
@@ -72,11 +72,14 @@ describe("recruiting hero and navigation", () => {
         .getAllByRole("link")
         .map((link) => [link.textContent, link.getAttribute("href")]),
     ).toEqual([
-      ["首页", "/#top"],
-      ["实习", "/#internships"],
-      ["系统设计", "/#case-studies"],
-      ["博客", "/blog"],
-      ["关于", "/#about"],
+      ["信息", "#info"],
+      ["实习", "#internships"],
+      ["系统", "#systems"],
+      ["开源", "#open-source"],
+      ["荣誉", "#honors"],
+      ["博客", "#writing"],
+      ["联系", "#contact"],
+      ["GitHub", "https://github.com/cxzg007"],
       ["简历", "/resume.pdf"],
     ]);
     expect(screen.queryByRole("link", { name: "教育" })).not.toBeInTheDocument();

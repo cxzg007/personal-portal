@@ -4,11 +4,14 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const navigation = [
-  { label: "首页", href: "/#top" },
-  { label: "实习", href: "/#internships" },
-  { label: "系统设计", href: "/#case-studies" },
-  { label: "博客", href: "/blog" },
-  { label: "关于", href: "/#about" },
+  { label: "信息", href: "#info" },
+  { label: "实习", href: "#internships" },
+  { label: "系统", href: "#systems" },
+  { label: "开源", href: "#open-source" },
+  { label: "荣誉", href: "#honors" },
+  { label: "博客", href: "#writing" },
+  { label: "联系", href: "#contact" },
+  { label: "GitHub", href: "https://github.com/cxzg007" },
   { label: "简历", href: "/resume.pdf" },
 ] as const;
 
@@ -17,7 +20,13 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
     <ul className="navigation-list">
       {navigation.map((item) => (
         <li key={item.label}>
-          <Link href={item.href} onClick={onNavigate} prefetch={item.href === "/resume.pdf" ? false : null}>
+          <Link
+            href={item.href}
+            onClick={onNavigate}
+            prefetch={item.href === "/resume.pdf" ? false : null}
+            rel={item.href.startsWith("http") ? "noreferrer" : undefined}
+            target={item.href.startsWith("http") ? "_blank" : undefined}
+          >
             {item.label}
           </Link>
         </li>
@@ -65,8 +74,7 @@ export function Header() {
     <header className="site-header" id="top">
       <div className="header-inner">
         <Link className="site-mark" href="/#top" aria-label="返回首页">
-          <span aria-hidden="true">⌁</span>
-          <span>PORTFOLIO</span>
+          <span>cxzg007.</span>
         </Link>
 
         <nav className="desktop-navigation" aria-label="主导航">
