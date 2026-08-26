@@ -1,13 +1,13 @@
-import { CaseStudies } from "@/components/home/case-studies";
-import { Contact } from "@/components/home/contact";
-import { FeaturedWriting } from "@/components/home/featured-writing";
-import { Hero } from "@/components/home/hero";
-import { ImpactMetrics } from "@/components/home/impact-metrics";
-import { InternshipTimeline } from "@/components/home/internship-timeline";
-import { OpenSourceSpotlight } from "@/components/home/open-source-spotlight";
-import { ScrollEnhancements } from "@/components/home/scroll-enhancements";
+import { ContactStage } from "@/components/home/contact-stage";
+import { HonorGallery } from "@/components/home/honor-gallery";
+import { OpenSourceShowcase } from "@/components/home/open-source-showcase";
+import { PageMotionController } from "@/components/home/page-motion-controller";
+import { ProfileHero } from "@/components/home/profile-hero";
+import { ProfileInfo } from "@/components/home/profile-info";
+import { StickyInternshipStack } from "@/components/home/sticky-internship-stack";
+import { SystemProjectTabs } from "@/components/home/system-project-tabs";
+import { WritingStage } from "@/components/home/writing-stage";
 import { Header } from "@/components/shell/header";
-import { Section } from "@/components/shell/section";
 import { loadSiteContent } from "@/content/load-site-content";
 import { getAllPosts } from "@/content/posts";
 import { serializeJsonLd } from "@/lib/discovery";
@@ -48,34 +48,43 @@ export default function HomePage() {
   };
 
   return (
-    <div className="page-shell">
+    <div className="profile-shell">
       <Header />
-      <ScrollEnhancements />
+      <PageMotionController />
       <main id="main-content" tabIndex={-1}>
         <script
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
           type="application/ld+json"
         />
-        <Hero profile={content.profile} />
-        <ImpactMetrics metrics={content.metrics} />
-
-        <Section eyebrow="01 / EXPERIENCE" id="internships" title="实习经历">
-          <InternshipTimeline internships={content.internships} />
-        </Section>
-
-        <Section eyebrow="02 / OPEN SOURCE" id="open-source" title="开源贡献">
-          <OpenSourceSpotlight project={content.openSource} />
-        </Section>
-
-        <Section eyebrow="03 / SYSTEM DESIGN" id="case-studies" title="后端工程与系统设计">
-          <CaseStudies caseStudies={content.caseStudies} />
-        </Section>
-
-        <FeaturedWriting posts={featuredPosts} />
-
-        <Section eyebrow="05 / ABOUT" id="about" title="关于我">
-          <Contact about={content.about} profile={content.profile} />
-        </Section>
+        <ProfileHero profile={content.profile} />
+        <section aria-labelledby="info-heading" className="profile-stage" id="info">
+          <h2 id="info-heading">个人信息</h2>
+          <ProfileInfo about={content.about} profile={content.profile} />
+        </section>
+        <section aria-labelledby="internships-heading" className="profile-stage" id="internships">
+          <h2 id="internships-heading">实习内容落在真实系统里。</h2>
+          <StickyInternshipStack internships={content.internships} />
+        </section>
+        <section aria-labelledby="systems-heading" className="profile-stage" id="systems">
+          <h2 id="systems-heading">项目按工程问题组织。</h2>
+          <SystemProjectTabs projects={content.caseStudies} />
+        </section>
+        <section aria-labelledby="open-source-heading" className="profile-stage" id="open-source">
+          <h2 id="open-source-heading">开源贡献与公开影响力。</h2>
+          <OpenSourceShowcase project={content.openSource} />
+        </section>
+        <section aria-labelledby="honors-heading" className="profile-stage" id="honors">
+          <h2 id="honors-heading">荣誉与长期积累。</h2>
+          <HonorGallery academicHonors={content.academicHonors} openSourceHonors={content.openSource.honors} />
+        </section>
+        <section aria-labelledby="writing-heading" className="profile-stage" id="writing">
+          <h2 id="writing-heading">技术写作与工程复盘。</h2>
+          <WritingStage posts={featuredPosts} />
+        </section>
+        <section aria-labelledby="contact-heading" className="profile-stage" id="contact">
+          <h2 id="contact-heading">Build reliable agent systems together.</h2>
+          <ContactStage profile={content.profile} />
+        </section>
       </main>
     </div>
   );

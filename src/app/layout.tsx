@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { loadSiteContent } from "@/content/load-site-content";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
+import "./profile.css";
 
 const content = loadSiteContent();
 const siteUrl = getSiteUrl();
