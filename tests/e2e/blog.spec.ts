@@ -13,6 +13,8 @@ const threeRuntimeSignatures = [
   { label: "Three.js package path", pattern: /(?:node_modules|\.pnpm)[^\n"']*?[\\/]three(?:@|[\\/])/i },
   { label: "Three.js renderer", pattern: /WebGLRenderer/ },
   { label: "Three.js devtools hook", pattern: /__THREE_DEVTOOLS__/ },
+  { label: "Three.js clock", pattern: /THREE\.Clock/ },
+  { label: "Agent network scene module", pattern: /agent-network-scene/ },
 ] as const;
 
 async function expectRouteBundlesWithoutThree(page: Page, route: string) {
@@ -43,7 +45,7 @@ async function expectRouteBundlesWithoutThree(page: Page, route: string) {
   await expect(page.locator("canvas")).toHaveCount(0);
 }
 
-for (const route of ["/blog", "/blog/first-agent-system"] as const) {
+for (const route of ["/", "/blog", "/blog/first-agent-system"] as const) {
   test(`${route} loaded script bodies exclude Three.js and React Three Fiber`, async ({ page }) => {
     await expectRouteBundlesWithoutThree(page, route);
   });

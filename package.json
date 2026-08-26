@@ -20,11 +20,9 @@
     "@mdx-js/loader": "latest",
     "@mdx-js/react": "latest",
     "@next/mdx": "latest",
-    "@react-three/fiber": "latest",
     "github-slugger": "latest",
     "gray-matter": "latest",
     "mdast-util-to-string": "latest",
-    "motion": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
@@ -32,7 +30,6 @@
     "remark-frontmatter": "latest",
     "remark-gfm": "latest",
     "remark-parse": "latest",
-    "three": "latest",
     "unified": "11.0.0"
   },
   "devDependencies": {
@@ -47,7 +44,6 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/three": "latest",
     "@vitejs/plugin-react": "latest",
     "eslint": "9.39.5",
     "eslint-config-next": "latest",
