@@ -23,6 +23,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
           <Link
             href={item.href}
             onClick={onNavigate}
+            data-nav-section={item.href.startsWith("#") ? item.href.slice(1) : undefined}
             prefetch={item.href === "/resume.pdf" ? false : null}
             rel={item.href.startsWith("http") ? "noreferrer" : undefined}
             target={item.href.startsWith("http") ? "_blank" : undefined}
