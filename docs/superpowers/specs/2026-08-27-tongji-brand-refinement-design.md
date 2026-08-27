@@ -2,19 +2,20 @@
 
 ## 1. 目标与边界
 
-在现有生产站点基础上完成五项品牌精修：绑定个人域名、隐藏简历入口、教育信息精简为「同济大学」、侧栏新增同济校徽徽章区块并引入衬线中文字体、以及完整验收闭环。
+在现有生产站点基础上完成五项品牌精修：Vercel 子域改短（jiangjunjie.vercel.app）、隐藏简历入口、教育信息精简为「同济大学」、侧栏新增同济校徽徽章区块并引入衬线中文字体、以及完整验收闭环。
 
 本轮不改动页面整体骨架、导航结构与其他既有内容模块；不新增页面路由。
 
 **合规边界**：同济大学校徽与校名受商标保护。本轮使用仅限个人教育背景标识（非商业用途），素材直接取自同济大学官网「学校标识」页（https://www.tongji.edu.cn/xxgk1/xxbs1.htm）。spec 与实现注释中均注明来源与用途。
 
-## 2. A 模块：域名绑定（依赖用户完成购买）
+## 2. A 模块：Vercel 子域改短（零成本，已确认采用）
 
-- 用户购买主域 `jiangjunjie.com`。`www.jiangjunjie.com` 为主域免费子域，无需单独购买，DNS 记录免费配置。
-- Vercel 控制台添加两个域名：`jiangjunjie.com`（A 记录 / apex）与 `www.jiangjunjie.com`（CNAME），配置 `www` 301 重定向到主域。
-- 生产环境变量 `NEXT_PUBLIC_SITE_URL` 由 `https://jiangjunjie-personal-portal.vercel.app` 更新为 `https://jiangjunjie.com`，驱动 metadata、canonical、JSON-LD 与 OG URL。
+- 放弃购买自定义域名，改为 Vercel 项目子域改短：`jiangjunjie-personal-portal.vercel.app` → `jiangjunjie.vercel.app`。
+- 用户已在 Vercel 项目 Domains 设置中添加 `jiangjunjie.vercel.app`（若被占用则回退备选 `jjjiang.vercel.app`，实施时以 Vercel 实际分配为准），并移除旧子域或保留其自动重定向。
+- 生产环境变量 `NEXT_PUBLIC_SITE_URL` 由 `https://jiangjunjie-personal-portal.vercel.app` 更新为 `https://jiangjunjie.vercel.app`，驱动 metadata、canonical、JSON-LD 与 OG URL。
+- 既有测试中针对旧域 URL 的断言（canonical/OG/siteUrl 相关）同步改写为新域。
 - 部署沿用现有手动两步流程（push + `vercel deploy --prod`），部署后以新域 curl 验收。
-- **外部依赖**：域名购买由用户完成；未购买前该模块不可实施，其余模块不受阻塞。
+- **回滚**：Vercel 子域修改可随时撤销，旧子域 301 由 Vercel 自动处理，无数据风险。
 
 ## 3. B 模块：简历入口隐藏
 
@@ -58,4 +59,4 @@
 - 单元/组件测试全量通过（`pnpm exec vitest run`）。
 - 生产构建成功（`pnpm build`）。
 - e2e 冒烟通过（`pnpm exec playwright test tests/e2e/server-rendering.spec.ts` 及相关套件）。
-- 部署后生产验收：新域 `https://jiangjunjie.com` curl 检查 HTML 标题、metadata、JSON-LD `alumniOf` 为「同济大学」；`www` 子域 301 跳转到主域；校徽静态资源可访问（HTTP 200）；简历直链 `public/resume.pdf` 仍可访问且 UI 无入口。
+- 部署后生产验收：新域 `https://jiangjunjie.vercel.app` curl 检查 HTML 标题、metadata、JSON-LD `alumniOf` 为「同济大学」；旧子域 `jiangjunjie-personal-portal.vercel.app` 301 跳转到新域；校徽静态资源可访问（HTTP 200）；简历直链 `public/resume.pdf` 仍可访问且 UI 无入口。
