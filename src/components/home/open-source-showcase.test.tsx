@@ -17,7 +17,7 @@ describe("OpenSourceShowcase", () => {
     expect(screen.getByText("Open-source Contributor · cxzg007")).toBeVisible();
     expect(
       screen.getByText(
-        "Semantica 是知识图谱与推理基础设施项目；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
+        "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
       ),
     ).toBeVisible();
   });

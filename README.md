@@ -1,6 +1,6 @@
 # 江俊杰 · AI Agent / 后端开发个人门户
 
-面向校招求职展示的个人门户，使用原生 Next.js App Router、TypeScript、MDX 和渐进增强的 Three.js 场景构建。核心身份、教育、实习、系统设计和联系方式由服务端 HTML 提供；3D 只是可完全降级的视觉增强层。
+面向校招求职展示的个人门户，使用原生 Next.js App Router、TypeScript 和 MDX 构建。核心身份、教育、实习、系统设计和联系方式全部由服务端 HTML 与 CSS 呈现；本站不使用 WebGL、Three.js 或任何 Canvas 3D 场景。
 
 内容由 JSON、MDX 与 Git 管理。当前没有 CMS、管理后台、账号、评论或数据库；每次内容修改都通过代码审查、自动校验和重新部署发布。
 
@@ -44,6 +44,16 @@ pnpm start
 ## 更新个人内容
 
 编辑 `content/site-content.json`，保持现有结构和字段类型。内容校验会拒绝空实习、无效 HTTPS 外链、内部地址、私钥和常见令牌样式文本。
+
+几个关键板块的编辑位置：
+
+- **技术 ID（technicalId）**：顶层 `profile.technicalId`，渲染于首页身份区，用于标识开源身份。修改时应与 GitHub 用户名保持一致，并同步核对 `openSource.identity` 与 `openSource.graphNodes` 中的引用。
+- **结构化贡献**：`openSource.contributions` 数组，每个条目含 `number`（PR 号）、`status`（限定 `merged`、`open` 或 `review`）、`summary` 和 `url`。状态必须如实反映 PR 当前状态，校验器会拒绝合并状态但缺少有效链接等不一致的条目。配套的开源荣誉在 `openSource.honors` 数组（`platform`、`rank`、`period`、`evidence`）。
+- **学术荣誉**：顶层 `academicHonors` 数组，每个条目含 `title`、`source`、`period` 和 `note`，由首页荣誉板块渲染。仅收录可公开证明的荣誉。
+- **四个系统案例**：顶层 `caseStudies` 数组，即首页系统设计 Tab 的数据源。每个案例含 `id`、`tabLabel`（Tab 标签文案）、`visualKind`（限定 `ontology`、`streaming`、`memory` 或 `graph`，决定示意图类型）、`title`、`problem`、`constraints`、`decisions`、`tradeoffs`、`contribution`、`result`、`stack` 与 `links`。增删或改写案例会同时影响 Tab 数量与快照基线，需重新运行视觉测试。
+- **MDX 文章**：见下文「发布 MDX 文章」一节。
+
+修改以上任何板块后，除运行下方校验命令外，涉及系统案例的改动还需重跑 `tests/e2e/home.spec.ts` 与视觉基线检查。
 
 每段实习与开源板块都必须提供品牌 Logo 字段 `logo`：
 
@@ -106,20 +116,14 @@ NEXT_PUBLIC_SITE_URL=https://portfolio.example.test pnpm build
 pnpm test:e2e -- tests/e2e/blog.spec.ts tests/e2e/metadata.spec.ts
 ```
 
-## 3D 性能与降级
+## 无 WebGL 声明
 
-场景根据能力选择三种模式：
-
-- `full`：WebGL 可用、未启用减少动态效果且设备算力充足；显示完整轻量网络。
-- `lite`：WebGL 可用但设备核心数较低或移动视口；降低场景复杂度和渲染成本。
-- `static`：系统启用减少动态效果、WebGL 不可用、初始化报错或场景在 4 秒内未就绪；显示静态 SVG。
-
-首屏文字和按钮始终独立于 Canvas。排查空白或卡顿时，先检查浏览器控制台中的 `[agent-network] fallback` 警告和元素上的 `data-scene-mode`，再检查 WebGL、系统减少动态效果设置及硬件并发数。不要为了强制显示 3D 而移除静态降级或降低正文可读性。
+本站不含 WebGL、Three.js 或 Canvas 3D 渲染，页面动效全部由 CSS 与轻量 JavaScript 实现，并在系统启用减少动态效果时自动关闭；内容、导航与联系方式在任何设备上都不依赖图形加速。依赖边界测试会阻止重新引入 3D 运行时。
 
 相关验证：
 
 ```bash
-pnpm test -- src/lib/webgl.test.ts src/lib/scene-performance.test.ts src/components/scene/scene-loader.test.tsx
+pnpm exec vitest run src/lib/dependency-boundary.test.ts
 pnpm test:e2e -- tests/e2e/reduced-motion.spec.ts
 ```
 
@@ -173,7 +177,7 @@ pnpm test:e2e -- tests/e2e/visual.spec.ts --update-snapshots
 - 展开每段实习，检查行动、结果、个人边界和外链；
 - 系统设计案例、架构说明与 Semantica 公开 PR 链接；
 - `/blog` 的筛选与搜索、文章详情、目录、代码块和上一篇/下一篇；
-- 系统减少动态效果时为 `static`，移动/低性能设备能使用 `lite` 或静态回退；
+- 系统减少动态效果时页面动效自动关闭，内容、导航与所有板块仍完整可用；
 - `/resume.pdf` 返回成功且内容正确；站内链接、邮箱、GitHub 和所有 `target="_blank"` 外链目标正确；
 - 浏览器 Console 与 Network 中没有未解释的页面错误。
 

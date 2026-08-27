@@ -141,3 +141,89 @@ test("homepage exposes the reference-style section order", async ({ page }) => {
     "profile", "info", "internships", "systems", "open-source", "honors", "writing", "contact",
   ]);
 });
+
+test("internship cards ship brand logos, alternating layouts, and desktop sticky stacking", async (
+  { page },
+  testInfo,
+) => {
+  test.skip(testInfo.project.name !== "chromium", "sticky stacking is a desktop-only layout");
+  await page.goto("/");
+
+  const internships = page.locator("main > section#internships");
+  const logos = ["京东品牌标志", "智元机器人 AGIBOT 品牌标志", "中国船舶集团 CSSC 品牌标志"];
+  const layouts = ["copy-visual", "visual-copy", "copy-visual"];
+
+  for (let index = 0; index < 3; index += 1) {
+    const card = internships.locator(`article[data-card-index="${index}"]`);
+    await expect(card).toBeVisible();
+    await expect(card.getByRole("img", { name: logos[index] })).toBeVisible();
+    await expect(card).toHaveAttribute("data-layout", layouts[index]);
+    const position = await card.evaluate((element) => window.getComputedStyle(element).position);
+    expect(position).toBe("sticky");
+  }
+
+  await expect(internships.getByRole("button")).toHaveCount(0);
+});
+
+test("open source showcase exposes seven PR links, statuses, and both honor tracks", async ({ page }) => {
+  await page.goto("/");
+
+  const openSource = page.locator("main > section#open-source");
+  await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(7);
+  await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(2);
+  await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(5);
+  await expect(openSource.getByLabel("Semantica 能力链路")).toBeVisible();
+  await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
+
+  const honors = page.locator("main > section#honors");
+  await expect(honors.getByText("#1 Repository of the Day")).toBeVisible();
+  await expect(honors.getByText("#3 Repository of the Week")).toBeVisible();
+  await expect(honors.getByText("国家励志奖学金", { exact: true })).toBeVisible();
+  await expect(honors.getByText("大唐杯上海市二等奖")).toBeVisible();
+  await expect(honors.getByText("本科专业排名 12/62")).toBeVisible();
+  await expect(honors.getByText("排名来自公开趋势记录,非 GitHub 官方奖项。")).toBeVisible();
+});
+
+test("writing stage renders the single article with a full-read destination", async ({ page }) => {
+  await page.goto("/");
+
+  const writing = page.locator("main > section#writing");
+  await expect(writing.getByRole("article")).toHaveCount(1);
+  await expect(
+    writing.getByRole("heading", { name: "从 Semantica 开源贡献看 Agent 项目的工程协作" }),
+  ).toBeVisible();
+  await expect(
+    writing.getByRole("link", { name: "阅读《从 Semantica 开源贡献看 Agent 项目的工程协作》全文" }),
+  ).toHaveAttribute("href", "/blog/first-agent-system");
+});
+
+test("brand marks load eagerly and never shift page height after load", async ({ page }) => {
+  await page.goto("/");
+
+  const marks = page.locator("main .brand-mark img");
+  await expect(marks).toHaveCount(4);
+
+  // `page.goto` waits for the load event, so every brand mark (including the
+  // below-the-fold Semantica logo) must already be decoded at this point.
+  const unloaded = await marks.evaluateAll((images) =>
+    images
+      .map((image, index) => ({
+        index,
+        alt: image.getAttribute("alt") ?? "",
+        complete: (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0,
+      }))
+      .filter((entry) => !entry.complete),
+  );
+  expect(unloaded).toEqual([]);
+
+  const heightAtLoad = await page.evaluate(() => document.documentElement.scrollHeight);
+
+  await page.waitForLoadState("networkidle");
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(heightAtLoad);
+
+  // Scrolling must not trigger any late logo-driven reflow either.
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(500);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(heightAtLoad);
+});

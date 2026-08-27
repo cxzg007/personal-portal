@@ -7,7 +7,7 @@ export function ContactStage({ profile }: { profile: SiteContent["profile"] }) {
       <p>{profile.recruitingStatus}</p>
       <ul>
         <li>
-          <a href={`mailto:${profile.email}`}>{profile.email}</a>
+          <a href={`mailto:${profile.email}`} aria-label={`发送邮件至 ${profile.email}`}>{profile.email}</a>
         </li>
         <li>
           <a href={profile.github} target="_blank" rel="noreferrer">

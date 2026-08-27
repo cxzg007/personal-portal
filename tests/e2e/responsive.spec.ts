@@ -4,6 +4,7 @@ import type { Locator, Page } from "@playwright/test";
 const viewports = [
   { label: "mobile", width: 390, height: 844 },
   { label: "tablet", width: 768, height: 1024 },
+  { label: "laptop", width: 1280, height: 800 },
   { label: "desktop", width: 1440, height: 900 },
 ] as const;
 
@@ -62,7 +63,7 @@ async function expectHorizontallyContained(
 async function expectNoHiddenOffscreenContent(page: Page) {
   const offenders = await page.evaluate(() => {
     const tolerance = 1;
-    const allowedOverflow = ".hero-visual, .hero-visual *, .table-scroll, .table-scroll *";
+    const allowedOverflow = ".table-scroll, .table-scroll *";
     const labels = (element: Element) => {
       const className = typeof element.className === "string" ? `.${element.className.trim().replaceAll(" ", ".")}` : "";
       return `${element.tagName.toLowerCase()}${className}`;
@@ -81,8 +82,7 @@ async function expectNoHiddenOffscreenContent(page: Page) {
         if (rect.left < -tolerance || rect.right > window.innerWidth + tolerance) {
           issues.push(`${labels(element)} is offscreen at ${rect.left.toFixed(2)}..${rect.right.toFixed(2)}`);
         }
-        const overflowComesFromAllowedHeroDecoration = element.matches(".hero");
-        if (!overflowComesFromAllowedHeroDecoration && element.scrollWidth > element.clientWidth + tolerance) {
+        if (element.scrollWidth > element.clientWidth + tolerance) {
           issues.push(`${labels(element)} has hidden/scrolling width ${element.clientWidth}..${element.scrollWidth}`);
         }
         return issues;
@@ -101,12 +101,16 @@ for (const viewport of viewports) {
     await page.goto("/");
 
     await expectNoHorizontalOverflow(page);
-    await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
-    const hero = page.getByRole("region", { name: "江俊杰" });
-    await expectHorizontallyContained(hero.locator(".hero-copy"));
-    await expectHorizontallyContained(hero.locator(".hero-actions"));
-    await expectHorizontallyContained(hero.getByRole("link", { name: "查看实习经历" }));
-    await expectHorizontallyContained(hero.getByRole("link", { name: "下载简历" }));
+    await expect(
+      page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ }),
+    ).toBeVisible();
+
+    const hero = page.getByRole("region", { name: /cxzg007 Profile/ });
+    await expectHorizontallyContained(hero.locator(".profile-hero-copy"));
+    await expectHorizontallyContained(hero.getByRole("link", { name: "查看实习", exact: true }));
+    await expectHorizontallyContained(hero.getByRole("link", { name: "下载简历", exact: true }));
+    await expectHorizontallyContained(hero.getByLabel("联系方式"));
+    await expectHorizontallyContained(hero.getByLabel("教育经历"));
 
     if (viewport.width <= 760) {
       await expect(page.getByRole("button", { name: "打开导航菜单" })).toBeVisible();
@@ -114,29 +118,33 @@ for (const viewport of viewports) {
       await expect(page.getByRole("navigation", { name: "主导航" })).toBeVisible();
     }
 
-    const firstInternship = page.locator("#internships").getByRole("article").first();
-    await firstInternship.getByRole("button", { name: "查看技术细节" }).click();
-    await expect(firstInternship.getByRole("heading", { name: "业务背景" })).toBeVisible();
-    await expect(firstInternship.getByRole("heading", { name: "交付结果" })).toBeVisible();
+    const internships = page.locator("main > section#internships");
+    const firstInternship = internships.locator('article[data-card-index="0"]');
     await expectHorizontallyContained(firstInternship);
+    await expectHorizontallyContained(firstInternship.getByRole("img", { name: "京东品牌标志" }));
+    await expectHorizontallyContained(firstInternship.getByLabel("京东 能力建设记录"));
+    await expectHorizontallyContained(internships.getByLabel("中国船舶集团 722 研究所 能力建设记录"));
 
-    const internshipDetails = firstInternship.locator(".internship-details");
-    await expectHorizontallyContained(internshipDetails);
-    for (const detailSection of await internshipDetails.locator(":scope > section").all()) {
-      await expectHorizontallyContained(detailSection);
-    }
-    await expectHorizontallyContained(firstInternship.getByRole("img", { name: /品牌标志/ }));
-    await expectHorizontallyContained(firstInternship.getByRole("list", { name: /工程链路/ }));
-    await expectHorizontallyContained(page.locator("#open-source .open-source-spotlight"));
-    await expectHorizontallyContained(page.getByRole("list", { name: "Semantica 图原生能力链路" }));
+    const systems = page.locator("main > section#systems");
+    await expectHorizontallyContained(systems.getByRole("tablist"));
+    await expectHorizontallyContained(systems.locator("#system-panel-ontology-agent-platform"));
 
-    const firstCaseStudy = page.locator("#case-studies").getByRole("article").first();
-    await expectHorizontallyContained(firstCaseStudy);
-    await expectHorizontallyContained(firstCaseStudy.locator(".architecture-flow"));
+    const openSource = page.locator("main > section#open-source");
+    await expectHorizontallyContained(openSource.locator(".open-source-showcase"));
+    await expectHorizontallyContained(openSource.getByLabel("Semantica 能力链路"));
+    await expectHorizontallyContained(openSource.getByLabel("Semantica 公开资料"));
 
-    const contactPanel = page.locator("#about .contact-panel");
-    await expectHorizontallyContained(contactPanel);
-    await expectHorizontallyContained(page.locator("#about").getByRole("link", { name: "发送邮件联系江俊杰" }));
+    const honors = page.locator("main > section#honors");
+    await expectHorizontallyContained(honors.getByLabel("开源影响力"));
+    await expectHorizontallyContained(honors.getByLabel("教育与竞赛"));
+
+    await expectHorizontallyContained(page.locator("main > section#writing").getByRole("article"));
+
+    const contact = page.locator("main > section#contact");
+    await expectHorizontallyContained(contact);
+    await expectHorizontallyContained(contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }));
+    await expectHorizontallyContained(contact.getByRole("link", { name: "下载简历 PDF" }));
+
     await expectNoHiddenOffscreenContent(page);
     await expectNoHorizontalOverflow(page);
   });
@@ -188,7 +196,7 @@ for (const viewport of viewports) {
   });
 }
 
-test("homepage brand narrative keeps visible geometry at 1920x1080", async ({ page }, testInfo) => {
+test("homepage reference profile keeps visible geometry at 1920x1080", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1920x1080 desktop acceptance");
 
   await page.setViewportSize({ width: 1920, height: 1080 });
@@ -197,9 +205,9 @@ test("homepage brand narrative keeps visible geometry at 1920x1080", async ({ pa
 
   await expectNoHorizontalOverflow(page);
 
-  const heroHeading = page.getByRole("heading", { level: 1, name: "cxzg007" });
-  const brandCards = page.locator("#internships").getByRole("article");
-  const openSourceCard = page.locator("#open-source .open-source-spotlight");
+  const heroHeading = page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ });
+  const brandCards = page.locator("main > section#internships").getByRole("article");
+  const openSourceCard = page.locator("main > section#open-source .open-source-showcase");
   await expect(brandCards).toHaveCount(3);
 
   const geometryTargets = [heroHeading, ...(await brandCards.all()), openSourceCard];

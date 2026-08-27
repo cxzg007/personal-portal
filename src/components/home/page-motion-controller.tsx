@@ -81,7 +81,10 @@ export function PageMotionController() {
         .map((id) => document.getElementById(id))
         .filter((element): element is HTMLElement => element !== null)
         .map((element) => ({ id: element.id, top: element.getBoundingClientRect().top }));
-      const activeSection = selectActiveSection(entries, headerHeight);
+      const activeSection =
+        window.scrollY + window.innerHeight >= root.scrollHeight - 1
+          ? entries.at(-1)?.id ?? "profile"
+          : selectActiveSection(entries, headerHeight);
       root.dataset.activeSection = activeSection;
       setNavigationState(activeSection);
 

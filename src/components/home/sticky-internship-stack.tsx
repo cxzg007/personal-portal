@@ -8,7 +8,7 @@ type StickyInternshipStackProps = {
 
 export function StickyInternshipStack({ internships }: StickyInternshipStackProps) {
   return (
-    <section className="sticky-internship-stack" id="internships">
+    <section className="sticky-internship-stack">
       <ol className="sticky-internship-list">
         {internships.map((internship, index) => (
           <li key={internship.id}>

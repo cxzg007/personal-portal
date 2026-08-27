@@ -24,7 +24,7 @@ describe("sticky internship stack", () => {
     expect(cards[1]).toHaveAttribute("data-layout", "visual-copy");
     expect(cards[2]).toHaveAttribute("data-card-index", "2");
     expect(cards[2]).toHaveAttribute("data-layout", "copy-visual");
-    expect(container.querySelector("section#internships")).not.toBeNull();
+    expect(container.querySelector("section.sticky-internship-stack")).not.toBeNull();
   });
 
   it("exposes every internship fully via static visible content", () => {

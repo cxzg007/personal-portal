@@ -4,6 +4,7 @@ import type { Locator, Page } from "@playwright/test";
 
 const auditedRoutes = ["/", "/blog", "/blog/first-agent-system"] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
+const primaryNavItems = ["信息", "实习", "系统", "开源", "荣誉", "博客", "联系", "GitHub", "简历"] as const;
 
 async function expectNextTab(page: Page, target: Locator) {
   await page.keyboard.press("Tab");
@@ -33,9 +34,11 @@ for (const route of auditedRoutes) {
   });
 }
 
-test("desktop keyboard order covers skip navigation, primary actions, disclosures, and contact", async ({
-  page,
-}) => {
+test("desktop keyboard order covers skip navigation, nine nav links, hero actions, and contact", async (
+  { page },
+  testInfo,
+) => {
+  test.skip(testInfo.project.name !== "chromium", "desktop keyboard order is a desktop-only layout");
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
@@ -50,63 +53,38 @@ test("desktop keyboard order covers skip navigation, primary actions, disclosure
   const desktopNavigation = page.getByRole("navigation", { name: "主导航" });
   await expect(desktopNavigation).toBeVisible();
 
-  const hero = page.getByRole("region", { name: "江俊杰" });
-  const primaryAction = hero.getByRole("link", { name: "查看实习经历" });
-  const resumeAction = hero.getByRole("link", { name: "下载简历" });
-  const heroEmail = hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com" });
-  const heroGithub = hero.getByRole("link", { name: "GitHub / cxzg007" });
+  const hero = page.getByRole("region", { name: /cxzg007 Profile/ });
+  const postTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
+  const openSource = page.locator("main > section#open-source");
+  const contact = page.locator("main > section#contact");
 
-  const preInternshipSequence = [
+  const keyboardOrder = [
     skipLink,
     page.getByRole("link", { name: "返回首页" }),
-    ...["首页", "实习", "系统设计", "博客", "关于", "简历"].map((name) =>
-      desktopNavigation.getByRole("link", { exact: true, name }),
+    ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
+    hero.getByRole("link", { name: "查看实习", exact: true }),
+    hero.getByRole("link", { name: "下载简历", exact: true }),
+    hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com", exact: true }),
+    hero.getByRole("link", { name: "GitHub", exact: true }),
+    page.locator("#system-tab-ontology-agent-platform"),
+    ...[0, 1, 2, 3, 4, 5, 6].map((index) =>
+      openSource.getByRole("link", { name: /^PR #/ }).nth(index),
     ),
-    primaryAction,
-    resumeAction,
-    heroEmail,
-    heroGithub,
+    openSource.getByRole("link", { name: "Semantica GitHub 仓库", exact: true }),
+    openSource.getByRole("link", { name: "阅读 Semantica 贡献复盘", exact: true }),
+    page.locator("main > section#writing").getByRole("link", { name: `阅读《${postTitle}》全文` }),
+    contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }),
+    contact.getByRole("link", { name: "GitHub", exact: true }),
+    contact.getByRole("link", { name: "下载简历 PDF", exact: true }),
   ];
 
-  for (const target of preInternshipSequence) {
+  for (const target of keyboardOrder) {
     await expectNextTab(page, target);
     await expectVisibleFocus(target);
   }
 
-  const internshipToggles = page.locator("#internships").getByRole("button", {
-    name: "查看技术细节",
-  });
-  await expect(internshipToggles).toHaveCount(3);
-
-  for (let index = 0; index < 3; index += 1) {
-    const toggle = internshipToggles.nth(index);
-    await expectNextTab(page, toggle);
-    await expectVisibleFocus(toggle);
-    await page.keyboard.press("Enter");
-    await expect(toggle).toHaveAttribute("aria-expanded", "true");
-    await page.keyboard.press("Space");
-    await expect(toggle).toHaveAttribute("aria-expanded", "false");
-    await expect(toggle).toBeFocused();
-  }
-
-  const contact = page.locator("#about");
-  const postTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
-  const postInternshipSequence = [
-    page.locator("#open-source").locator("summary", { hasText: "更多贡献" }),
-    page.locator("#open-source").getByRole("link", { name: "查看 Semantica GitHub 项目" }),
-    page.locator("#open-source").getByRole("link", { name: "阅读 Semantica 贡献复盘" }),
-    page.locator("#writing").getByRole("link", { name: "查看全部文章" }),
-    page.locator("#writing").getByRole("link", { exact: true, name: postTitle }),
-    page.locator("#writing").getByRole("link", { name: `阅读文章：${postTitle}` }),
-    contact.getByRole("link", { name: "发送邮件联系江俊杰" }),
-    contact.getByRole("link", { name: "查看 cxzg007 的 GitHub" }),
-    contact.getByRole("link", { name: "下载 PDF 简历" }),
-  ];
-
-  for (const target of postInternshipSequence) {
-    await expectNextTab(page, target);
-    await expectVisibleFocus(target);
-  }
+  await page.keyboard.press("Tab");
+  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
 });
 
 test("mobile navigation is operable by keyboard and restores focus on close", async ({ page }) => {
@@ -135,7 +113,7 @@ test("mobile navigation is operable by keyboard and restores focus on close", as
   await expect(mobileNavigation).toBeVisible();
   await expectNextTab(page, closeButton);
 
-  for (const name of ["首页", "实习", "系统设计", "博客", "关于", "简历"]) {
+  for (const name of primaryNavItems) {
     const link = mobileNavigation.getByRole("link", { exact: true, name });
     await expectNextTab(page, link);
     await expectVisibleFocus(link);
@@ -146,7 +124,8 @@ test("mobile navigation is operable by keyboard and restores focus on close", as
   await expect(menuToggle).toBeFocused();
 });
 
-test("blog filters and article actions remain keyboard operable", async ({ page }) => {
+test("blog filters and article actions remain keyboard operable", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "desktop keyboard order is a desktop-only layout");
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/blog");
 
@@ -159,9 +138,7 @@ test("blog filters and article actions remain keyboard operable", async ({ page 
   for (const target of [
     skipLink,
     siteMark,
-    ...["首页", "实习", "系统设计", "博客", "关于", "简历"].map((name) =>
-      desktopNavigation.getByRole("link", { exact: true, name }),
-    ),
+    ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
     search,
   ]) {
     await expectNextTab(page, target);
@@ -188,12 +165,13 @@ test("blog filters and article actions remain keyboard operable", async ({ page 
   await expectNextTab(page, page.getByRole("link", { name: `阅读文章：${articleTitle}` }));
 });
 
-test("reduced motion preserves content and removes Canvas", async ({ page }) => {
+test("reduced motion preserves content, removes Canvas, and sets the static profile", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
   await expect(page.locator("canvas")).toHaveCount(0);
-  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "查看实习经历" })).toBeVisible();
-  await expect(page.locator("#internships")).toBeVisible();
+  await expect(page.locator("html[data-profile-motion='static']")).toHaveCount(1);
+  await expect(page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: "查看实习", exact: true })).toBeVisible();
+  await expect(page.locator("main > section#internships")).toBeVisible();
 });

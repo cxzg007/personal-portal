@@ -138,6 +138,7 @@ function mountEnhancedPage() {
     height: 400,
     width: 1_000,
   });
+  vi.spyOn(document.documentElement, "scrollHeight", "get").mockReturnValue(5_000);
   render(<PageMotionController />);
 }
 
@@ -289,6 +290,25 @@ describe("page motion controller", () => {
     expect(document.querySelector('a[data-nav-section="info"]')).not.toHaveAttribute(
       "aria-current",
     );
+  });
+
+  it("activates the last navigation section when the page is scrolled to the bottom", () => {
+    stubMatchMedia({});
+    mountEnhancedPage();
+
+    vi.spyOn(window, "scrollY", "get").mockReturnValue(5_000);
+    dispatchScroll();
+
+    const lastSectionId = [
+      ...document.querySelectorAll<HTMLAnchorElement>("a[data-nav-section]"),
+    ]
+      .map((link) => link.getAttribute("data-nav-section"))
+      .filter((id): id is string => id !== null && document.getElementById(id) !== null)
+      .at(-1)!;
+    expect(document.documentElement).toHaveAttribute("data-active-section", lastSectionId);
+    expect(
+      document.querySelector(`a[data-nav-section="${lastSectionId}"]`),
+    ).toHaveAttribute("aria-current", "location");
   });
 
   it("schedules at most one requestAnimationFrame per scroll or pointer event", () => {

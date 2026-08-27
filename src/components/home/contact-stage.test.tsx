@@ -22,7 +22,7 @@ describe("ContactStage", () => {
   it("links the email, GitHub profile, and downloadable resume exactly once each", () => {
     render(<ContactStage profile={profile} />);
 
-    const email = screen.getByRole("link", { name: profile.email });
+    const email = screen.getByRole("link", { name: `发送邮件至 ${profile.email}` });
     expect(email).toHaveAttribute("href", `mailto:${profile.email}`);
 
     const github = screen.getByRole("link", { name: "GitHub" });

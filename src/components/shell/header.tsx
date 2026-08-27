@@ -63,8 +63,11 @@ export function Header() {
     if (typeof window.matchMedia !== "function") return;
 
     const desktopBreakpoint = window.matchMedia("(min-width: 761px)");
-    const handleBreakpointChange = (event: MediaQueryListEvent) => {
-      if (event.matches) setIsOpen(false);
+    // Any breakpoint crossing resets the menu: entering desktop must close it,
+    // and a rapid desktop round-trip can coalesce the media query change events
+    // into a single matches=false dispatch, which must still reset the menu.
+    const handleBreakpointChange = () => {
+      setIsOpen(false);
     };
 
     desktopBreakpoint.addEventListener("change", handleBreakpointChange);
@@ -75,6 +78,7 @@ export function Header() {
     <header className="site-header" id="top">
       <div className="header-inner">
         <Link className="site-mark" href="/#top" aria-label="返回首页">
+          <span aria-hidden="true">⌁</span>
           <span>cxzg007.</span>
         </Link>
 

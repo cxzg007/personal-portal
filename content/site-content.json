@@ -214,7 +214,7 @@
     "name": "Semantica",
     "logo": { "src": "/brands/semantica.png", "alt": "Semantica 项目标志", "theme": "semantica" },
     "identity": "Open-source Contributor · cxzg007",
-    "background": "Semantica 是知识图谱与推理基础设施项目；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
+    "background": "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
     "snapshotDate": "2026-08-21",
     "honors": [
       { "platform": "GitHub Trending", "rank": "#1 Repository of the Day", "period": "Daily", "evidence": "User-provided public ranking screenshot" },
