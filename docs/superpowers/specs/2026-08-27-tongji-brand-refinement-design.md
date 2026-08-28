@@ -19,7 +19,7 @@
 
 ## 3. B 模块：简历入口隐藏
 
-- 移除页面 UI 中的简历下载链接（侧栏与导航中的简历入口）。
+- 移除页面 UI 中的全部三处简历下载入口：首屏 CTA（`profile-hero.tsx` 的「下载简历」次按钮）、联系区块（`contact-stage.tsx` 的「下载简历 PDF」）、顶部导航（`header.tsx` 的「简历」项）。
 - 保留 `public/resume.pdf` 文件本体、`resume-asset` 构建期校验与 metadata 相关测试，文件仍可经直链访问。
 - `tests/e2e/server-rendering.spec.ts` 中针对简历链接可见性的断言同步改写为「UI 不渲染简历链接」；`metadata.spec.ts` 与简历资产校验保持通过。
 
@@ -40,7 +40,7 @@
 
 ### 5.2 徽章区块设计
 
-- 侧栏教育行重排为徽章区块：左侧校徽图（约 32–36px，圆角处理与现有卡片体系协调）+ 右侧「同济大学」衬线大字（Noto Serif SC，字重约 600）。
+- 侧栏教育行重排为徽章区块：左侧校徽图（`/brands/tongji.png`，36px，沿用 `public/brands/` 资产目录与 `SOURCES.md` 来源记录惯例，next/image 渲染与 `BrandMark` 一致）+ 右侧「同济大学」衬线大字（Noto Serif SC，字重 600）。
 - 其下为紧凑层级：专业、学位、毕业年份按现有信息降级排列，字段间距统一收紧，消除当前「斜杠串联」的拥挤感。
 - 个人介绍区 `profile-info.tsx` 的学校值同步使用衬线字体渲染，保持两处一致。
 
