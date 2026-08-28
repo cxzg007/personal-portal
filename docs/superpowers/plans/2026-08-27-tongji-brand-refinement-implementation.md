@@ -31,7 +31,7 @@
 - Consumes: `content/site-content.json` 的 `profile.education[].school` 字段（现有值「同济大学电子与信息工程学院」）。
 - Produces: `school` 值统一为「同济大学」；下游 `profile-dock.tsx`、`profile-info.tsx`、JSON-LD `alumniOf` 随数据自动更新，后续任务无需再改学校文案。
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 创建 `src/content/site-content.test.ts`：
 
@@ -53,26 +53,26 @@ describe("site-content education copy", () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `pnpm exec vitest run src/content/site-content.test.ts`
 Expected: FAIL，实际值为「同济大学电子与信息工程学院」。
 
-- [ ] **Step 3: 修改数据**
+- [x] **Step 3: 修改数据**
 
 `content/site-content.json` 第 10 行与第 20 行，将 `"school": "同济大学电子与信息工程学院"` 改为 `"school": "同济大学"`（两处，major/degree/graduationYear 等其余字段不动）。
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `pnpm exec vitest run src/content/site-content.test.ts`
 Expected: PASS（1 个测试）。
 
-- [ ] **Step 5: 回归真实内容加载的既有单测**
+- [x] **Step 5: 回归真实内容加载的既有单测**
 
 Run: `pnpm exec vitest run src/components/home`
 Expected: PASS（fixtures 已用「同济大学」，不受影响）。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add content/site-content.json src/content/site-content.test.ts
@@ -93,7 +93,7 @@ git commit -m "content: simplify school names to 同济大学"
 - Consumes: Task 1 后的内容数据（无学校文案耦合）。
 - Produces: 页面 UI 不再渲染任何 `href="/resume.pdf"` 链接；`public/resume.pdf`、`src/lib/resume-asset.ts` 构建校验、`tests/e2e/metadata.spec.ts:40-44` 资产测试全部保留不动。
 
-- [ ] **Step 1: 先改单测断言为「不存在」**
+- [x] **Step 1: 先改单测断言为「不存在」**
 
 `src/components/home/profile-hero.test.tsx` 第 19 行改为：
 
@@ -115,12 +115,12 @@ git commit -m "content: simplify school names to 同济大学"
     );
 ```
 
-- [ ] **Step 2: 运行单测确认失败**
+- [x] **Step 2: 运行单测确认失败**
 
 Run: `pnpm exec vitest run src/components/home/profile-hero.test.tsx src/components/home/contact-stage.test.tsx src/components/home/page-motion-controller.test.tsx`
 Expected: FAIL（组件仍渲染简历链接）。
 
-- [ ] **Step 3: 实施组件改动**
+- [x] **Step 3: 实施组件改动**
 
 `src/components/home/profile-hero.tsx`：删除第 20-22 行的 secondary CTA：
 
@@ -146,12 +146,12 @@ Expected: FAIL（组件仍渲染简历链接）。
             prefetch={item.href === "/resume.pdf" ? false : null}
 ```
 
-- [ ] **Step 4: 运行单测确认通过**
+- [x] **Step 4: 运行单测确认通过**
 
 Run: `pnpm exec vitest run src/components/home`
 Expected: PASS（全部）。
 
-- [ ] **Step 5: 改写 e2e 断言**
+- [x] **Step 5: 改写 e2e 断言**
 
 `tests/e2e/home.spec.ts`：
 - 删除第 23 行 `await expect(hero.getByRole("link", { name: "下载简历" })).toHaveAttribute("href", "/resume.pdf");`
@@ -170,12 +170,12 @@ Expected: PASS（全部）。
   await expect(page.getByRole("link", { name: /简历/ })).toHaveCount(0);
 ```
 
-- [ ] **Step 6: 运行 e2e 确认通过**
+- [x] **Step 6: 运行 e2e 确认通过**
 
 Run: `pnpm exec playwright test tests/e2e/home.spec.ts tests/e2e/accessibility.spec.ts tests/e2e/responsive.spec.ts tests/e2e/server-rendering.spec.ts`
 Expected: PASS（全部用例；metadata.spec 的 resume 资产直链测试不受影响，可在 Step 7 一并跑）。
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```bash
 git add src/components/home/profile-hero.tsx src/components/home/contact-stage.tsx src/components/shell/header.tsx src/components/home/profile-hero.test.tsx src/components/home/contact-stage.test.tsx src/components/home/page-motion-controller.test.tsx tests/e2e/home.spec.ts tests/e2e/accessibility.spec.ts tests/e2e/responsive.spec.ts tests/e2e/server-rendering.spec.ts
@@ -198,12 +198,12 @@ git commit -m "feat: remove resume download links from UI while keeping the publ
 - Consumes: Task 1 后的 `education[0]`（school=「同济大学」、major、degree、graduationYear）；`BrandAsset` schema 不涉及（徽章图不在 internships/openSource 配置内，`assertValidBrandAssets` 不校验它）。
 - Produces: 侧栏教育区块渲染 36px 校徽图（next/image，`/brands/tongji.png`）+ 衬线「同济大学」+ 紧凑专业/学位/年份层级；页面不新增交互。
 
-- [ ] **Step 1: 添加字体依赖并验证镜像可装**
+- [x] **Step 1: 添加字体依赖并验证镜像可装**
 
 Run: `/bin/zsh -lc 'cd "/Users/jiangjunjie.37/personal portal/.worktrees/personal-portal" && pnpm add @fontsource/noto-serif-sc'`
 Expected: 依赖装入 `package.json`（默认 400 字重；600 字重按 CSS import 按需引入）。
 
-- [ ] **Step 2: 写失败测试**
+- [x] **Step 2: 写失败测试**
 
 创建 `src/components/home/profile-dock.test.tsx`：
 
@@ -235,12 +235,12 @@ describe("ProfileDock education badge", () => {
 
 注：若 `loadSiteContent` 的实际导出名或路径不同（侦查时为 `@/content/loader` 的约定），以现有 `profile-info.test.tsx` 等真实用法为准；测试中 import 路径须与项目实际一致。若 ProfileDock 接收 props（如 `education` 数组），按现有调用方式传参，而不是依赖 loader。
 
-- [ ] **Step 3: 运行测试确认失败**
+- [x] **Step 3: 运行测试确认失败**
 
 Run: `pnpm exec vitest run src/components/home/profile-dock.test.tsx`
 Expected: FAIL（找不到 img 角色 / 校徽）。
 
-- [ ] **Step 4: 复制校徽资产并补录来源**
+- [x] **Step 4: 复制校徽资产并补录来源**
 
 ```bash
 cp "/Users/jiangjunjie.37/personal portal/brand-assets/badge.png" public/brands/tongji.png
@@ -259,7 +259,7 @@ cp "/Users/jiangjunjie.37/personal portal/brand-assets/badge.png" public/brands/
 - Retrieved: 2026-08-28
 ```
 
-- [ ] **Step 5: 重构 ProfileDock 教育区块**
+- [x] **Step 5: 重构 ProfileDock 教育区块**
 
 `src/components/home/profile-dock.tsx`：将 education 行的 `span(school)/"//"/span(major)/"//"/span(degree)/"//"/span(graduationYear)` 斜杠串联结构，重写为（保留现有 className 命名风格，标注无障碍）：
 
@@ -288,7 +288,7 @@ cp "/Users/jiangjunjie.37/personal portal/brand-assets/badge.png" public/brands/
 
 `import Image from "next/image";` 加到文件顶部 import 区。若组件当前从 `education` 数组按索引取值，保持取 `education[0]`（硕士条目）或两条 education 均渲染徽章块——以现有组件对 `profile.education` 的遍历方式为准，徽章块结构套用于每个条目外层，img 仅首条渲染一次（两条教育记录均为同济，校徽显示一次即可；实现时若组件本来就 map 全部条目，可仅在 `index === 0` 时渲染 Image，或拆出独立徽章行放 map 之上——以视觉合理为准并同步测试断言 `getAllByRole("img", ...)` 与实际数量一致）。
 
-- [ ] **Step 6: 字体 import**
+- [x] **Step 6: 字体 import**
 
 `src/app/layout.tsx` 顶部 import 区追加：
 
@@ -298,7 +298,7 @@ import "@fontsource/noto-serif-sc/600.css";
 
 （600 字重即可满足标题级衬线展示；如需 400 备用再加。）
 
-- [ ] **Step 7: CSS 重写**
+- [x] **Step 7: CSS 重写**
 
 `src/app/profile.css` 191-206 行附近：删除现有 `.profile-dock-education` 旧网格/斜杠 span 样式，重写为：
 
@@ -342,17 +342,17 @@ import "@fontsource/noto-serif-sc/600.css";
 
 变量 `--font-serif-sc` 不必在 globals.css 定义（CSS 直接写字体栈回退即可，保持零额外全局改动）；颜色变量名以现有 profile.css 实际使用的变量为准（侦查为 `var(--muted-foreground)` 风格，若实际不同则替换成文件中已存在的等价变量）。
 
-- [ ] **Step 8: 运行单测确认通过**
+- [x] **Step 8: 运行单测确认通过**
 
 Run: `pnpm exec vitest run src/components/home`
 Expected: PASS（含新 profile-dock 测试与受牵连的其他组件测试）。
 
-- [ ] **Step 9: 视觉冒烟（e2e 回归）**
+- [x] **Step 9: 视觉冒烟（e2e 回归）**
 
 Run: `pnpm exec playwright test tests/e2e/responsive.spec.ts tests/e2e/server-rendering.spec.ts`
 Expected: PASS（侧栏文本变化不停导致断言失败；若某用例断言了旧「//」串联文本，按新结构同步修正该断言）。
 
-- [ ] **Step 10: 提交**
+- [x] **Step 10: 提交**
 
 ```bash
 git add package.json pnpm-lock.yaml public/brands/tongji.png public/brands/SOURCES.md src/app/layout.tsx src/app/profile.css src/components/home/profile-dock.tsx src/components/home/profile-dock.test.tsx
@@ -370,12 +370,12 @@ git commit -m "feat: add Tongji badge block with Noto Serif SC to profile dock"
 - Consumes: Task 2/3 后的 DOM 结构（简历链接已移除、侧栏新增 img/文本节点）。
 - Produces: 动效「导航区段覆盖」单测与真实 DOM 保持一致，防止遗漏动态元素。
 
-- [ ] **Step 1: 全量运行动效单测**
+- [x] **Step 1: 全量运行动效单测**
 
 Run: `pnpm exec vitest run src/components/home/page-motion-controller.test.tsx`
 Expected: PASS（Task 2 已删 454-456 行简历特判）。若失败，按 spec 的意图修正断言（动态元素须带 data-nav-section 或被显式豁免），不改产品代码。
 
-- [ ] **Step 2: 提交（如无改动则跳过）**
+- [x] **Step 2: 提交（如无改动则跳过）**
 
 无文件改动则本任务无 commit；有断言修正则单独 commit：`test: align motion controller coverage with post-refactor DOM`。
 
@@ -391,17 +391,17 @@ Expected: PASS（Task 2 已删 454-456 行简历特判）。若失败，按 spec
 - Consumes: 已部署的生产项目 `jiangjunjie-personal-portal`（团队 `junjie1467-6343s-projects`）。
 - Produces: 新生产 URL `https://jiangjunjie.vercel.app`；旧域 `jiangjunjie-personal-portal.vercel.app` 自动 301 重定向；`NEXT_PUBLIC_SITE_URL` 生产环境变量同步更新。
 
-- [ ] **Step 1: 改子域名（用户已授权 CLI 尝试，失败回退人工控制台）**
+- [x] **Step 1: 改子域名（用户已授权 CLI 尝试，失败回退人工控制台）**
 
 优先用本机已登录的 Vercel CLI 尝试（子域名与项目名绑定，评估 `vercel` CLI 的项目改名/domains 能力，如 `npx -y --registry=https://registry.npmmirror.com vercel@latest domains` 与项目相关子命令）；CLI 不支持改名时，回退人工：项目 Settings → Domains → Rename/Add domain 为 `jiangjunjie.vercel.app`，并请用户确认完成。
 - 若提示 `jiangjunjie.vercel.app` 已被占用：回退第二选择 `jjjiang.vercel.app`（后续步骤与验收 URL 同步替换）。
 - **完成 CLI/控制台操作后检查 `.gitignore` 是否被篡改、`.vercel/` 是否生成，有则还原/删除。**
 
-- [ ] **Step 2: 更新生产环境变量**
+- [x] **Step 2: 更新生产环境变量**
 
 控制台：Settings → Environment Variables → 将 `NEXT_PUBLIC_SITE_URL` 的 Production 值改为 `https://jiangjunjie.vercel.app`（或回退域名值），保存后须重新部署才生效（Task 6 部署即触发）。
 
-- [ ] **Step 3: 验证仓库无域名硬编码**
+- [x] **Step 3: 验证仓库无域名硬编码**
 
 Run: `grep -rn "jiangjunjie-personal-portal.vercel.app" src/ tests/ content/` 
 Expected: 无输出（若有命中则按 site-url 体系改为读 `NEXT_PUBLIC_SITE_URL` 的值，不留硬编码）。
@@ -417,7 +417,7 @@ Expected: 无输出（若有命中则按 site-url 体系改为读 `NEXT_PUBLIC_S
 - Consumes: Task 1-5 全部完成后的代码库与 Vercel 项目。
 - Produces: 生产站点在新子域上线，旧域 301，metadata/JSON-LD/sitemap/rss 指向新域。
 
-- [ ] **Step 1: 本地全量验证**
+- [x] **Step 1: 本地全量验证**
 
 Run: `/bin/zsh -lc 'cd "/Users/jiangjunjie.37/personal portal/.worktrees/personal-portal" && pnpm verify'`
 Expected: lint + typecheck + unit + e2e 全部 PASS。
