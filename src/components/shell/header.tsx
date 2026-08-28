@@ -12,7 +12,6 @@ const navigation = [
   { label: "博客", href: "#writing" },
   { label: "联系", href: "#contact" },
   { label: "GitHub", href: "https://github.com/cxzg007" },
-  { label: "简历", href: "/resume.pdf" },
 ] as const;
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
@@ -24,7 +23,6 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
             href={item.href}
             onClick={onNavigate}
             data-nav-section={item.href.startsWith("#") ? item.href.slice(1) : undefined}
-            prefetch={item.href === "/resume.pdf" ? false : null}
             rel={item.href.startsWith("http") ? "noreferrer" : undefined}
             target={item.href.startsWith("http") ? "_blank" : undefined}
           >

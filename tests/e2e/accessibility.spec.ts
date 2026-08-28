@@ -4,7 +4,7 @@ import type { Locator, Page } from "@playwright/test";
 
 const auditedRoutes = ["/", "/blog", "/blog/first-agent-system"] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
-const primaryNavItems = ["信息", "实习", "系统", "开源", "荣誉", "博客", "联系", "GitHub", "简历"] as const;
+const primaryNavItems = ["信息", "实习", "系统", "开源", "荣誉", "博客", "联系", "GitHub"] as const;
 
 async function expectNextTab(page: Page, target: Locator) {
   await page.keyboard.press("Tab");
@@ -63,7 +63,6 @@ test("desktop keyboard order covers skip navigation, nine nav links, hero action
     page.getByRole("link", { name: "返回首页" }),
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
     hero.getByRole("link", { name: "查看实习", exact: true }),
-    hero.getByRole("link", { name: "下载简历", exact: true }),
     hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com", exact: true }),
     hero.getByRole("link", { name: "GitHub", exact: true }),
     page.locator("#system-tab-ontology-agent-platform"),
@@ -75,7 +74,6 @@ test("desktop keyboard order covers skip navigation, nine nav links, hero action
     page.locator("main > section#writing").getByRole("link", { name: `阅读《${postTitle}》全文` }),
     contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }),
     contact.getByRole("link", { name: "GitHub", exact: true }),
-    contact.getByRole("link", { name: "下载简历 PDF", exact: true }),
   ];
 
   for (const target of keyboardOrder) {

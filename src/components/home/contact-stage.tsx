@@ -14,11 +14,6 @@ export function ContactStage({ profile }: { profile: SiteContent["profile"] }) {
             GitHub
           </a>
         </li>
-        <li>
-          <a href="/resume.pdf" download>
-            下载简历 PDF
-          </a>
-        </li>
       </ul>
     </section>
   );

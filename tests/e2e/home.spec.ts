@@ -20,7 +20,6 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
     "https://github.com/cxzg007",
   );
   await expect(page.getByRole("link", { name: "查看实习" })).toHaveAttribute("href", "#internships");
-  await expect(hero.getByRole("link", { name: "下载简历" })).toHaveAttribute("href", "/resume.pdf");
   await expect(page.getByRole("link", { name: "教育" })).toHaveCount(0);
 });
 
@@ -79,12 +78,10 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   const contact = page.locator("main > section#contact");
   const email = contact.getByRole("link", { name: "jiangjunjie_tj@foxmail.com" });
   const github = contact.getByRole("link", { name: "GitHub", exact: true });
-  const resume = contact.getByRole("link", { name: "下载简历 PDF" });
   await expect(email).toHaveAttribute("href", "mailto:jiangjunjie_tj@foxmail.com");
   await expect(github).toHaveAttribute("href", "https://github.com/cxzg007");
-  await expect(resume).toHaveAttribute("href", "/resume.pdf");
 
-  for (const link of [email, github, resume]) {
+  for (const link of [email, github]) {
     for (let step = 0; step < 40; step += 1) {
       if (await link.evaluate((element) => document.activeElement === element)) break;
       await page.keyboard.press("Tab");

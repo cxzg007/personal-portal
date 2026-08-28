@@ -17,9 +17,6 @@ export function ProfileHero({ profile }: ProfileHeroProps) {
           <a className="profile-cta profile-cta-primary" href="#internships">
             查看实习
           </a>
-          <a className="profile-cta profile-cta-secondary" href="/resume.pdf">
-            下载简历
-          </a>
         </div>
       </div>
       <ProfileDock profile={profile} />

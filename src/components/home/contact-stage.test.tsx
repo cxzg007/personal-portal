@@ -19,7 +19,7 @@ describe("ContactStage", () => {
     expect(screen.getByText(profile.recruitingStatus)).toBeVisible();
   });
 
-  it("links the email, GitHub profile, and downloadable resume exactly once each", () => {
+  it("links the email and GitHub profile exactly once each", () => {
     render(<ContactStage profile={profile} />);
 
     const email = screen.getByRole("link", { name: `发送邮件至 ${profile.email}` });
@@ -30,8 +30,6 @@ describe("ContactStage", () => {
     expect(github).toHaveAttribute("target", "_blank");
     expect(github).toHaveAttribute("rel", "noreferrer");
 
-    const resume = screen.getByRole("link", { name: "下载简历 PDF" });
-    expect(resume).toHaveAttribute("href", "/resume.pdf");
-    expect(resume).toHaveAttribute("download");
+    expect(screen.queryByRole("link", { name: "下载简历 PDF" })).not.toBeInTheDocument();
   });
 });

@@ -108,7 +108,6 @@ for (const viewport of viewports) {
     const hero = page.getByRole("region", { name: /cxzg007 Profile/ });
     await expectHorizontallyContained(hero.locator(".profile-hero-copy"));
     await expectHorizontallyContained(hero.getByRole("link", { name: "查看实习", exact: true }));
-    await expectHorizontallyContained(hero.getByRole("link", { name: "下载简历", exact: true }));
     await expectHorizontallyContained(hero.getByLabel("联系方式"));
     await expectHorizontallyContained(hero.getByLabel("教育经历"));
 
@@ -143,7 +142,6 @@ for (const viewport of viewports) {
     const contact = page.locator("main > section#contact");
     await expectHorizontallyContained(contact);
     await expectHorizontallyContained(contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }));
-    await expectHorizontallyContained(contact.getByRole("link", { name: "下载简历 PDF" }));
 
     await expectNoHiddenOffscreenContent(page);
     await expectNoHorizontalOverflow(page);

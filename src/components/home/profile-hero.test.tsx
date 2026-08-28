@@ -16,7 +16,7 @@ describe("profile hero", () => {
     expect(screen.getByRole("heading", { level: 1, name: "cxzg007 Profile" })).toBeVisible();
     expect(screen.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
     expect(screen.getByRole("link", { name: "查看实习" })).toHaveAttribute("href", "#internships");
-    expect(screen.getByRole("link", { name: "下载简历" })).toHaveAttribute("href", "/resume.pdf");
+    expect(screen.queryByRole("link", { name: "下载简历" })).not.toBeInTheDocument();
     expect(screen.getByText("通信工程 → 后端系统 → Agent / 知识图谱 → 可靠 AI 工程")).toBeVisible();
   });
 

@@ -451,8 +451,5 @@ describe("page motion controller", () => {
     expect(document.querySelector('a[href="https://github.com/cxzg007"]')).not.toHaveAttribute(
       "data-nav-section",
     );
-    expect(document.querySelector('a[href="/resume.pdf"]')).not.toHaveAttribute(
-      "data-nav-section",
-    );
   });
 });

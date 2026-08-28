@@ -12,5 +12,5 @@ test("core recruiting content is server rendered", async ({ page }) => {
   await expect(page.getByText("#1 Repository of the Day")).toBeVisible();
   await expect(page.getByRole("link", { name: /发送邮件/ })).toHaveAttribute("href", "mailto:jiangjunjie_tj@foxmail.com");
   await expect(page.getByRole("link", { name: /GitHub/ }).last()).toHaveAttribute("href", "https://github.com/cxzg007");
-  await expect(page.getByRole("link", { name: /简历/ }).last()).toHaveAttribute("href", "/resume.pdf");
+  await expect(page.getByRole("link", { name: /简历/ })).toHaveCount(0);
 });
