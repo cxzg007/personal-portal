@@ -219,6 +219,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 
 .profile-dock-serif {
   font-family: "Noto Serif SC", "Songti SC", serif;
+  font-weight: 600;
 }
 
 .profile-dock-education-detail {

@@ -45,7 +45,9 @@ describe("profile dock", () => {
     render(<ProfileDock profile={profile} />);
 
     const education = profile.education[0];
-    const school = screen.getAllByText(education.school).at(-1);
+    const educationList = screen.getByRole("list", { name: "教育经历" });
+    const firstItem = within(educationList).getAllByRole("listitem")[0];
+    const school = within(firstItem).getByText(education.school);
     expect(school).toHaveClass("profile-dock-education-school", "profile-dock-serif");
   });
 
