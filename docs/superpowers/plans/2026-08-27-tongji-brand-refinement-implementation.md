@@ -391,9 +391,9 @@ Expected: PASS（Task 2 已删 454-456 行简历特判）。若失败，按 spec
 - Consumes: 已部署的生产项目 `jiangjunjie-personal-portal`（团队 `junjie1467-6343s-projects`）。
 - Produces: 新生产 URL `https://jiangjunjie.vercel.app`；旧域 `jiangjunjie-personal-portal.vercel.app` 自动 301 重定向；`NEXT_PUBLIC_SITE_URL` 生产环境变量同步更新。
 
-- [ ] **Step 1: 改子域名（需用户授权或在控制台操作）**
+- [ ] **Step 1: 改子域名（用户已授权 CLI 尝试，失败回退人工控制台）**
 
-`npx -y --registry=https://registry.npmmirror.com vercel@latest domains` 确认可用性；**改短子域名建议在控制台完成**：项目 Settings → Domains → Rename/Add domain 为 `jiangjunjie.vercel.app`。
+优先用本机已登录的 Vercel CLI 尝试（子域名与项目名绑定，评估 `vercel` CLI 的项目改名/domains 能力，如 `npx -y --registry=https://registry.npmmirror.com vercel@latest domains` 与项目相关子命令）；CLI 不支持改名时，回退人工：项目 Settings → Domains → Rename/Add domain 为 `jiangjunjie.vercel.app`，并请用户确认完成。
 - 若提示 `jiangjunjie.vercel.app` 已被占用：回退第二选择 `jjjiang.vercel.app`（后续步骤与验收 URL 同步替换）。
 - **完成 CLI/控制台操作后检查 `.gitignore` 是否被篡改、`.vercel/` 是否生成，有则还原/删除。**
 
