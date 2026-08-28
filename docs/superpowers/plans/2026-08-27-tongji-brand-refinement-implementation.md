@@ -393,6 +393,8 @@ Expected: PASS（Task 2 已删 454-456 行简历特判）。若失败，按 spec
 
 - [x] **Step 1: 改子域名（用户已授权 CLI 尝试，失败回退人工控制台）**
 
+> **2026-08-28 事后修正**：CLI rename 虽报 Success，但团队账号实际不会分配纯短子域，`jiangjunjie.vercel.app` 从未生效（Task 6 部署后确认 404）；最终经用户决策 rename 回 `jiangjunjie-personal-portal`，本任务域名变更目标整体放弃，详见 Task 6 Step 4 偏差记录。
+
 优先用本机已登录的 Vercel CLI 尝试（子域名与项目名绑定，评估 `vercel` CLI 的项目改名/domains 能力，如 `npx -y --registry=https://registry.npmmirror.com vercel@latest domains` 与项目相关子命令）；CLI 不支持改名时，回退人工：项目 Settings → Domains → Rename/Add domain 为 `jiangjunjie.vercel.app`，并请用户确认完成。
 - 若提示 `jiangjunjie.vercel.app` 已被占用：回退第二选择 `jjjiang.vercel.app`（后续步骤与验收 URL 同步替换）。
 - **完成 CLI/控制台操作后检查 `.gitignore` 是否被篡改、`.vercel/` 是否生成，有则还原/删除。**
@@ -422,21 +424,24 @@ Expected: 无输出（若有命中则按 site-url 体系改为读 `NEXT_PUBLIC_S
 Run: `/bin/zsh -lc 'cd "/Users/jiangjunjie.37/personal portal/.worktrees/personal-portal" && pnpm verify'`
 Expected: lint + typecheck + unit + e2e 全部 PASS。
 
-- [ ] **Step 2: 提交计划勾选与 push**
+- [x] **Step 2: 提交计划勾选与 push**
 
 （执行者按完成情况更新计划 checkbox 后）
 ```bash
 git push origin feature/personal-portal
 ```
+（commit 656ea05，含 Task 1-5/Task 6 Step 1 勾选与过期视觉快照更新，已 push。）
 
-- [ ] **Step 3: 生产部署**
+- [x] **Step 3: 生产部署**
 
 ```bash
 npx -y --registry=https://registry.npmmirror.com vercel@latest deploy --prod
 ```
 **部署后必须：还原 `.gitignore` 被篡改的行、删除 `.vercel/` 目录，`git status` 干净。**
 
-- [ ] **Step 4: 新域验收**
+（实际部署 3 次：`jiangjunjie-67idhfzwc`、`jjjiang-lr95vap09`、最终 `jiangjunjie-personal-portal-2k4l1rx6m`，均 Ready。CLI 陷阱检查多次通过：无 `.vercel/`、`.gitignore` 无改动、status 干净。）
+
+- [x] **Step 4: 新域验收**（域名方案偏差，见下）
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" https://jiangjunjie.vercel.app/
@@ -448,16 +453,22 @@ curl -s https://jiangjunjie.vercel.app/ | grep -c "下载简历" || echo "0 resu
 ```
 Expected: 首行 200；JSON-LD/sitemap 含新域；tongji.png 与「同济大学」≥1；「下载简历」0。
 
-- [ ] **Step 5: 旧域 301 验收**
+> **域偏差记录（2026-08-28）**：Vercel 团队账号不分配纯短子域（`[project].vercel.app`），项目只获得 `[project]-[team].vercel.app`（且受 SSO 保护不可公开访问）；`jiangjunjie.vercel.app` 与回退域 `jjjiang.vercel.app` 均为 404（vercel.app 为通配 DNS，404 非占用证据）。经用户决策回退旧域：项目名 rename 回 `jiangjunjie-personal-portal`，`NEXT_PUBLIC_SITE_URL` 改回旧域值，重新生产部署。验收在旧域 `https://jiangjunjie-personal-portal.vercel.app` 等效执行：HTTP 200；页面 18 处站点 URL 全部为旧域；sitemap 全部指向旧域；tongji.png=2、同济大学=5、下载简历=0，`/brands/tongji.png` 资产 200。**子域缩短目标（Task 5 Step 1/2 及本任务新域项）经用户决策放弃，旧域为唯一生产域。**
+
+- [x] **Step 5: 旧域 301 验收**（域名方案偏差，见 Step 4 记录）
 
 ```bash
 curl -s -o /dev/null -w "%{http_code} %{redirect_url}\n" https://jiangjunjie-personal-portal.vercel.app/
 ```
 Expected: `301` 且 redirect_url 为 `https://jiangjunjie.vercel.app/`（或回退域名）。
 
-- [ ] **Step 6: 更新记忆与收尾**
+（实际：域变更已放弃，旧域 `200` 直接服务最新内容，非 301；此项按用户决策关闭。）
+
+- [x] **Step 6: 更新记忆与收尾**
 
 生产部署事实（新子域）更新到 `.joycode/memory/reference_production_deployment.md`；向用户报告新旧域验收结果。
+
+（记忆文件已按实际状态更新：项目名 `jiangjunjie-personal-portal`、生产 URL 旧域、纯短域不可用结论。）
 
 ---
 
