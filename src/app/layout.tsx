@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { loadSiteContent } from "@/content/load-site-content";
 import { getSiteUrl } from "@/lib/site-url";
+import "@fontsource/noto-serif-sc/600.css";
 import "./globals.css";
 import "./profile.css";
 

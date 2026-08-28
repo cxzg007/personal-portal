@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import type { SiteContent } from "@/content/schema";
 
 type ProfileDockProps = {
@@ -14,15 +16,29 @@ export function ProfileDock({ profile }: ProfileDockProps) {
       <p className="profile-dock-status">{profile.recruitingStatus}</p>
 
       <ul aria-label="教育经历" className="profile-dock-education">
-        {profile.education.map((education) => (
-          <li key={`${education.school}-${education.degree}-${education.graduationYear}`}>
-            <span>{education.school}</span>
-            <span aria-hidden="true">/</span>
-            <span>{education.major}</span>
-            <span aria-hidden="true">/</span>
-            <span>{education.degree}</span>
-            <span aria-hidden="true">/</span>
-            <span>{education.graduationYear}</span>
+        {profile.education.map((education, index) => (
+          <li
+            key={`${education.school}-${education.degree}-${education.graduationYear}`}
+            className="profile-dock-education-entry"
+          >
+            <div className="profile-dock-education-main">
+              {index === 0 ? (
+                <Image
+                  alt="同济大学校徽"
+                  className="profile-dock-education-badge"
+                  height={36}
+                  src="/brands/tongji.png"
+                  width={36}
+                />
+              ) : null}
+              <span className="profile-dock-education-school profile-dock-serif">
+                {education.school}
+              </span>
+            </div>
+            <span className="profile-dock-education-detail">{education.major}</span>
+            <span className="profile-dock-education-detail">
+              {`${education.degree} · ${education.graduationYear}`}
+            </span>
           </li>
         ))}
       </ul>

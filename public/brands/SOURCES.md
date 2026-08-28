@@ -25,4 +25,13 @@ Retrieval date: 2026-08-21
 - Source repository: https://github.com/semantica-agi/semantica (`Semantica Logo.png` at repository root).
 - Unaltered except file extraction/format preservation.
 
+## tongji.png
+
+- File: public/brands/tongji.png
+- Brand: 同济大学校徽（Tongji University seal）
+- Source: https://www.tongji.edu.cn/xxgk1/xxbs1.htm （同济大学官网「学校标识」页）
+- Extraction method: 下载官网公开提供的透明底 PNG 校徽（140x140），重命名为 tongji.png
+- License/usage: 官网公开标识，仅用于本站「教育背景」个人标识，非商业用途
+- Retrieved: 2026-08-28
+
 The resume portrait and private resume text are intentionally excluded from these public assets.

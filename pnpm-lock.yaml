@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/noto-serif-sc':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@mdx-js/loader':
         specifier: latest
         version: 3.1.1
@@ -453,6 +456,9 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@fontsource/noto-serif-sc@5.3.0':
+    resolution: {integrity: sha512-0/zaEFkidiWldE62rTeD74x8ygUsQvejiSNtO0LQxQk3qpaHnlMZ3w4C7yH80B4KTIg8VKeFP4oSgwWMchY9+g==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1056,8 +1062,8 @@ packages:
   '@types/node@26.2.0':
     resolution: {integrity: sha512-5IviulTZeRNp2vAJ514cc/HUlY5nZ9fCbq9DMyC52BrhFZACo3nI0R7qBxhQmo/d27NFe96ur/b7Wwxklda+kg==}
 
-  '@types/node@26.3.0':
-    resolution: {integrity: sha512-L3fgrnchriRC2ExBflb8j4uZZURHZfQsmQeyVzhjcHW4kkwVyo8/0h1B2MVzMTrYUJYu6G7EWs14hW/L9putqw==}
+  '@types/node@26.4.0':
+    resolution: {integrity: sha512-faiGnoIrLH/V8cibOMEAZ8pMw6oXqSukl29ra4mN8GdaB2ZewzeaLj+INpV5N+Z1eKWzY+IzaIZH2EIR6YZRNQ==}
 
   '@types/react-dom@19.2.4':
     resolution: {integrity: sha512-Bsc+QHgp+P/F02XDzNCY9jnZNCUuLki36KT7VKrTXXLdHf+vHMNZnW1rVu5DNW/rCK+fya3DATySbLM4yhtKUw==}
@@ -3656,6 +3662,8 @@ snapshots:
 
   '@exodus/bytes@1.15.1': {}
 
+  '@fontsource/noto-serif-sc@5.3.0': {}
+
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -3792,7 +3800,7 @@ snapshots:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 26.3.0
+      '@types/node': 26.4.0
       '@types/yargs': 16.0.11
       chalk: 4.0.0
 
@@ -4138,7 +4146,7 @@ snapshots:
     dependencies:
       undici-types: 8.3.0
 
-  '@types/node@26.3.0':
+  '@types/node@26.4.0':
     dependencies:
       undici-types: 8.3.0
 
