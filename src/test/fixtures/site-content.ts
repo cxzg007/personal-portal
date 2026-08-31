@@ -224,24 +224,6 @@ export const validSiteContent = {
       links: [],
     },
   ],
-  academicHonors: [
-    {
-      title: "国家励志奖学金",
-      source: "同济大学",
-      period: "本科",
-      note: "本科在校期间获得国家励志奖学金。",
-    },
-    {
-      title: "大唐杯上海市二等奖",
-      source: "“大唐杯”竞赛",
-      period: "本科",
-      note: "“大唐杯”竞赛上海市二等奖。",
-    },
-    {
-      title: "本科专业排名 12/62",
-      source: "同济大学",
-      period: "本科",
-      note: "本科专业综合排名 12/62。",
     },
   ],
   about: ["同济大学电子信息硕士。"],
