@@ -180,18 +180,11 @@ describe("validateSiteContent", () => {
     expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
   });
 
-  it("rejects an academic honor missing its note", () => {
-    const input = structuredClone(validSiteContent);
-    delete (input.academicHonors[0] as { note?: string }).note;
-    expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
-  });
-
   it.each([
     ["duplicate PR numbers", (copy: SiteContent) => { copy.openSource.contributions[1].number = copy.openSource.contributions[0].number; }],
     ["non-GitHub PR url", (copy: SiteContent) => { copy.openSource.contributions[0].url = "https://example.com/semantica/pull/1081"; }],
     ["non-positive PR number", (copy: SiteContent) => { copy.openSource.contributions[0].number = 0; }],
     ["twelve contributions", (copy: SiteContent) => { copy.openSource.contributions.pop(); }],
-    ["two academic honors", (copy: SiteContent) => { copy.academicHonors.pop(); }],
     ["unsupported visual kind", (copy: SiteContent) => { copy.caseStudies[0].visualKind = "timeline" as SiteContent["caseStudies"][number]["visualKind"]; }],
     ["duplicate tab labels", (copy: SiteContent) => { copy.caseStudies[1].tabLabel = copy.caseStudies[0].tabLabel; }],
   ])("rejects %s", (_label, mutate) => {

@@ -224,7 +224,5 @@ export const validSiteContent = {
       links: [],
     },
   ],
-    },
-  ],
   about: ["同济大学电子信息硕士。"],
 } satisfies SiteContent;
