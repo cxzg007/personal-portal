@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const NAV_SECTIONS = ["info", "internships", "systems", "open-source", "honors", "writing", "contact"];
+const NAV_SECTIONS = ["info", "internships", "systems", "open-source", "writing", "contact"];
 
 test("reduced motion preference keeps the layout static without hiding content", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -14,8 +14,6 @@ test("reduced motion preference keeps the layout static without hiding content",
   await expect(page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ })).toBeVisible();
   await expect(page.getByRole("link", { name: "查看实习" })).toBeVisible();
   await expect(page.locator("main > section#internships .sticky-internship-card")).toHaveCount(3);
-  await expect(page.getByText("国家励志奖学金", { exact: true })).toBeVisible();
-  await expect(page.getByText("本科专业排名 12/62")).toBeVisible();
 
   const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
   expect(documentWidth).toBeLessThanOrEqual(page.viewportSize()?.width ?? 0);
@@ -47,7 +45,7 @@ test("enhanced motion marks one active navigation link after scrolling each sect
     await expect(activeLink).toHaveAttribute("aria-current", "location");
   }
 
-  await scrollToSectionTop("honors");
+  await scrollToSectionTop("writing");
   await expect
     .poll(async () => page.locator('.sticky-internship-card[data-stack-progress="2"]').count())
     .toBeGreaterThan(0);

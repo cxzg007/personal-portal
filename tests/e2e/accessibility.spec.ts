@@ -4,7 +4,7 @@ import type { Locator, Page } from "@playwright/test";
 
 const auditedRoutes = ["/", "/blog", "/blog/first-agent-system"] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
-const primaryNavItems = ["信息", "实习", "系统", "开源", "荣誉", "博客", "联系", "GitHub"] as const;
+const primaryNavItems = ["信息", "实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
 
 async function expectNextTab(page: Page, target: Locator) {
   await page.keyboard.press("Tab");
@@ -34,7 +34,7 @@ for (const route of auditedRoutes) {
   });
 }
 
-test("desktop keyboard order covers skip navigation, eight nav links, hero actions, and contact", async (
+test("desktop keyboard order covers skip navigation, seven nav links, hero actions, and contact", async (
   { page },
   testInfo,
 ) => {

@@ -66,15 +66,14 @@ test("system project tabs visual at 1440", async ({ page }, testInfo) => {
   await expect(page.locator("main > section#systems")).toHaveScreenshot("system-tabs-1440.png");
 });
 
-test("open source showcase and honors visual at 1440", async ({ page }, testInfo) => {
+test("open source showcase visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 
   await prepareStablePage(page, "/");
   const openSource = page.locator("main > section#open-source");
-  const honors = page.locator("main > section#honors");
-  const clip = await combinedRegion(page, [openSource, honors]);
+  const clip = await combinedRegion(page, [openSource]);
 
-  await expect(page).toHaveScreenshot("open-source-honors-1440.png", { fullPage: true, clip });
+  await expect(page).toHaveScreenshot("open-source-1440.png", { fullPage: true, clip });
 });
 
 test("writing stage and contact visual at 1440", async ({ page }, testInfo) => {

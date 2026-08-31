@@ -435,7 +435,6 @@ describe("page motion controller", () => {
       "#internships": "internships",
       "#systems": "systems",
       "#open-source": "open-source",
-      "#honors": "honors",
       "#writing": "writing",
       "#contact": "contact",
     };
@@ -447,7 +446,7 @@ describe("page motion controller", () => {
       expect(link).not.toHaveAttribute("aria-current");
     }
 
-    expect(document.querySelectorAll("a[data-nav-section]")).toHaveLength(7);
+    expect(document.querySelectorAll("a[data-nav-section]")).toHaveLength(6);
     expect(document.querySelector('a[href="https://github.com/cxzg007"]')).not.toHaveAttribute(
       "data-nav-section",
     );

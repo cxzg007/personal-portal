@@ -133,10 +133,6 @@ for (const viewport of viewports) {
     await expectHorizontallyContained(openSource.getByLabel("Semantica 能力链路"));
     await expectHorizontallyContained(openSource.getByLabel("Semantica 公开资料"));
 
-    const honors = page.locator("main > section#honors");
-    await expectHorizontallyContained(honors.getByLabel("开源影响力"));
-    await expectHorizontallyContained(honors.getByLabel("教育与竞赛"));
-
     await expectHorizontallyContained(page.locator("main > section#writing").getByRole("article"));
 
     const contact = page.locator("main > section#contact");
