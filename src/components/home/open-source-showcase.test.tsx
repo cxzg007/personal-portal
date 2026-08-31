@@ -48,6 +48,21 @@ describe("OpenSourceShowcase", () => {
     expect(screen.getAllByText("OPEN")).toHaveLength(4);
   });
 
+  it("orders merged contributions first, newest PR number within each group", () => {
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
+
+    const numbers = screen
+      .getAllByRole("link", { name: /PR #/ })
+      .map((link) => Number(link.textContent!.match(/#(\d+)/)![1]));
+    const merged = openSource.contributions.filter((c) => c.status === "merged");
+    const expected = [
+      ...merged.toSorted((a, b) => b.number - a.number).map((c) => c.number),
+      ...openSource.contributions.filter((c) => c.status !== "merged").map((c) => c.number),
+    ];
+    expect(numbers).toEqual(expected);
+    expect(numbers[0]).toBe(Math.max(...merged.map((c) => c.number)));
+  });
+
   it("states the dated snapshot boundary computed from contribution statuses", () => {
     render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 

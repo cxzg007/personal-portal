@@ -11,6 +11,10 @@ type OpenSourceShowcaseProps = {
 
 export function OpenSourceShowcase({ project, stars }: OpenSourceShowcaseProps) {
   const merged = project.contributions.filter(({ status }) => status === "merged");
+  const orderedContributions = [
+    ...merged.toSorted((a, b) => b.number - a.number),
+    ...project.contributions.filter((c) => c.status !== "merged"),
+  ];
 
   return (
     <article aria-labelledby="open-source-showcase-heading" className="open-source-showcase">
@@ -41,7 +45,7 @@ export function OpenSourceShowcase({ project, stars }: OpenSourceShowcaseProps) 
       </ul>
 
       <ul className="open-source-showcase-contributions">
-        {project.contributions.map((contribution) => (
+        {orderedContributions.map((contribution) => (
           <li className="open-source-showcase-contribution" key={contribution.number}>
             <a href={contribution.url} rel="noreferrer" target="_blank">
               {`PR #${contribution.number}：${contribution.summary}`}

@@ -174,6 +174,8 @@ test("open source showcase exposes thirteen PR links and statuses", async ({ pag
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(13);
+  const firstPr = openSource.getByRole("link", { name: /^PR #/ }).first();
+  await expect(firstPr).toHaveText(/PR #1226/);
   await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(9);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(4);
   await expect(openSource.getByLabel("Semantica 能力链路")).toBeVisible();
