@@ -8,7 +8,6 @@ const navigation = [
   { label: "实习", href: "#internships" },
   { label: "系统", href: "#systems" },
   { label: "开源", href: "#open-source" },
-  { label: "荣誉", href: "#honors" },
   { label: "博客", href: "#writing" },
   { label: "联系", href: "#contact" },
   { label: "GitHub", href: "https://github.com/cxzg007" },

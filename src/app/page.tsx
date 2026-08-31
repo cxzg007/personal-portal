@@ -1,5 +1,4 @@
 import { ContactStage } from "@/components/home/contact-stage";
-import { HonorGallery } from "@/components/home/honor-gallery";
 import { OpenSourceShowcase } from "@/components/home/open-source-showcase";
 import { PageMotionController } from "@/components/home/page-motion-controller";
 import { ProfileHero } from "@/components/home/profile-hero";
@@ -72,10 +71,6 @@ export default function HomePage() {
         <section aria-labelledby="open-source-heading" className="profile-stage" id="open-source">
           <h2 id="open-source-heading">开源贡献与公开影响力。</h2>
           <OpenSourceShowcase project={content.openSource} />
-        </section>
-        <section aria-labelledby="honors-heading" className="profile-stage" id="honors">
-          <h2 id="honors-heading">荣誉与长期积累。</h2>
-          <HonorGallery academicHonors={content.academicHonors} openSourceHonors={content.openSource.honors} />
         </section>
         <section aria-labelledby="writing-heading" className="profile-stage" id="writing">
           <h2 id="writing-heading">技术写作与工程复盘。</h2>
