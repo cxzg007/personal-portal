@@ -24,6 +24,10 @@ describe("profile dock", () => {
     const educationList = screen.getByRole("list", { name: "教育经历" });
     expect(within(educationList).getAllByRole("listitem")).toHaveLength(2);
 
+    for (const item of within(educationList).getAllByRole("listitem")) {
+      expect(within(item).getAllByRole("img", { name: "同济大学校徽" })).toHaveLength(1);
+    }
+
     for (const education of profile.education) {
       expect(screen.getAllByText(education.school).length).toBeGreaterThan(0);
       expect(screen.getByText(education.major)).toBeVisible();
@@ -33,12 +37,13 @@ describe("profile dock", () => {
     }
   });
 
-  it("renders the Tongji badge image exactly once with descriptive alt text", () => {
+  it("renders the Tongji badge on every education entry", () => {
     render(<ProfileDock profile={profile} />);
 
     const badges = screen.getAllByRole("img", { name: "同济大学校徽" });
-    expect(badges).toHaveLength(1);
+    expect(badges).toHaveLength(2);
     expect(badges[0]).toHaveAttribute("src", expect.stringContaining("tongji.png"));
+    expect(badges[1]).toHaveAttribute("src", expect.stringContaining("tongji.png"));
   });
 
   it("shows the university name in the serif school line of the first entry", () => {

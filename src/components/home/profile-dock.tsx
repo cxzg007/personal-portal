@@ -16,21 +16,19 @@ export function ProfileDock({ profile }: ProfileDockProps) {
       <p className="profile-dock-status">{profile.recruitingStatus}</p>
 
       <ul aria-label="教育经历" className="profile-dock-education">
-        {profile.education.map((education, index) => (
+        {profile.education.map((education) => (
           <li
             key={`${education.school}-${education.degree}-${education.graduationYear}`}
             className="profile-dock-education-entry"
           >
             <div className="profile-dock-education-main">
-              {index === 0 ? (
-                <Image
-                  alt="同济大学校徽"
-                  className="profile-dock-education-badge"
-                  height={36}
-                  src="/brands/tongji.png"
-                  width={36}
-                />
-              ) : null}
+              <Image
+                alt="同济大学校徽"
+                className="profile-dock-education-badge"
+                height={36}
+                src="/brands/tongji.png"
+                width={36}
+              />
               <span className="profile-dock-education-school profile-dock-serif">
                 {education.school}
               </span>
