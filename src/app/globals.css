@@ -264,8 +264,7 @@ main {
 }
 
 .content-section {
-  min-height: 34rem;
-  padding-block: clamp(6rem, 12vw, 10rem);
+  padding-block: clamp(3rem, 8vw, 5rem);
   border-bottom: 1px solid rgba(var(--amber-rgb), 0.09);
 }
 
@@ -470,10 +469,6 @@ main {
   .button {
     min-width: 0;
     padding-inline: 0.7rem;
-  }
-
-  .content-section {
-    min-height: auto;
   }
 
 }

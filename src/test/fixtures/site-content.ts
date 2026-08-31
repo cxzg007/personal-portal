@@ -41,7 +41,13 @@ export const validSiteContent = {
       role: "后端开发实习生",
       period: "2026-07 – 至今",
       context: "建设 AI 数据智能平台。",
-      actions: ["治理本体映射。"],
+      actions: [
+        "治理本体映射。",
+        "推导跨实体最短关联路径。",
+        "生成受控语义查询。",
+        "建设规则执行链路。",
+        "治理本体查询性能。",
+      ],
       results: ["形成绑定生命周期。"],
       ownership: "负责本体映射治理。",
       stack: ["Java"],
@@ -56,7 +62,13 @@ export const validSiteContent = {
         { label: "查询推导", detail: "通过 OntologyGraph、BFS 与 TopK 生成受控语义查询。" },
         { label: "安全执行", detail: "以规则 Schema、确定性映射和批量写入约束业务动作。" },
       ],
-      highlights: ["形成“建立—校验—同步—修正”的本体绑定生命周期。"],
+      highlights: [
+        "治理本体映射。",
+        "推导跨实体最短关联路径。",
+        "生成受控语义查询。",
+        "建设规则执行链路。",
+        "治理本体查询性能。",
+      ],
       projects: [
         {
           id: "ontology-platform",

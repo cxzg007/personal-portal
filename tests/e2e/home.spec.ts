@@ -38,6 +38,17 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(internships.getByLabel("智元机器人 能力建设记录")).toBeVisible();
   await expect(internships.getByLabel("中国船舶集团 722 研究所 能力建设记录")).toBeVisible();
 
+  const internshipCards = internships.getByRole("article");
+  await expect(
+    internshipCards.nth(0).getByLabel("京东 能力建设记录").getByRole("listitem"),
+  ).toHaveCount(5);
+  await expect(
+    internshipCards.nth(1).getByLabel("智元机器人 能力建设记录").getByRole("listitem"),
+  ).toHaveCount(6);
+  await expect(
+    internshipCards.nth(2).getByLabel("中国船舶集团 722 研究所 能力建设记录").getByRole("listitem"),
+  ).toHaveCount(3);
+
   const systems = page.locator("main > section#systems");
   const tabs = systems.getByRole("tab");
   await expect(tabs).toHaveCount(4);

@@ -9,7 +9,7 @@ type InternshipStoryCardProps = {
 };
 
 export function InternshipStoryCard({ internship, index }: InternshipStoryCardProps) {
-  const capabilityRecords = internship.highlights.slice(0, 3);
+  const capabilityRecords = internship.highlights;
 
   return (
     <article
@@ -32,7 +32,11 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
           <p className="internship-context">{internship.context}</p>
           <p className="internship-ownership">{internship.ownership}</p>
           <p className="internship-stack">{internship.stack.join("、")}</p>
-          <p className="internship-result">{internship.results[0]}</p>
+          {internship.results.map((result) => (
+            <p className="internship-result" key={result}>
+              {result}
+            </p>
+          ))}
         </div>
         <div className="internship-visual-column">
           <BrandMark asset={internship.logo} />

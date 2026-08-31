@@ -32,6 +32,11 @@ describe("internship story card", () => {
     const resultMatches = within(card).getAllByText(internship.results[0]);
     expect(resultMatches.length).toBeGreaterThan(0);
     expect(resultMatches[0]).toBeVisible();
+    for (const result of internship.results) {
+      const matches = within(card).getAllByText(result);
+      expect(matches.length).toBeGreaterThan(0);
+      expect(matches[0]).toBeVisible();
+    }
     for (const item of internship.stack) {
       expect(card.textContent).toContain(item);
     }
@@ -48,8 +53,8 @@ describe("internship story card", () => {
     });
     expect(records.className).toContain("capability-records");
     const recordItems = within(records).getAllByRole("listitem");
-    expect(recordItems).toHaveLength(3);
-    internship.highlights.slice(0, 3).forEach((highlight, index) => {
+    expect(recordItems).toHaveLength(internship.highlights.length);
+    internship.highlights.forEach((highlight, index) => {
       expect(recordItems[index]).toHaveTextContent(highlight);
     });
 
@@ -70,5 +75,25 @@ describe("internship story card", () => {
     expect(within(card).getByRole("list", { name: "智元机器人 能力建设记录" })).toBeVisible();
     expect(within(card).getByText(internship.valueHeadline)).toBeVisible();
     expect(within(card).queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("renders all six agibot capability records including both projects", () => {
+    const internship = internships.find((item) => item.id === "agibot-agent");
+    expect(internship).toBeDefined();
+    render(<InternshipStoryCard internship={internship!} index={1} />);
+
+    const records = within(screen.getByRole("article")).getByRole("list", {
+      name: "智元机器人 能力建设记录",
+    });
+    const recordItems = within(records).getAllByRole("listitem");
+    expect(recordItems).toHaveLength(internship!.highlights.length);
+    expect(internship!.highlights).toHaveLength(6);
+    internship!.highlights.forEach((highlight, index) => {
+      expect(recordItems[index]).toHaveTextContent(highlight);
+    });
+    expect(records.textContent).toContain("clip-player");
+    expect(records.textContent).toContain("agibot_retriever");
+    expect(records.textContent).toContain("三级读取链路");
+    expect(records.textContent).toContain("三级实体去重");
   });
 });

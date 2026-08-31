@@ -28,18 +28,22 @@ test("enhanced motion marks one active navigation link after scrolling each sect
 
   await expect(page.locator("html")).toHaveAttribute("data-profile-motion", "enhanced");
 
-  const scrollToSectionTop = (sectionId: string) =>
-    page.evaluate((id) => {
+  const scrollToSectionTop = (sectionId: string, allowBottom = false) =>
+    page.evaluate(({ id, allowBottom }) => {
       const section = document.querySelector(`main > section#${id}`);
       const header = document.querySelector("header");
       if (!section || !header) return;
       const headerBottom = header.getBoundingClientRect().bottom;
-      const target = section.getBoundingClientRect().top + window.scrollY - headerBottom - 60;
+      const desired = section.getBoundingClientRect().top + window.scrollY - headerBottom - 60;
+      // 滚动位置到达页面底部会触发 motion controller 的页底兜底（高亮最后一个
+      // section）。非最后一个 section 保留 2px 余量，确保判定走常规命中路径。
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const target = allowBottom ? desired : Math.min(desired, maxScroll - 2);
       window.scrollTo(0, Math.max(0, target));
-    }, sectionId);
+    }, { id: sectionId, allowBottom });
 
   for (const sectionId of NAV_SECTIONS) {
-    await scrollToSectionTop(sectionId);
+    await scrollToSectionTop(sectionId, sectionId === NAV_SECTIONS.at(-1));
     await expect(page.locator("html")).toHaveAttribute("data-active-section", sectionId);
     const activeLink = page.locator(`nav[aria-label="主导航"] a[data-nav-section="${sectionId}"]`);
     await expect(activeLink).toHaveAttribute("aria-current", "location");
