@@ -65,7 +65,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
-  await expect(openSource.getByText(/截至 2026-08-21/)).toBeVisible();
+  await expect(openSource.getByText(/截至 2026-08-31/)).toBeVisible();
   await expect(openSource.getByRole("link", { name: "Semantica GitHub 仓库" })).toHaveAttribute(
     "href",
     "https://github.com/semantica-agi/semantica",
@@ -162,13 +162,13 @@ test("internship cards ship brand logos, alternating layouts, and desktop sticky
   await expect(internships.getByRole("button")).toHaveCount(0);
 });
 
-test("open source showcase exposes seven PR links, statuses, and both honor tracks", async ({ page }) => {
+test("open source showcase exposes thirteen PR links, statuses, and both honor tracks", async ({ page }) => {
   await page.goto("/");
 
   const openSource = page.locator("main > section#open-source");
-  await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(7);
-  await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(2);
-  await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(5);
+  await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(13);
+  await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(9);
+  await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(4);
   await expect(openSource.getByLabel("Semantica 能力链路")).toBeVisible();
   await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
 

@@ -40,9 +40,9 @@
     },
     {
       "label": "Semantica PR",
-      "value": 7,
+      "value": 13,
       "suffix": "个",
-      "evidence": "Semantica 公开仓库 PR 快照（2026-08-21）：#1077、#1081、#1094、#1096、#1113、#1143、#1153，其中 #1081、#1094 已合并。"
+      "evidence": "Semantica 公开仓库 PR 快照（2026-08-31）：#1077、#1081、#1094、#1096、#1113、#1143、#1153、#1160、#1208、#1215、#1217、#1226、#1243，其中 #1077、#1081、#1094、#1096、#1113、#1143、#1215、#1217、#1226 共九个已合并。"
     },
     {
       "label": "本科专业排名",
@@ -81,8 +81,8 @@
         "建设业务实体、属性、关系与物理表字段的映射治理，完善绑定校验、失效检测、Schema 同步、反向引用与绑定修正。",
         "将字符串 JOIN 条件改造为结构化 joinKeys，设计内存 OntologyGraph，并基于 BFS 推导跨实体最短关联路径。",
         "通过实体相关性评分和 TopK 召回筛选 LLM 查询上下文，生成语义 SQL 后由确定性映射转换为物理 SQL。",
-        "参与“场景理解—本体匹配—规则生成—Action 编排—预览确认—发布调度”链路，设计规则输出 Schema 编译与版本化。",
-        "引入 Caffeine 域级缓存与主动失效，治理本体查询 N+1 和规则重复编译。"
+        "参与“场景理解—本体匹配—规则生成—Action 编排—预览确认—发布调度”链路，设计规则输出 Schema 编译与版本化，支持新旧规则格式兼容的依赖检查与安全批量删除。",
+        "引入 Caffeine 域级缓存、主动失效与定时重建，治理本体查询 N+1 和规则重复编译。"
       ],
       "results": [
         "形成“建立—校验—同步—修正”的本体绑定生命周期。",
@@ -127,9 +127,9 @@
           "name": "clip-player",
           "summary": "机器人多传感器数据流式回放平台",
           "highlights": [
-            "建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制和共享会话。",
+            "建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制、共享会话，并对接 Lichtblick 可视化调试链路。",
             "设计本地持久化、远端 IndexedReader 与 S3 RangeReader 三级读取链路。",
-            "使用虚拟时钟、原子世代计数器、有界队列和慢消费者隔离保障并发稳定性。"
+            "使用虚拟时钟、原子世代计数器、请求取消与 requestId 过滤实现低开销 seek，并以有界队列和慢消费者隔离保障并发稳定性。"
           ]
         },
         {
@@ -145,9 +145,9 @@
       ],
       "context": "参与机器人多传感器数据回放，以及面向企业 AI Agent 的知识检索和长期记忆管理系统建设。",
       "actions": [
-        "为 clip-player 建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制和共享会话。",
+        "为 clip-player 建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制、共享会话，并对接 Lichtblick 可视化调试链路。",
         "设计本地持久化、远端 IndexedReader 与 S3 RangeReader 三级读取链路，加入 tail cache、顺序读窗口和 singleflight 去重。",
-        "使用虚拟时钟和原子世代计数器实现播放状态一致性，修复 bufio.Writer 并发 data race，并通过有界队列和慢消费者隔离保障稳定性。",
+        "使用虚拟时钟和原子世代计数器实现播放状态一致性，以请求取消与 requestId 过滤实现低开销 seek，修复 bufio.Writer 并发 data race，并通过有界队列和慢消费者隔离保障稳定性。",
         "为 agibot_retriever 设计“SQL 精确匹配—向量 TopK—LLM 消歧”三级实体去重和 Redis 分布式锁创建临界区。",
         "通过 MySQL CAS 状态机、dead-letter、异步补偿和 Reaper 实现幂等抽取与故障自愈。",
         "通过关系合法集、latest-wins、跨 Chunk 滚动上下文和文档锚点增强知识图谱连通性。"
@@ -194,7 +194,7 @@
       "actions": [
         "围绕链路建立、波束匹配、网络重构与通信恢复开展算法设计。",
         "开发仿真脚本，评估通信建立成功率、恢复时延与链路稳定性。",
-        "参与研究所与高校合作项目论证，负责无人机集群智能通信方案设计和技术文档编写。"
+        "参与研究所与上海交通大学、同济大学合作项目论证，负责无人机集群智能通信方案设计和技术文档编写。"
       ],
       "results": [
         "完成通信网络重构算法验证、结果整理和项目交付。",
@@ -214,13 +214,19 @@
     "name": "Semantica",
     "logo": { "src": "/brands/semantica.png", "alt": "Semantica 项目标志", "theme": "semantica" },
     "identity": "Open-source Contributor · cxzg007",
-    "background": "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
-    "snapshotDate": "2026-08-21",
+    "background": "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约与执行链路并行化。",
+    "snapshotDate": "2026-08-31",
     "honors": [
       { "platform": "GitHub Trending", "rank": "#1 Repository of the Day", "period": "Daily", "evidence": "User-provided public ranking screenshot" },
       { "platform": "Trendshift · Python", "rank": "#3 Repository of the Week", "period": "Weekly", "evidence": "User-provided public ranking screenshot" }
     ],
     "contributions": [
+      {
+        "number": 1077,
+        "status": "merged",
+        "summary": "RETE alpha/beta Token 模型：为规则匹配提供 alpha/beta Token 层级的模型支撑。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1077"
+      },
       {
         "number": 1081,
         "status": "merged",
@@ -234,34 +240,64 @@
         "url": "https://github.com/semantica-agi/semantica/pull/1094"
       },
       {
-        "number": 1077,
-        "status": "open",
-        "summary": "RETE alpha/beta Token 模型：为规则匹配提供 alpha/beta Token 层级的模型支撑。",
-        "url": "https://github.com/semantica-agi/semantica/pull/1077"
-      },
-      {
         "number": 1096,
-        "status": "open",
+        "status": "merged",
         "summary": "规则 Action 与 provenance：将规则执行的动作与来源追溯关联。",
         "url": "https://github.com/semantica-agi/semantica/pull/1096"
       },
       {
         "number": 1113,
-        "status": "open",
+        "status": "merged",
         "summary": "RDF name→label 规范化：统一 RDF 导出中 name 与 label 的命名。",
         "url": "https://github.com/semantica-agi/semantica/pull/1113"
       },
       {
         "number": 1143,
-        "status": "open",
+        "status": "merged",
         "summary": "时间图指标：补充时间稳定性相关的指标说明。",
         "url": "https://github.com/semantica-agi/semantica/pull/1143"
+      },
+      {
+        "number": 1215,
+        "status": "merged",
+        "summary": "pipeline 注册 handler 接线：将 pipeline 各阶段与注册 handler 正确连接，修正阶段调度接线。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1215"
+      },
+      {
+        "number": 1217,
+        "status": "merged",
+        "summary": "serializer round-trip 依赖与 delta 元数据：保证序列化往返中依赖信息与增量元数据的正确性。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1217"
+      },
+      {
+        "number": 1226,
+        "status": "merged",
+        "summary": "set_parallelism 依赖层并行执行：按依赖分层调度实现图执行并行化。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1226"
       },
       {
         "number": 1153,
         "status": "open",
         "summary": "决策模型契约：补齐决策模型 auto_generate_id 相关契约。",
         "url": "https://github.com/semantica-agi/semantica/pull/1153"
+      },
+      {
+        "number": 1160,
+        "status": "open",
+        "summary": "PolicyEngine compliance 失败处理：将合规检查失败从静默结果改为显式抛出。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1160"
+      },
+      {
+        "number": 1208,
+        "status": "open",
+        "summary": "冲突解决修复：修复冲突解决路径中的 unhashable TypeError。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1208"
+      },
+      {
+        "number": 1243,
+        "status": "open",
+        "summary": "SPARQLReasoner.execute_query 三路径实现：store 委托、rdflib 回退与缓存隔离。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1243"
       }
     ],
     "graphNodes": ["ContextGraph", "RDF / SHACL", "Temporal Graph", "Rule Inference", "cxzg007 contributions"],
@@ -389,8 +425,8 @@
       "tradeoffs": [
         "以贡献粒度换取可验证性与沟通清晰度。"
       ],
-      "contribution": "提交七个公开 PR，#1081 与 #1094 已合并。",
-      "result": "贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
+      "contribution": "提交十三个公开 PR，其中九个已合并，覆盖 #1077、#1081、#1094、#1096、#1113、#1143、#1215、#1217 与 #1226。",
+      "result": "贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约、序列化往返与执行链路并行化。",
       "stack": [
         "Python",
         "RDF",

@@ -17,29 +17,29 @@ describe("OpenSourceShowcase", () => {
     expect(screen.getByText("Open-source Contributor · cxzg007")).toBeVisible();
     expect(
       screen.getByText(
-        "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理与决策模型契约。",
+        "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约与执行链路并行化。",
       ),
     ).toBeVisible();
   });
 
-  it("renders seven PR links with exact hrefs and visible status badges", () => {
+  it("renders thirteen PR links with exact hrefs and visible status badges", () => {
     render(<OpenSourceShowcase project={openSource} />);
 
-    expect(screen.getAllByRole("link", { name: /PR #/ })).toHaveLength(7);
+    expect(screen.getAllByRole("link", { name: /PR #/ })).toHaveLength(13);
     openSource.contributions.forEach((contribution) => {
       expect(
         screen.getByRole("link", { name: `PR #${contribution.number}：${contribution.summary}` }),
       ).toHaveAttribute("href", contribution.url);
     });
-    expect(screen.getAllByText("MERGED")).toHaveLength(2);
-    expect(screen.getAllByText("OPEN")).toHaveLength(5);
+    expect(screen.getAllByText("MERGED")).toHaveLength(9);
+    expect(screen.getAllByText("OPEN")).toHaveLength(4);
   });
 
   it("states the dated snapshot boundary computed from contribution statuses", () => {
     render(<OpenSourceShowcase project={openSource} />);
 
     expect(
-      screen.getByText("截至 2026-08-21：2 个贡献已合并，其余处于开放或审阅状态。"),
+      screen.getByText("截至 2026-08-31：9 个贡献已合并，其余处于开放或审阅状态。"),
     ).toBeVisible();
   });
 

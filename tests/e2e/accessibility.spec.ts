@@ -66,7 +66,7 @@ test("desktop keyboard order covers skip navigation, eight nav links, hero actio
     hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com", exact: true }),
     hero.getByRole("link", { name: "GitHub", exact: true }),
     page.locator("#system-tab-ontology-agent-platform"),
-    ...[0, 1, 2, 3, 4, 5, 6].map((index) =>
+    ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((index) =>
       openSource.getByRole("link", { name: /^PR #/ }).nth(index),
     ),
     openSource.getByRole("link", { name: "Semantica GitHub 仓库", exact: true }),

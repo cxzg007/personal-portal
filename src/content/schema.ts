@@ -322,8 +322,8 @@ export function validateSiteContent(input: unknown): ValidationResult {
         ["platform", "rank", "period", "evidence"].forEach((field) => checkText(value[field], `openSource.honors[${index}].${field}`));
       });
     }
-    if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 7) {
-      errors.push("openSource.contributions must contain exactly 7 entries");
+    if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 13) {
+      errors.push("openSource.contributions must contain exactly 13 entries");
     } else {
       const seenPrNumbers = new Set<number>();
       let mergedCount = 0;
@@ -348,8 +348,8 @@ export function validateSiteContent(input: unknown): ValidationResult {
           errors.push(`openSource.contributions[${index}].url must be an HTTPS GitHub PR URL`);
         }
       });
-      if (mergedCount !== 2) {
-        errors.push("openSource.contributions must contain exactly 2 merged entries");
+      if (mergedCount !== 9) {
+        errors.push("openSource.contributions must contain exactly 9 merged entries");
       }
     }
     if (!Array.isArray(openSource.graphNodes) || openSource.graphNodes.length !== 5) errors.push("openSource.graphNodes must contain exactly 5 entries");

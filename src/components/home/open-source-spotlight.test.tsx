@@ -17,8 +17,8 @@ describe("OpenSourceSpotlight", () => {
     expect(screen.getByText("Open-source Contributor · cxzg007")).toBeVisible();
     expect(screen.getByText("#1 Repository of the Day")).toBeVisible();
     expect(screen.getByText("#3 Repository of the Week")).toBeVisible();
-    expect(screen.getByText("7")).toBeVisible();
-    expect(screen.getByText("2")).toBeVisible();
+    expect(screen.getByText("13")).toBeVisible();
+    expect(screen.getByText("9")).toBeVisible();
   });
 
   it("renders the graph-native capability chain and verified public links", () => {
@@ -41,7 +41,9 @@ describe("OpenSourceSpotlight", () => {
     render(<OpenSourceSpotlight project={openSource} />);
 
     expect(
-      screen.getByText("截至 2026-08-21：#1081 与 #1094 已合并，其余贡献处于开放或审阅状态。"),
+      screen.getByText(
+        "截至 2026-08-31：9 个贡献已合并（#1077、#1081、#1094、#1096、#1113、#1143、#1215、#1217、#1226），其余贡献处于开放或审阅状态。",
+      ),
     ).toBeVisible();
   });
 });

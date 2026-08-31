@@ -67,7 +67,7 @@ export function OpenSourceSpotlight({ project }: OpenSourceSpotlightProps) {
             <li key={contribution.number}>{contribution.summary}</li>
           ))}
         </ul>
-        <p className="open-source-attribution">{`截至 ${project.snapshotDate}：${mergedIds.join(" 与 ")} 已合并，其余贡献处于开放或审阅状态。`}</p>
+        <p className="open-source-attribution">{`截至 ${project.snapshotDate}：${mergedIds.length} 个贡献已合并（${mergedIds.join("、")}），其余贡献处于开放或审阅状态。`}</p>
       </section>
 
       <details className="open-source-more">
