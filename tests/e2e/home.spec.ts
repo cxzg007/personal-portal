@@ -133,9 +133,9 @@ test("mobile navigation resets cleanly across the desktop breakpoint", async ({ 
 test("homepage exposes the reference-style section order", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator("main > section")).toHaveCount(8);
+  await expect(page.locator("main > section")).toHaveCount(7);
   expect(await page.locator("main > section").evaluateAll((sections) => sections.map(({ id }) => id))).toEqual([
-    "profile", "info", "internships", "systems", "open-source", "honors", "writing", "contact",
+    "profile", "info", "internships", "systems", "open-source", "writing", "contact",
   ]);
 });
 
@@ -162,7 +162,7 @@ test("internship cards ship brand logos, alternating layouts, and desktop sticky
   await expect(internships.getByRole("button")).toHaveCount(0);
 });
 
-test("open source showcase exposes thirteen PR links, statuses, and both honor tracks", async ({ page }) => {
+test("open source showcase exposes thirteen PR links and statuses", async ({ page }) => {
   await page.goto("/");
 
   const openSource = page.locator("main > section#open-source");
@@ -171,14 +171,15 @@ test("open source showcase exposes thirteen PR links, statuses, and both honor t
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(4);
   await expect(openSource.getByLabel("Semantica 能力链路")).toBeVisible();
   await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
+});
 
-  const honors = page.locator("main > section#honors");
-  await expect(honors.getByText("#1 Repository of the Day")).toBeVisible();
-  await expect(honors.getByText("#3 Repository of the Week")).toBeVisible();
-  await expect(honors.getByText("国家励志奖学金", { exact: true })).toBeVisible();
-  await expect(honors.getByText("大唐杯上海市二等奖")).toBeVisible();
-  await expect(honors.getByText("本科专业排名 12/62")).toBeVisible();
-  await expect(honors.getByText("排名来自公开趋势记录,非 GitHub 官方奖项。")).toBeVisible();
+test("honors section and its navigation entry are fully removed", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("section#honors")).toHaveCount(0);
+  await expect(page.getByText("荣誉与长期积累")).toHaveCount(0);
+  await expect(page.getByText("国家励志奖学金")).toHaveCount(0);
+  await expect(page.getByText("大唐杯上海市二等奖")).toHaveCount(0);
+  await expect(page.locator('header a[href="#honors"]')).toHaveCount(0);
 });
 
 test("writing stage renders the single article with a full-read destination", async ({ page }) => {
