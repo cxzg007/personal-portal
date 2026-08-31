@@ -734,79 +734,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
   text-underline-offset: 4px;
 }
 
-/* --- honor gallery --- */
-
-.honor-gallery {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem;
-}
-
-.honor-gallery-column {
-  padding: 1.75rem;
-  border: 1px solid var(--profile-line);
-  border-radius: 20px;
-  background: var(--profile-panel);
-}
-
-.honor-gallery-list {
-  display: grid;
-  gap: 1.1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.honor-gallery-item {
-  display: grid;
-  gap: 0.25rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--profile-line);
-}
-
-.honor-gallery-item:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.honor-gallery-platform {
-  color: #5c4d39;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.honor-gallery-rank,
-.honor-gallery-title {
-  font-size: 1.05rem;
-  font-weight: 650;
-}
-
-.honor-gallery-source {
-  color: #5c4d39;
-  font-size: 0.9rem;
-}
-
-.honor-gallery-period {
-  color: #a04a28;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.8rem;
-}
-
-.honor-gallery-note {
-  color: #5c4d39;
-  font-size: 0.85rem;
-}
-
-.honor-gallery-disclaimer {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: var(--profile-muted);
-  font-size: 0.82rem;
-  opacity: 0.8;
-}
-
 /* --- writing stage (components render unclassed article markup) --- */
 
 .profile-shell #writing article {
@@ -939,7 +866,6 @@ html[data-profile-motion="static"] .profile-reveal {
   }
 
   .architecture-stage,
-  .honor-gallery,
   .profile-info-facts {
     grid-template-columns: minmax(0, 1fr);
   }

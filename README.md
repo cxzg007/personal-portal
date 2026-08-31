@@ -49,7 +49,6 @@ pnpm start
 
 - **技术 ID（technicalId）**：顶层 `profile.technicalId`，渲染于首页身份区，用于标识开源身份。修改时应与 GitHub 用户名保持一致，并同步核对 `openSource.identity` 与 `openSource.graphNodes` 中的引用。
 - **结构化贡献**：`openSource.contributions` 数组，每个条目含 `number`（PR 号）、`status`（限定 `merged`、`open` 或 `review`）、`summary` 和 `url`。状态必须如实反映 PR 当前状态，校验器会拒绝合并状态但缺少有效链接等不一致的条目。配套的开源荣誉在 `openSource.honors` 数组（`platform`、`rank`、`period`、`evidence`）。
-- **学术荣誉**：顶层 `academicHonors` 数组，每个条目含 `title`、`source`、`period` 和 `note`，由首页荣誉板块渲染。仅收录可公开证明的荣誉。
 - **四个系统案例**：顶层 `caseStudies` 数组，即首页系统设计 Tab 的数据源。每个案例含 `id`、`tabLabel`（Tab 标签文案）、`visualKind`（限定 `ontology`、`streaming`、`memory` 或 `graph`，决定示意图类型）、`title`、`problem`、`constraints`、`decisions`、`tradeoffs`、`contribution`、`result`、`stack` 与 `links`。增删或改写案例会同时影响 Tab 数量与快照基线，需重新运行视觉测试。
 - **MDX 文章**：见下文「发布 MDX 文章」一节。
 
