@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { BrandMark } from "@/components/home/brand-mark";
 import type { OpenSourceProject } from "@/content/schema";
 
@@ -19,6 +21,21 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
       </header>
 
       <p className="open-source-showcase-background">{project.background}</p>
+
+      <ul aria-label="Semantica 项目荣誉" className="open-source-honor-badges">
+        {project.honors.map((honor) => (
+          <li key={honor.rank}>
+            <Image
+              alt={`${honor.platform} ${honor.rank}`}
+              height={28}
+              loading="eager"
+              src={`https://img.shields.io/badge/${encodeURIComponent(honor.platform)}-${encodeURIComponent(honor.rank)}-c47f17?style=flat-square`}
+              unoptimized
+              width={280}
+            />
+          </li>
+        ))}
+      </ul>
 
       <ul className="open-source-showcase-contributions">
         {project.contributions.map((contribution) => (

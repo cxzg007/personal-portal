@@ -74,6 +74,12 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
     "href",
     "/blog/first-agent-system",
   );
+  await expect(
+    openSource.getByRole("img", { name: "GitHub Trending #1 Repository of the Day" }),
+  ).toBeVisible();
+  await expect(
+    openSource.getByRole("img", { name: "Trendshift · Python #3 Repository of the Week" }),
+  ).toBeVisible();
 
   const contact = page.locator("main > section#contact");
   const email = contact.getByRole("link", { name: "jiangjunjie_tj@foxmail.com" });

@@ -22,6 +22,18 @@ describe("OpenSourceShowcase", () => {
     ).toBeVisible();
   });
 
+  it("renders trending honor badges as shields.io images", () => {
+    render(<OpenSourceShowcase project={openSource} />);
+
+    const badges = screen.getAllByRole("img", { name: /Trending|Trendshift/ });
+    expect(badges).toHaveLength(2);
+    expect(badges[0]).toHaveAttribute("alt", "GitHub Trending #1 Repository of the Day");
+    expect(badges[1]).toHaveAttribute("alt", "Trendshift · Python #3 Repository of the Week");
+    for (const badge of badges) {
+      expect(badge).toHaveAttribute("src", expect.stringContaining("img.shields.io/badge/"));
+    }
+  });
+
   it("renders thirteen PR links with exact hrefs and visible status badges", () => {
     render(<OpenSourceShowcase project={openSource} />);
 
