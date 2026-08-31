@@ -16,7 +16,7 @@ export function BrandMark({ asset, className = "" }: BrandMarkProps) {
         (e.g. the Semantica logo) to zero height until scroll, which shifts
         the document by ~44px after the logo loads.
       */}
-      <Image alt={asset.alt} height={72} loading="eager" src={asset.src} width={180} />
+      <Image alt={asset.alt} height={56} loading="eager" src={asset.src} width={140} />
     </div>
   );
 }

@@ -295,7 +295,7 @@ main {
   min-width: 0;
   align-items: center;
   justify-items: center;
-  padding: 0.75rem 0.9rem;
+  padding: 0.5rem 0.9rem;
   border: 1px solid rgb(var(--brand-accent) / 0.32);
   border-radius: 0.65rem;
   background: rgba(255, 251, 238, 0.92);
@@ -303,8 +303,9 @@ main {
 }
 
 .brand-mark img {
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 68px;
+  max-width: 100%;
   object-fit: contain;
 }
 
