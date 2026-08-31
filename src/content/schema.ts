@@ -60,13 +60,6 @@ export type Internship = {
   status: "Shipped" | "Optimized" | "Deployed";
 };
 
-export type AcademicHonor = {
-  title: string;
-  source: string;
-  period: string;
-  note: string;
-};
-
 export type CaseStudy = {
   id: string;
   tabLabel: "Ontology Agent" | "Streaming Backend" | "Knowledge Memory" | "Semantica";
@@ -97,7 +90,6 @@ export type SiteContent = {
   internships: Internship[];
   openSource: OpenSourceProject;
   caseStudies: CaseStudy[];
-  academicHonors: AcademicHonor[];
   about: string[];
 };
 
@@ -406,19 +398,6 @@ export function validateSiteContent(input: unknown): ValidationResult {
       }
     });
   }
-
-  if (!Array.isArray(siteContent.academicHonors) || siteContent.academicHonors.length !== 3) {
-    errors.push("academicHonors must contain exactly 3 entries");
-  } else {
-    siteContent.academicHonors.forEach((honor, index) => {
-      const value = checkRecord(honor, `academicHonors[${index}]`);
-      if (!value) return;
-      ["title", "source", "period", "note"].forEach((field) =>
-        checkText(value[field], `academicHonors[${index}].${field}`),
-      );
-    });
-  }
-
   checkStringArray(siteContent.about, "about", 1);
 
   return errors.length === 0 ? { ok: true } : { ok: false, errors };
