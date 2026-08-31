@@ -11,10 +11,11 @@ afterEach(cleanup);
 
 describe("OpenSourceShowcase", () => {
   it("presents the official Semantica logo, identity and background", () => {
-    render(<OpenSourceShowcase project={openSource} />);
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 
     expect(screen.getByRole("img", { name: "Semantica 项目标志" })).toBeVisible();
     expect(screen.getByText("Open-source Contributor · cxzg007")).toBeVisible();
+    expect(screen.getByText("11.4k+ GitHub Stars")).toBeVisible();
     expect(
       screen.getByText(
         "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约与执行链路并行化。",
@@ -23,7 +24,7 @@ describe("OpenSourceShowcase", () => {
   });
 
   it("renders trending honor badges as shields.io images", () => {
-    render(<OpenSourceShowcase project={openSource} />);
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 
     const badges = screen.getAllByRole("img", { name: /Trending|Trendshift/ });
     expect(badges).toHaveLength(2);
@@ -35,7 +36,7 @@ describe("OpenSourceShowcase", () => {
   });
 
   it("renders thirteen PR links with exact hrefs and visible status badges", () => {
-    render(<OpenSourceShowcase project={openSource} />);
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 
     expect(screen.getAllByRole("link", { name: /PR #/ })).toHaveLength(13);
     openSource.contributions.forEach((contribution) => {
@@ -48,7 +49,7 @@ describe("OpenSourceShowcase", () => {
   });
 
   it("states the dated snapshot boundary computed from contribution statuses", () => {
-    render(<OpenSourceShowcase project={openSource} />);
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 
     expect(
       screen.getByText("截至 2026-08-31：9 个贡献已合并，其余处于开放或审阅状态。"),
@@ -56,7 +57,7 @@ describe("OpenSourceShowcase", () => {
   });
 
   it("renders the five-node capability chain as a named list", () => {
-    render(<OpenSourceShowcase project={openSource} />);
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 
     const chain = screen.getByRole("list", { name: "Semantica 能力链路" });
     expect(chain).toHaveTextContent("cxzg007");
@@ -67,7 +68,7 @@ describe("OpenSourceShowcase", () => {
   });
 
   it("links to the external repository and the internal article", () => {
-    render(<OpenSourceShowcase project={openSource} />);
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 
     const repositoryLink = screen.getByRole("link", { name: "Semantica GitHub 仓库" });
     expect(repositoryLink).toHaveAttribute("href", "https://github.com/semantica-agi/semantica");

@@ -141,6 +141,8 @@ describe("validateSiteContent", () => {
     ["four graph nodes", (copy: SiteContent) => { copy.openSource.graphNodes.pop(); }],
     ["non-HTTPS repository", (copy: SiteContent) => { copy.openSource.repositoryUrl = "http://github.com/semantica-agi/semantica"; }],
     ["non-blog article path", (copy: SiteContent) => { copy.openSource.articlePath = "/articles/semantica" as SiteContent["openSource"]["articlePath"]; }],
+    ["fractional stars snapshot", (copy: SiteContent) => { copy.openSource.starsSnapshot = 11400.5; }],
+    ["negative stars snapshot", (copy: SiteContent) => { copy.openSource.starsSnapshot = -1; }],
   ])("rejects %s", (_label, mutate) => {
     const copy = structuredClone(validSiteContent) as SiteContent;
     mutate(copy);

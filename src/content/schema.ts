@@ -34,6 +34,7 @@ export type OpenSourceProject = {
   identity: string;
   background: string;
   snapshotDate: string;
+  starsSnapshot: number;
   honors: Array<{ platform: string; rank: string; period: string; evidence: string }>;
   contributions: OpenSourceContribution[];
   graphNodes: [string, string, string, string, string];
@@ -305,6 +306,9 @@ export function validateSiteContent(input: unknown): ValidationResult {
     }
     const snapshotDate = checkText(openSource.snapshotDate, "openSource.snapshotDate");
     if (snapshotDate && !/^\d{4}-\d{2}-\d{2}$/.test(snapshotDate)) errors.push("openSource.snapshotDate must use YYYY-MM-DD");
+    if (!Number.isInteger(openSource.starsSnapshot) || (openSource.starsSnapshot as number) < 0) {
+      errors.push("openSource.starsSnapshot must be a non-negative integer");
+    }
     if (!Array.isArray(openSource.honors) || openSource.honors.length < 2) {
       errors.push("openSource.honors must contain at least 2 entries");
     } else {

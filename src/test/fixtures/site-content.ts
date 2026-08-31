@@ -78,6 +78,7 @@ export const validSiteContent = {
     identity: "Open-source Contributor · cxzg007",
     background: "Semantica 是知识图谱与推理基础设施项目。",
     snapshotDate: "2026-08-31",
+    starsSnapshot: 11400,
     honors: [
       { platform: "GitHub Trending", rank: "#1 Repository of the Day", period: "Daily", evidence: "Public screenshot" },
       { platform: "Trendshift · Python", rank: "#3 Repository of the Week", period: "Weekly", evidence: "Public screenshot" },

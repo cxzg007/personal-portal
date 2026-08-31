@@ -2,12 +2,14 @@ import Image from "next/image";
 
 import { BrandMark } from "@/components/home/brand-mark";
 import type { OpenSourceProject } from "@/content/schema";
+import { formatStars } from "@/lib/github-stars";
 
 type OpenSourceShowcaseProps = {
   project: OpenSourceProject;
+  stars: number;
 };
 
-export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
+export function OpenSourceShowcase({ project, stars }: OpenSourceShowcaseProps) {
   const merged = project.contributions.filter(({ status }) => status === "merged");
 
   return (
@@ -17,6 +19,7 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
         <div>
           <p className="open-source-showcase-identity">{project.identity}</p>
           <h3 id="open-source-showcase-heading">{project.name}</h3>
+          <p className="open-source-stars">{`${formatStars(stars)} GitHub Stars`}</p>
         </div>
       </header>
 

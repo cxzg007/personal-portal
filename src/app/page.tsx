@@ -10,10 +10,12 @@ import { Header } from "@/components/shell/header";
 import { loadSiteContent } from "@/content/load-site-content";
 import { getAllPosts } from "@/content/posts";
 import { serializeJsonLd } from "@/lib/discovery";
+import { fetchGitHubStars } from "@/lib/github-stars";
 import { getSiteUrl } from "@/lib/site-url";
 
-export default function HomePage() {
+export default async function HomePage() {
   const content = loadSiteContent();
+  const stars = await fetchGitHubStars(content.openSource.starsSnapshot);
   const featuredPosts = getAllPosts().filter((post) => post.featured && !post.draft).slice(0, 4);
   const siteUrl = getSiteUrl();
   const personId = new URL("/#person", siteUrl).toString();
@@ -70,7 +72,7 @@ export default function HomePage() {
         </section>
         <section aria-labelledby="open-source-heading" className="profile-stage" id="open-source">
           <h2 id="open-source-heading">开源贡献与公开影响力。</h2>
-          <OpenSourceShowcase project={content.openSource} />
+          <OpenSourceShowcase project={content.openSource} stars={stars} />
         </section>
         <section aria-labelledby="writing-heading" className="profile-stage" id="writing">
           <h2 id="writing-heading">技术写作与工程复盘。</h2>

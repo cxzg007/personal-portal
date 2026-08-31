@@ -66,6 +66,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
   await expect(openSource.getByText(/截至 2026-08-31/)).toBeVisible();
+  await expect(openSource.getByText(/GitHub Stars/)).toBeVisible();
   await expect(openSource.getByRole("link", { name: "Semantica GitHub 仓库" })).toHaveAttribute(
     "href",
     "https://github.com/semantica-agi/semantica",
