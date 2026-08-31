@@ -40,4 +40,10 @@ describe("profile info", () => {
       "可靠 AI 应用 / 后端系统",
     ]);
   });
+
+  it("renders the school value with the serif profile class", () => {
+    render(<ProfileInfo about={about} profile={profile} />);
+
+    expect(screen.getByText(profile.education[0].school)).toHaveClass("profile-dock-serif");
+  });
 });

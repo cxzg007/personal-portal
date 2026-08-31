@@ -29,7 +29,7 @@ export function ProfileInfo({ profile, about }: ProfileInfoProps) {
         </div>
         <div>
           <dt>学校</dt>
-          <dd>{primaryEducation.school}</dd>
+          <dd className="profile-dock-serif">{primaryEducation.school}</dd>
         </div>
         <div>
           <dt>学位</dt>

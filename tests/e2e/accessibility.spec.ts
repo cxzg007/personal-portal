@@ -34,7 +34,7 @@ for (const route of auditedRoutes) {
   });
 }
 
-test("desktop keyboard order covers skip navigation, nine nav links, hero actions, and contact", async (
+test("desktop keyboard order covers skip navigation, eight nav links, hero actions, and contact", async (
   { page },
   testInfo,
 ) => {
