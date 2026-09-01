@@ -247,6 +247,7 @@ main {
 
 .button-primary:hover {
   background: var(--terracotta-deep);
+  color: var(--surface);
 }
 
 .button-secondary {
@@ -954,7 +955,7 @@ main {
   display: block;
   padding: 0.65rem 0.9rem;
   border-bottom: 1px solid rgba(var(--amber-rgb), 0.11);
-  color: var(--muted);
+  color: var(--ink);
   font-family: var(--font-mono);
   font-size: 0.52rem;
   letter-spacing: 0.14em;
