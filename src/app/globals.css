@@ -47,10 +47,7 @@ body {
   min-width: 0;
   margin: 0;
   overflow-x: clip;
-  background:
-    radial-gradient(circle at 72% 5%, rgba(184, 95, 63, 0.12), transparent 31rem),
-    radial-gradient(circle at 12% 28%, rgba(var(--amber-rgb), 0.1), transparent 24rem),
-    linear-gradient(180deg, #f1dfbf, var(--color-bg) 34rem, #f8efdc);
+  background-color: var(--page);
 }
 
 body::before {
@@ -117,8 +114,9 @@ button {
   z-index: 50;
   top: 0;
   min-width: 0;
-  border-bottom: 1px solid rgba(var(--amber-rgb), 0.1);
-  background: rgba(248, 239, 220, 0.7);
+  border-bottom: 1px solid var(--line);
+  background: var(--color-panel);
+  box-shadow: 0 0.5rem 2rem color-mix(in srgb, var(--ink) 5%, transparent);
   backdrop-filter: blur(18px) saturate(135%);
 }
 
@@ -240,14 +238,13 @@ main {
 }
 
 .button-primary {
-  background: var(--color-primary);
-  color: #000000;
+  background: var(--terracotta);
+  color: var(--surface);
   box-shadow: 0 0.8rem 2.5rem rgba(var(--amber-rgb), 0.15);
 }
 
 .button-primary:hover {
   background: var(--terracotta-deep);
-  color: var(--surface);
 }
 
 .button-secondary {
@@ -604,7 +601,12 @@ main {
   color: var(--muted);
   cursor: pointer;
   font-size: 0.68rem;
-  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.blog-tag-filter button:hover,
+.blog-empty-state button:hover {
+  transform: translateY(-2px);
 }
 
 .blog-tag-filter button:hover,
@@ -780,11 +782,12 @@ main {
   margin-top: clamp(2.5rem, 6vw, 4.5rem);
   color: var(--muted);
   font-size: 0.72rem;
-  transition: color 160ms ease;
+  transition: color 160ms ease, transform 160ms ease;
 }
 
 .article-back-link:hover {
   color: var(--color-primary);
+  transform: translateY(-2px);
 }
 
 .article-layout {

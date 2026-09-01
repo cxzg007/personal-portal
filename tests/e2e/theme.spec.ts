@@ -50,3 +50,71 @@ test("root document background is light, not dark", async ({ page }) => {
   );
   expect(pageColor).toBe("#f8efdc");
 });
+
+test("page canvas paints the warm paper token as a solid background", async ({ page }) => {
+  await page.goto("/");
+  const colors = await page.evaluate(() => {
+    const probe = document.createElement("div");
+    probe.style.color = "var(--page)";
+    document.body.appendChild(probe);
+    const tokenColor = getComputedStyle(probe).color;
+    probe.remove();
+    return {
+      tokenColor,
+      bodyBackground: getComputedStyle(document.body).backgroundColor,
+    };
+  });
+  expect(colors.bodyBackground).toBe(colors.tokenColor);
+});
+
+test("sticky navigation uses a translucent cream panel with a soft shadow", async ({ page }) => {
+  await page.goto("/blog");
+  const nav = await page.evaluate(() => {
+    const header = document.querySelector<HTMLElement>(".site-header");
+    const style = getComputedStyle(header!);
+    const match = style.backgroundColor.match(/^rgba?\(([^)]+)\)$/);
+    const parts = match ? match[1].split(",").map((part) => Number.parseFloat(part.trim())) : [];
+    return {
+      background: style.backgroundColor,
+      alpha: parts.length === 4 ? parts[3] : 1,
+      red: parts[0] ?? 0,
+      green: parts[1] ?? 0,
+      blue: parts[2] ?? 0,
+      shadow: style.boxShadow,
+    };
+  });
+  expect(nav.background).toBe("rgba(255, 250, 240, 0.82)");
+  expect(nav.alpha).toBeGreaterThan(0.5);
+  expect(nav.red).toBe(255);
+  expect(nav.green).toBe(250);
+  expect(nav.blue).toBe(240);
+  expect(nav.shadow).not.toBe("none");
+});
+
+test("focused navigation and call-to-action links show a terracotta ring of at least 2px", async ({ page }) => {
+  await page.goto("/");
+  const navLink = page.getByRole("navigation", { name: "主导航" }).getByRole("link", { name: "信息", exact: true });
+  const cta = page.getByRole("link", { name: "查看实习", exact: true });
+  for (let i = 0; i < 6 && !(await navLink.evaluate((element) => element === document.activeElement)); i += 1) {
+    await page.keyboard.press("Tab");
+  }
+  await expect(navLink).toBeFocused();
+  const navRing = await navLink.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { style: style.outlineStyle, width: style.outlineWidth, color: style.outlineColor };
+  });
+  for (let i = 0; i < 10; i += 1) {
+    if (await cta.evaluate((element) => element === document.activeElement)) break;
+    await page.keyboard.press("Tab");
+  }
+  await expect(cta).toBeFocused();
+  const ctaRing = await cta.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { style: style.outlineStyle, width: style.outlineWidth, color: style.outlineColor };
+  });
+  for (const ring of [navRing, ctaRing]) {
+    expect(ring.style).not.toBe("none");
+    expect(Number.parseFloat(ring.width)).toBeGreaterThanOrEqual(2);
+    expect(ring.color).toBe("rgb(184, 95, 63)");
+  }
+});
