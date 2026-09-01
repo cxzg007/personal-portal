@@ -2,20 +2,20 @@
    Loaded after globals.css via src/app/layout.tsx. */
 
 .profile-shell {
-  --profile-bg: #f7efdd;
-  --profile-bg-deep: #f1e6cc;
-  --profile-hero-top: #e8d5ae;
-  --profile-hero-mid: #eddbb6;
-  --profile-hero-low: #f1e6cc;
-  --profile-ink: #3d2f1e;
-  --profile-muted: rgb(61 47 30 / 62%);
-  --profile-panel: #fffbee;
-  --profile-panel-deep: #f5ead4;
-  --profile-line: rgb(120 90 40 / 18%);
-  --profile-accent: #b96a3a;
+  --profile-bg: var(--page);
+  --profile-bg-deep: var(--surface-strong);
+  --profile-hero-top: var(--surface-strong);
+  --profile-hero-mid: var(--surface-strong);
+  --profile-hero-low: var(--surface-strong);
+  --profile-ink: var(--ink);
+  --profile-muted: rgb(56 45 34 / 62%);
+  --profile-panel: var(--surface);
+  --profile-panel-deep: var(--surface-strong);
+  --profile-line: rgb(56 45 34 / 18%);
+  --profile-accent: var(--terracotta);
   --profile-width: 68.75rem;
   color: var(--profile-ink);
-  background: linear-gradient(#f7efdd, #f1e6cc 42%, #f1e6cc);
+  background: linear-gradient(var(--page), var(--surface-strong) 42%, var(--surface-strong));
 }
 
 .profile-hero {
@@ -23,8 +23,8 @@
   min-height: 71.25rem;
   overflow: clip;
   background:
-    radial-gradient(circle at 50% 0%, rgb(230 197 141 / 46%), transparent 46%),
-    linear-gradient(#e8d5ae, #eddbb6 28%, #f1e6cc 54%, #f7efdd 78%, #faf3e3);
+    radial-gradient(circle at 50% 0%, rgb(237 207 130 / 46%), transparent 46%),
+    linear-gradient(var(--cream-strong), var(--surface-strong) 28%, var(--surface-strong) 54%, var(--page) 78%, var(--page));
 }
 
 .profile-hero h1 {
@@ -53,7 +53,7 @@
   inset-inline: 0;
   top: 0;
   border-bottom: 1px solid var(--profile-line);
-  background: rgb(247 239 221 / 82%);
+  background: rgb(248 239 220 / 82%);
   backdrop-filter: blur(18px) saturate(135%);
 }
 
@@ -76,6 +76,7 @@
 
 .profile-stage > h2 {
   margin: 0 0 1.75rem;
+  font-family: var(--font-display);
   font-size: clamp(1.75rem, 3.4vw, 2.5rem);
   font-weight: 560;
   letter-spacing: -0.01em;
@@ -101,8 +102,8 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 
 .profile-hero-kicker {
   margin: 0 0 1.5rem;
-  color: rgb(61 47 30 / 78%);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: rgb(56 45 34 / 78%);
+  font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -111,7 +112,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 .profile-hero-copy > p:not(.profile-hero-kicker) {
   width: min(40rem, 100%);
   margin: 1.75rem 0 0;
-  color: rgb(61 47 30 / 82%);
+  color: rgb(56 45 34 / 82%);
   font-size: clamp(1.05rem, 1.6vw, 1.25rem);
   line-height: 1.75;
 }
@@ -141,16 +142,16 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 
 .profile-cta-primary {
   background: var(--profile-accent);
-  color: #16040a;
-  box-shadow: 0 12px 32px rgb(185 106 58 / 28%);
+  color: #000000;
+  box-shadow: 0 12px 32px rgb(184 95 63 / 28%);
 }
 
 .profile-cta-primary:hover {
-  box-shadow: 0 16px 40px rgb(185 106 58 / 40%);
+  box-shadow: 0 16px 40px rgb(184 95 63 / 40%);
 }
 
 .profile-cta-secondary {
-  border: 1px solid rgb(61 47 30 / 42%);
+  border: 1px solid rgb(56 45 34 / 42%);
   color: var(--profile-ink);
 }
 
@@ -166,8 +167,8 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   padding: 2rem 2.25rem 2.25rem;
   border: 1px solid var(--profile-line);
   border-radius: 22px;
-  background: linear-gradient(180deg, rgb(255 251 238 / 86%), rgb(245 234 212 / 92%));
-  box-shadow: 0 24px 60px rgb(61 47 30 / 18%);
+  background: linear-gradient(180deg, rgb(255 250 240 / 86%), rgb(241 223 191 / 92%));
+  box-shadow: 0 24px 60px rgb(56 45 34 / 18%);
 }
 
 .profile-dock-name {
@@ -218,7 +219,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 }
 
 .profile-dock-serif {
-  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-family: var(--font-display);
   font-weight: 600;
 }
 
@@ -239,7 +240,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 .profile-dock-contacts a {
   color: var(--profile-ink);
   text-decoration: underline;
-  text-decoration-color: rgb(61 47 30 / 36%);
+  text-decoration-color: rgb(56 45 34 / 36%);
   text-underline-offset: 4px;
 }
 
@@ -250,7 +251,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 .profile-dock-growth {
   margin: 1.3rem 0 0;
   color: var(--profile-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.82rem;
   letter-spacing: 0.04em;
 }
@@ -294,7 +295,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 }
 
 .profile-info-facts dt {
-  color: #5c4d39;
+  color: var(--muted);
   font-size: 0.8rem;
   letter-spacing: 0.08em;
 }
@@ -325,7 +326,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   border: 1px solid var(--profile-line);
   border-radius: 22px;
   background: linear-gradient(180deg, var(--profile-panel), var(--profile-panel-deep));
-  box-shadow: 0 18px 48px rgb(61 47 30 / 16%);
+  box-shadow: 0 18px 48px rgb(56 45 34 / 16%);
   transition: transform 220ms ease, opacity 220ms ease;
 }
 
@@ -383,7 +384,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 
 .internship-period {
   color: var(--profile-accent);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   letter-spacing: 0.05em;
 }
 
@@ -421,7 +422,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 }
 
 .internship-stack {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
 }
 
@@ -437,13 +438,13 @@ html[data-profile-motion="static"] .sticky-internship-card {
   padding: 1rem;
   border: 1px solid var(--profile-line);
   border-radius: 20px;
-  background: rgb(245 234 212 / 55%);
+  background: rgb(241 223 191 / 55%);
 }
 
 .internship-status {
   margin: 0;
   color: var(--profile-accent);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.82rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -474,7 +475,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   padding: 0.45rem;
   border: 1px solid var(--profile-line);
   border-radius: 999px;
-  background: rgb(245 234 212 / 60%);
+  background: rgb(241 223 191 / 60%);
 }
 
 .system-project-tab {
@@ -495,7 +496,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 
 .system-project-tab[aria-selected="true"] {
   background: var(--profile-accent);
-  color: #16040a;
+  color: #000000;
 }
 
 .system-project-panel {
@@ -539,7 +540,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 .system-project-stack {
   margin: 0;
   color: var(--profile-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
 }
 
@@ -575,7 +576,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   padding: 1.25rem;
   border: 1px solid var(--profile-line);
   border-radius: 20px;
-  background: rgb(245 234 212 / 55%);
+  background: rgb(241 223 191 / 55%);
 }
 
 .architecture-stage-connector {
@@ -587,7 +588,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 
 .architecture-stage-label {
   color: var(--profile-accent);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -621,7 +622,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 .open-source-showcase-identity {
   margin: 0 0 0.3rem;
   color: var(--profile-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8rem;
   letter-spacing: 0.12em;
 }
@@ -654,13 +655,13 @@ html[data-profile-motion="static"] .sticky-internship-card {
   padding: 0.8rem 1rem;
   border: 1px solid var(--profile-line);
   border-radius: 14px;
-  background: rgb(245 234 212 / 55%);
+  background: rgb(241 223 191 / 55%);
 }
 
 .open-source-showcase-contribution a {
   color: var(--profile-ink);
   text-decoration: underline;
-  text-decoration-color: rgb(61 47 30 / 30%);
+  text-decoration-color: rgb(56 45 34 / 30%);
   text-underline-offset: 4px;
 }
 
@@ -673,7 +674,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   border: 1px solid var(--profile-line);
   border-radius: 999px;
   color: var(--profile-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.7rem;
   letter-spacing: 0.1em;
 }
@@ -685,9 +686,9 @@ html[data-profile-motion="static"] .sticky-internship-card {
 }
 
 .contribution-open {
-  border-color: rgb(185 106 58 / 40%);
-  background: rgb(185 106 58 / 12%);
-  color: #a04a28;
+  border-color: rgb(184 95 63 / 40%);
+  background: rgb(184 95 63 / 12%);
+  color: var(--terracotta-deep);
 }
 
 .open-source-showcase-boundary {
@@ -710,9 +711,9 @@ html[data-profile-motion="static"] .sticky-internship-card {
   padding: 0.5rem 1rem;
   border: 1px solid var(--profile-line);
   border-radius: 999px;
-  background: rgb(255 251 238 / 70%);
+  background: rgb(255 250 240 / 70%);
   color: var(--profile-ink);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8rem;
 }
 
@@ -770,7 +771,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   border: 1px solid var(--profile-line);
   border-radius: 999px;
   color: var(--profile-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
 }
 
@@ -789,7 +790,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   padding: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 4vw, 3rem);
   border: 1px solid var(--profile-line);
   border-radius: 22px;
-  background: linear-gradient(160deg, rgb(230 197 141 / 45%), var(--profile-panel) 60%);
+  background: linear-gradient(160deg, rgb(237 207 130 / 45%), var(--profile-panel) 60%);
   text-align: center;
 }
 
@@ -816,7 +817,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 .profile-shell #contact > section a {
   display: inline-flex;
   padding: 0.7rem 1.5rem;
-  border: 1px solid rgb(61 47 30 / 40%);
+  border: 1px solid rgb(56 45 34 / 40%);
   border-radius: 999px;
   color: var(--profile-ink);
   font-weight: 560;
