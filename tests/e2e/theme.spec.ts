@@ -93,7 +93,16 @@ test("sticky navigation uses a translucent cream panel with a soft shadow", asyn
 
 test("focused navigation and call-to-action links show a terracotta ring of at least 2px", async ({ page }) => {
   await page.goto("/");
-  const navLink = page.getByRole("navigation", { name: "主导航" }).getByRole("link", { name: "信息", exact: true });
+  // 移动视口（<=760px）下桌面主导航被隐藏，链接只存在于汉堡菜单抽屉中，
+  // 需先打开菜单并改用「移动导航」定位，否则 Tab 无法聚焦到目标链接。
+  const desktopNav = page.getByRole("navigation", { name: "主导航" });
+  const isDesktopNavVisible = await desktopNav.isVisible();
+  if (!isDesktopNavVisible) {
+    await page.getByRole("button", { name: "打开导航菜单" }).click();
+  }
+  const navLink = isDesktopNavVisible
+    ? desktopNav.getByRole("link", { name: "信息", exact: true })
+    : page.getByRole("navigation", { name: "移动导航" }).getByRole("link", { name: "信息", exact: true });
   const cta = page.getByRole("link", { name: "查看实习", exact: true });
   for (let i = 0; i < 6 && !(await navLink.evaluate((element) => element === document.activeElement)); i += 1) {
     await page.keyboard.press("Tab");
