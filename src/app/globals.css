@@ -825,10 +825,39 @@ main {
 }
 
 .article-header {
+  position: relative;
   grid-column: 1 / -1;
   max-width: 58rem;
-  padding-block: clamp(3rem, 8vw, 6rem) clamp(2.5rem, 6vw, 4.5rem);
-  border-bottom: 1px solid rgba(var(--amber-rgb), 0.12);
+  padding: clamp(2rem, 5vw, 3.25rem) clamp(1.25rem, 4vw, 3rem) clamp(1.75rem, 4.5vw, 2.75rem);
+  border: 1px solid color-mix(in srgb, var(--terracotta) 30%, transparent);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: 0 1.1rem 2.6rem rgba(56, 45, 34, 0.09);
+}
+
+.article-header::before,
+.article-header::after {
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  pointer-events: none;
+  content: "";
+}
+
+.article-header::before {
+  top: 0.85rem;
+  left: 0.85rem;
+  border-top: 2px solid var(--terracotta);
+  border-left: 2px solid var(--terracotta);
+  border-top-left-radius: 0.45rem;
+}
+
+.article-header::after {
+  right: 0.85rem;
+  bottom: 0.85rem;
+  border-right: 2px solid var(--terracotta);
+  border-bottom: 2px solid var(--terracotta);
+  border-bottom-right-radius: 0.45rem;
 }
 
 .article-header h1 {
@@ -846,7 +875,13 @@ main {
 }
 
 .article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
   margin-top: 1.4rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
 }
 
 .article-toc {
@@ -854,8 +889,10 @@ main {
   top: calc(var(--header-height) + 2rem);
   grid-column: 2;
   grid-row: 2;
-  padding-left: 1.2rem;
-  border-left: 1px solid rgba(var(--amber-rgb), 0.13);
+  padding: 1.1rem 1.15rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--sage) 45%, transparent);
+  border-radius: 0.9rem;
+  background: var(--sage-soft);
 }
 
 .article-toc p {
@@ -876,14 +913,14 @@ main {
 }
 
 .article-toc a {
-  color: var(--muted);
+  color: var(--ink);
   font-size: 0.68rem;
   line-height: 1.55;
   transition: color 160ms ease;
 }
 
 .article-toc a:hover {
-  color: var(--color-primary);
+  color: var(--terracotta-deep);
 }
 
 .article-toc-nested {
@@ -894,10 +931,10 @@ main {
   grid-column: 1;
   grid-row: 2;
   min-width: 0;
-  max-width: 47rem;
+  max-width: min(100%, 48rem);
   color: var(--ink);
   font-size: clamp(0.94rem, 1.7vw, 1.02rem);
-  line-height: 1.95;
+  line-height: 1.8;
 }
 
 .article-prose > :first-child {
@@ -1144,9 +1181,9 @@ main {
     position: static;
     grid-row: auto;
     padding: 1rem;
-    border: 1px solid rgba(var(--amber-rgb), 0.13);
+    border: 1px solid color-mix(in srgb, var(--sage) 45%, transparent);
     border-radius: 0.8rem;
-    background: rgba(255, 250, 240, 0.65);
+    background: var(--sage-soft);
   }
 
   .article-prose {

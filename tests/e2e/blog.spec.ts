@@ -117,6 +117,35 @@ test("blog index keeps the warm portfolio visual language with intact card conte
   await expect(page.getByRole("link", { name: `阅读文章：${articleTitle}` })).toBeVisible();
 });
 
+test("article keeps a readable warm editorial measure", async ({ page }) => {
+  await page.goto("/blog/first-agent-system");
+  const prose = page.locator(".article-prose");
+  await expect(prose).toHaveCSS("font-family", /Inter|PingFang|Microsoft YaHei/);
+  expect((await prose.boundingBox())!.width).toBeLessThanOrEqual(820);
+  await expect(page.locator(".article-header h1")).toHaveCSS("font-family", /Noto Serif SC/);
+
+  const reading = await page.evaluate(() => {
+    const prose = document.querySelector<HTMLElement>(".article-prose")!;
+    const header = document.querySelector<HTMLElement>(".article-header")!;
+    const toc = document.querySelector<HTMLElement>(".article-toc")!;
+    const meta = document.querySelector<HTMLElement>(".article-meta")!;
+    const proseStyle = getComputedStyle(prose);
+    return {
+      proseRatio: parseFloat(proseStyle.lineHeight) / parseFloat(proseStyle.fontSize),
+      proseMaxWidth: proseStyle.maxWidth,
+      headerBackground: getComputedStyle(header).backgroundColor,
+      tocBackground: getComputedStyle(toc).backgroundColor,
+      metaFont: getComputedStyle(meta).fontFamily,
+    };
+  });
+
+  expect(reading.proseRatio).toBeCloseTo(1.8, 2);
+  expect(reading.proseMaxWidth).toMatch(/^min\(100%, (48rem|768px)\)$/);
+  expect(reading.headerBackground).toBe("rgb(255, 250, 240)");
+  expect(reading.tocBackground).toBe("rgb(220, 227, 207)");
+  expect(reading.metaFont).toMatch(/Mono|monospace/);
+});
+
 test("opens the article with a table of contents and returns to the blog index", async ({ page }) => {
   await page.goto("/blog");
   await page.getByRole("link", { exact: true, name: articleTitle }).click();
