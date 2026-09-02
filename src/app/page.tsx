@@ -58,28 +58,28 @@ export default async function HomePage() {
           type="application/ld+json"
         />
         <ProfileHero profile={content.profile} />
-        <section aria-labelledby="info-heading" className="profile-stage" id="info">
-          <h2 id="info-heading">个人信息</h2>
+        <section aria-labelledby="info-heading" className="profile-stage profile-stage--cream" id="info">
+          <h2 className="profile-reveal" id="info-heading">个人信息</h2>
           <ProfileInfo about={content.about} profile={content.profile} />
         </section>
-        <section aria-labelledby="internships-heading" className="profile-stage" id="internships">
-          <h2 id="internships-heading">实习内容落在真实系统里。</h2>
+        <section aria-labelledby="internships-heading" className="profile-stage profile-stage--sage" id="internships">
+          <h2 className="profile-reveal" id="internships-heading">实习内容落在真实系统里。</h2>
           <StickyInternshipStack internships={content.internships} />
         </section>
-        <section aria-labelledby="systems-heading" className="profile-stage" id="systems">
-          <h2 id="systems-heading">项目按工程问题组织。</h2>
+        <section aria-labelledby="systems-heading" className="profile-stage profile-stage--cream" id="systems">
+          <h2 className="profile-reveal" id="systems-heading">项目按工程问题组织。</h2>
           <SystemProjectTabs projects={content.caseStudies} />
         </section>
-        <section aria-labelledby="open-source-heading" className="profile-stage" id="open-source">
-          <h2 id="open-source-heading">开源贡献与公开影响力。</h2>
+        <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--terracotta" id="open-source">
+          <h2 className="profile-reveal" id="open-source-heading">开源贡献与公开影响力。</h2>
           <OpenSourceShowcase project={content.openSource} stars={stars} />
         </section>
-        <section aria-labelledby="writing-heading" className="profile-stage" id="writing">
-          <h2 id="writing-heading">技术写作与工程复盘。</h2>
+        <section aria-labelledby="writing-heading" className="profile-stage profile-stage--sage" id="writing">
+          <h2 className="profile-reveal" id="writing-heading">技术写作与工程复盘。</h2>
           <WritingStage posts={featuredPosts} />
         </section>
-        <section aria-labelledby="contact-heading" className="profile-stage" id="contact">
-          <h2 id="contact-heading">Build reliable agent systems together.</h2>
+        <section aria-labelledby="contact-heading" className="profile-stage profile-stage--terracotta" id="contact">
+          <h2 className="profile-reveal" id="contact-heading">Build reliable agent systems together.</h2>
           <ContactStage profile={content.profile} />
         </section>
       </main>

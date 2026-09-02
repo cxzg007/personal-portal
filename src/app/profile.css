@@ -14,6 +14,13 @@
   --profile-line: rgb(56 45 34 / 18%);
   --profile-accent: var(--terracotta);
   --profile-width: 68.75rem;
+  /* Decorative field tones derived from the global palette tokens. */
+  --profile-field-cream: rgb(237 207 130 / 32%);
+  --profile-field-sage: rgb(125 146 112 / 22%);
+  --profile-field-terracotta: rgb(184 95 63 / 15%);
+  --profile-sage-wash: rgb(220 227 207 / 55%);
+  --profile-hairline: rgb(184 95 63 / 32%);
+  --profile-ink-wash: rgb(56 45 34 / 8%);
   color: var(--profile-ink);
   background: linear-gradient(var(--page), var(--surface-strong) 42%, var(--surface-strong));
 }
@@ -25,6 +32,38 @@
   background:
     radial-gradient(circle at 50% 0%, rgb(237 207 130 / 46%), transparent 46%),
     linear-gradient(var(--cream-strong), var(--surface-strong) 28%, var(--surface-strong) 54%, var(--page) 78%, var(--page));
+}
+
+/* Warm decorative geometry: sage wash, terracotta ring, hairline grid. */
+.profile-hero::before {
+  content: "";
+  position: absolute;
+  inset: auto 4% 4% 6%;
+  height: 52%;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgb(56 45 34 / 5%) 0,
+      rgb(56 45 34 / 5%) 1px,
+      transparent 1px,
+      transparent 12px
+    ),
+    var(--profile-sage-wash);
+  border-radius: 46% 54% 52% 48% / 58% 44% 56% 42%;
+  rotate: -3deg;
+  pointer-events: none;
+}
+
+.profile-hero::after {
+  content: "";
+  position: absolute;
+  inset: 12% 4% auto auto;
+  width: clamp(9rem, 18vw, 14rem);
+  aspect-ratio: 1;
+  border: 1.5px solid var(--profile-hairline);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, rgb(184 95 63 / 10%), transparent 58%);
+  pointer-events: none;
 }
 
 .profile-hero h1 {
@@ -54,7 +93,7 @@
   inset-inline: 0;
   top: 0;
   border-bottom: 1px solid var(--profile-line);
-  background: rgb(248 239 220 / 82%);
+  background: var(--color-panel);
   backdrop-filter: blur(18px) saturate(135%);
 }
 
@@ -69,8 +108,11 @@
 }
 
 .profile-stage {
+  position: relative;
+  isolation: isolate;
   width: min(calc(100% - 3rem), var(--profile-width));
   margin-inline: auto;
+  padding-inline: 1rem;
   padding-block: clamp(2.5rem, 6vw, 4.5rem);
   scroll-margin-top: calc(var(--profile-nav-height) + 1rem);
 }
@@ -81,6 +123,74 @@
   font-size: clamp(1.75rem, 3.4vw, 2.5rem);
   font-weight: 560;
   letter-spacing: -0.01em;
+}
+
+/* --- warm section themes: soft decorative color fields --- */
+
+.profile-stage--cream::before,
+.profile-stage--sage::before,
+.profile-stage--terracotta::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 36px 44px 40px 48px;
+}
+
+.profile-stage--cream::before {
+  inset: 12% 2rem auto 54%;
+  height: 64%;
+  background: var(--profile-field-cream);
+  rotate: 1.4deg;
+}
+
+.profile-stage--sage::before {
+  inset: 16% 52% auto 2rem;
+  height: 60%;
+  background: var(--profile-field-sage);
+  rotate: -1.2deg;
+}
+
+.profile-stage--terracotta::before {
+  inset: 10% 2rem auto 46%;
+  height: 70%;
+  background: var(--profile-field-terracotta);
+  rotate: -1.8deg;
+}
+
+.profile-stage--cream::after,
+.profile-stage--sage::after,
+.profile-stage--terracotta::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.profile-stage--cream::after {
+  inset: 4% auto auto 1.5rem;
+  width: 5.5rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--profile-hairline);
+  border-radius: 50%;
+}
+
+.profile-stage--sage::after {
+  inset: auto 1.5rem 6% auto;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--profile-hairline);
+  border-radius: 14px;
+  rotate: 12deg;
+}
+
+.profile-stage--terracotta::after {
+  inset: 3% 40% auto auto;
+  width: 3.5rem;
+  aspect-ratio: 1;
+  border: 1.5px solid var(--profile-hairline);
+  border-radius: 50%;
+  background: rgb(184 95 63 / 8%);
 }
 
 /* --- hero copy, CTA pills, profile dock --- */
@@ -134,7 +244,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  transition: transform 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
 .profile-cta:hover {
@@ -286,6 +396,8 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   border: 1px solid var(--profile-line);
   border-radius: 20px;
   background: var(--profile-panel);
+  rotate: -0.7deg;
+  transition: transform 480ms ease, rotate 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
 .profile-info-facts > div {
@@ -328,17 +440,19 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   border-radius: 22px;
   background: linear-gradient(180deg, var(--profile-panel), var(--profile-panel-deep));
   box-shadow: 0 18px 48px rgb(56 45 34 / 16%);
-  transition: transform 220ms ease, opacity 220ms ease;
+  transition: transform 480ms ease, opacity 480ms ease, rotate 480ms ease;
 }
 
 .sticky-internship-card[data-card-index="1"] {
   top: 104px;
+  rotate: 0.9deg;
 }
 
 .sticky-internship-card[data-card-index="2"],
 .sticky-internship-card[data-card-index="3"],
 .sticky-internship-card[data-card-index="4"] {
   top: 122px;
+  rotate: -1.1deg;
 }
 
 .sticky-internship-card[data-stack-progress="0"] {
@@ -488,7 +602,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   font-size: 0.9rem;
   font-weight: 560;
   cursor: pointer;
-  transition: background 160ms ease, color 160ms ease;
+  transition: background 480ms ease, color 480ms ease;
 }
 
 .system-project-tab:hover {
@@ -507,6 +621,8 @@ html[data-profile-motion="static"] .sticky-internship-card {
   border: 1px solid var(--profile-line);
   border-radius: 22px;
   background: linear-gradient(180deg, var(--profile-panel), var(--profile-panel-deep));
+  rotate: 0.9deg;
+  transition: transform 480ms ease, rotate 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
 .system-project-title {
@@ -612,6 +728,8 @@ html[data-profile-motion="static"] .sticky-internship-card {
   border: 1px solid var(--profile-line);
   border-radius: 22px;
   background: linear-gradient(180deg, var(--profile-panel), var(--profile-panel-deep));
+  rotate: -1.1deg;
+  transition: transform 480ms ease, rotate 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
 .open-source-showcase-header {
@@ -745,6 +863,8 @@ html[data-profile-motion="static"] .sticky-internship-card {
   border: 1px solid var(--profile-line);
   border-radius: 22px;
   background: linear-gradient(180deg, var(--profile-panel), var(--profile-panel-deep));
+  rotate: 0.8deg;
+  transition: transform 480ms ease, rotate 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
 .profile-shell #writing article h2 {
@@ -793,6 +913,8 @@ html[data-profile-motion="static"] .sticky-internship-card {
   border-radius: 22px;
   background: linear-gradient(160deg, rgb(237 207 130 / 45%), var(--profile-panel) 60%);
   text-align: center;
+  rotate: -0.6deg;
+  transition: transform 480ms ease, rotate 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
 .profile-shell #contact > section h2 {
@@ -822,7 +944,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   border-radius: 999px;
   color: var(--profile-ink);
   font-weight: 560;
-  transition: border-color 160ms ease, transform 160ms ease;
+  transition: border-color 480ms ease, transform 480ms ease;
 }
 
 .profile-shell #contact > section a:hover {
@@ -830,12 +952,25 @@ html[data-profile-motion="static"] .sticky-internship-card {
   transform: translateY(-2px);
 }
 
+/* --- unified warm card hover (desktop pointer only, <=4px lift) --- */
+
+@media (hover: hover) and (pointer: fine) {
+  .profile-info-facts:hover,
+  .system-project-panel:hover,
+  .open-source-showcase:hover,
+  .profile-shell #writing article:hover,
+  .profile-shell #contact > section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 56px rgb(56 45 34 / 18%);
+  }
+}
+
 /* --- reveal motion --- */
 
 .profile-reveal {
   opacity: 0;
   transform: translateY(18px);
-  transition: opacity 420ms ease, transform 420ms ease;
+  transition: opacity 480ms ease, transform 480ms ease;
 }
 
 .profile-reveal[data-in-view="true"] {
@@ -935,6 +1070,22 @@ html[data-profile-motion="static"] .profile-reveal {
     transform: none;
     transition: none;
   }
+
+  /* cancel collage tilt below 760px for a calm compact layout */
+  .profile-info-facts,
+  .system-project-panel,
+  .open-source-showcase,
+  .profile-shell #writing article,
+  .profile-shell #contact > section,
+  .sticky-internship-card[data-card-index] {
+    rotate: 0deg;
+  }
+
+  .profile-stage--cream::before,
+  .profile-stage--sage::before,
+  .profile-stage--terracotta::before {
+    rotate: 0deg;
+  }
 }
 
 /* --- reduced motion --- */
@@ -943,7 +1094,10 @@ html[data-profile-motion="static"] .profile-reveal {
   .profile-reveal {
     opacity: 1;
     transform: none;
-    transition: none;
+    transition-property: none;
+    /* explicit 0s beats the global 0.01ms !important fallback */
+    transition-duration: 0s !important;
+    rotate: none;
   }
 
   .sticky-internship-card,
@@ -953,6 +1107,7 @@ html[data-profile-motion="static"] .profile-reveal {
     opacity: 1;
     transform: none;
     transition: none;
+    rotate: none;
   }
 
   html[data-profile-motion="enhanced"] .profile-hero-copy {
@@ -967,6 +1122,25 @@ html[data-profile-motion="static"] .profile-reveal {
 
   .profile-cta:hover,
   .profile-shell #contact > section a:hover {
+    transform: none;
+  }
+
+  /* collage tilt and pointer-driven lifts are removed entirely */
+  .profile-info-facts,
+  .system-project-panel,
+  .open-source-showcase,
+  .profile-shell #writing article,
+  .profile-shell #contact > section,
+  .sticky-internship-card[data-card-index] {
+    rotate: none;
+    transition: none;
+  }
+
+  .profile-info-facts:hover,
+  .system-project-panel:hover,
+  .open-source-showcase:hover,
+  .profile-shell #writing article:hover,
+  .profile-shell #contact > section:hover {
     transform: none;
   }
 

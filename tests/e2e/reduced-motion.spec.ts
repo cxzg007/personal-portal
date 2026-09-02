@@ -66,3 +66,26 @@ test("layout stays static at 390px and restores enhanced motion above the 760px 
   await page.setViewportSize({ width: 1024, height: 768 });
   await expect(page.locator("html")).toHaveAttribute("data-profile-motion", "enhanced");
 });
+
+test("reduced motion removes reveal transitions while keeping section content visible", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  const reveals = await page.evaluate(() =>
+    Array.from(document.querySelectorAll<HTMLElement>(".profile-reveal")).map((element) => {
+      const style = getComputedStyle(element);
+      return {
+        transitionDuration: style.transitionDuration,
+        transform: style.transform,
+        opacity: style.opacity,
+      };
+    }),
+  );
+
+  expect(reveals.length).toBeGreaterThan(0);
+  for (const reveal of reveals) {
+    expect(reveal.transitionDuration).toBe("0s");
+    expect(reveal.transform).toBe("none");
+    expect(reveal.opacity).toBe("1");
+  }
+});

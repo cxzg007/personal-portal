@@ -118,3 +118,14 @@ test("focused navigation and call-to-action links show a terracotta ring of at l
     expect(ring.color).toBe("rgb(184, 95, 63)");
   }
 });
+
+test("homepage alternates warm portfolio section themes", async ({ page }) => {
+  await page.goto("/");
+  // 外层分区与 .profile-info 组件根都带 id="info"，用 .profile-stage 限定外层。
+  await expect(page.locator("#info.profile-stage")).toHaveClass(/profile-stage--cream/);
+  await expect(page.locator("#internships")).toHaveClass(/profile-stage--sage/);
+  await expect(page.locator("#systems")).toHaveClass(/profile-stage--cream/);
+  await expect(page.locator("#open-source")).toHaveClass(/profile-stage--terracotta/);
+  await expect(page.locator("#writing")).toHaveClass(/profile-stage--sage/);
+  await expect(page.locator("#contact")).toHaveClass(/profile-stage--terracotta/);
+});
