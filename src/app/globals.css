@@ -667,7 +667,7 @@ main {
 .blog-card::before {
   position: absolute;
   top: 1.15rem;
-  right: clamp(1.4rem, 4vw, 2.2rem);
+  left: clamp(1.4rem, 4vw, 2.2rem);
   padding-bottom: 0.25rem;
   border-bottom: 2px solid color-mix(in srgb, var(--terracotta) 55%, transparent);
   color: var(--terracotta-deep);
@@ -693,6 +693,10 @@ main {
   font-size: 0.6rem;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.06em;
+}
+
+.blog-card .blog-card-meta {
+  margin-top: 1.1rem;
 }
 
 .blog-card h2 {
