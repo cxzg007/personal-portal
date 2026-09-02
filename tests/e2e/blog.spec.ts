@@ -79,6 +79,44 @@ test("server-renders the public blog and filters without losing the empty-state 
   await expect(page.getByRole("link", { exact: true, name: articleTitle })).toBeVisible();
 });
 
+test("blog index keeps the warm portfolio visual language with intact card content", async ({
+  page,
+}) => {
+  await page.goto("/blog");
+
+  const values = await page.evaluate(() => {
+    const heroTitle = document.querySelector<HTMLElement>(".blog-hero h1")!;
+    const activeTag = document.querySelector<HTMLButtonElement>(
+      '.blog-tag-filter button[aria-pressed="true"]',
+    )!;
+    const filterPanel = document.querySelector<HTMLElement>(".blog-filter-panel")!;
+    const searchField = document.querySelector<HTMLElement>(".blog-search-field")!;
+    const card = document.querySelector<HTMLElement>(".blog-card")!;
+    const cardMeta = document.querySelector<HTMLElement>(".blog-card-meta")!;
+    return {
+      heroFont: getComputedStyle(heroTitle).fontFamily,
+      activeTagBackground: getComputedStyle(activeTag).backgroundColor,
+      filterPanelBackground: getComputedStyle(filterPanel).backgroundColor,
+      searchFieldFont: getComputedStyle(searchField).fontFamily,
+      cardBackground: getComputedStyle(card).backgroundColor,
+      cardMetaFont: getComputedStyle(cardMeta).fontFamily,
+    };
+  });
+
+  expect(values.heroFont).toContain("Noto Serif SC");
+  expect(["rgb(184, 95, 63)", "rgb(136, 68, 47)"]).toContain(values.activeTagBackground);
+  expect(values.filterPanelBackground).toBe("rgb(220, 227, 207)");
+  expect(values.searchFieldFont).toMatch(/Mono|monospace/);
+  expect(values.cardBackground).toBe("rgb(255, 250, 240)");
+  expect(values.cardMetaFont).toMatch(/Mono|monospace/);
+
+  await expect(page.locator(".blog-card h2")).toHaveCount(1);
+  await expect(page.locator(".blog-card h2")).toHaveText(articleTitle);
+  await expect(page.locator('.blog-card [aria-label="文章标签"] li')).toHaveCount(3);
+  await expect(page.getByRole("link", { exact: true, name: articleTitle })).toBeVisible();
+  await expect(page.getByRole("link", { name: `阅读文章：${articleTitle}` })).toBeVisible();
+});
+
 test("opens the article with a table of contents and returns to the blog index", async ({ page }) => {
   await page.goto("/blog");
   await page.getByRole("link", { exact: true, name: articleTitle }).click();
