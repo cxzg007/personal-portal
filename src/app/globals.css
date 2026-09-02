@@ -238,7 +238,7 @@ main {
 }
 
 .button-primary {
-  background: var(--terracotta);
+  background: var(--terracotta-deep);
   color: var(--surface);
   box-shadow: 0 0.8rem 2.5rem rgba(var(--amber-rgb), 0.15);
 }
