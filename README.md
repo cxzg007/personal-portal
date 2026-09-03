@@ -1,4 +1,4 @@
-# 江俊杰 · AI Agent / 后端开发个人门户
+# AI Agent / 后端开发个人门户
 
 面向校招求职展示的个人门户，使用原生 Next.js App Router、TypeScript 和 MDX 构建。核心身份、教育、实习、系统设计和联系方式全部由服务端 HTML 与 CSS 呈现；本站不使用 WebGL、Three.js 或任何 Canvas 3D 场景。
 
