@@ -126,3 +126,17 @@ test("article detail visual", async ({ page }) => {
 
   await expect(page.locator(".article-layout")).toHaveScreenshot("article-detail.png");
 });
+
+test("Semantica capability map remains stable", async ({ page }) => {
+  await prepareStablePage(page, "/");
+  const map = page.getByRole("region", { name: "Semantica 双层能力地图" });
+  await expect(map).toBeVisible();
+  await expect(map).toHaveScreenshot("semantica-capability-map.png", {
+    animations: "disabled",
+  });
+
+  await map.getByRole("button", { name: "能力节点：Rule & Decision" }).click();
+  await expect(map).toHaveScreenshot("semantica-rule-decision.png", {
+    animations: "disabled",
+  });
+});
