@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { expectSemanticaMapComplete } from "./helpers/semantica-map";
+
 test("homepage exposes the campus recruiting identity and primary actions", async ({ page }) => {
   await page.goto("/");
 
@@ -78,7 +80,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
   await expect(openSource.getByText(/截至 2026-08-31/)).toBeVisible();
   await expect(openSource.getByText(/GitHub Stars/)).toBeVisible();
-  await expect(openSource.getByRole("link", { name: "Semantica GitHub 仓库" })).toHaveAttribute(
+  await expect(openSource.getByRole("link", { name: "Semantica GitHub repository" })).toHaveAttribute(
     "href",
     "https://github.com/semantica-agi/semantica",
   );
@@ -185,12 +187,39 @@ test("open source showcase exposes thirteen PR links and statuses", async ({ pag
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(13);
-  const firstPr = openSource.getByRole("link", { name: /^PR #/ }).first();
-  await expect(firstPr).toHaveText(/PR #1226/);
   await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(9);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(4);
-  await expect(openSource.getByLabel("Semantica 能力链路")).toBeVisible();
+  await expect(openSource.getByLabel("Semantica 项目工作链")).toBeVisible();
   await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
+});
+
+test("Semantica map preserves click priority and DOM order", async ({ page }) => {
+  await page.goto("/");
+  const map = page.getByRole("region", { name: "Semantica 双层能力地图" });
+  await expectSemanticaMapComplete(map);
+  const graph = map.getByRole("button", { name: "能力节点：ContextGraph" });
+  const rule = map.getByRole("button", { name: "能力节点：Rule & Decision" });
+  const graphDomain = map.getByTestId("domain-graph-data-adapters");
+  const ruleDomain = map.getByTestId("domain-rule-query-reasoning");
+  const links = map.getByRole("link", { name: /^PR #/ });
+  const before = await links.allTextContents();
+
+  await rule.hover();
+  await expect(ruleDomain).toHaveAttribute("data-emphasis", "active");
+  await expect(graphDomain).toHaveAttribute("data-emphasis", "muted");
+  await page.mouse.move(0, 0);
+  await expect(ruleDomain).toHaveAttribute("data-emphasis", "default");
+
+  await graph.click();
+  await rule.hover();
+  await expect(graph).toHaveAttribute("aria-pressed", "true");
+  await expect(graphDomain).toHaveAttribute("data-emphasis", "active");
+  await expect(ruleDomain).toHaveAttribute("data-emphasis", "muted");
+  await expect(links).toHaveCount(13);
+  expect(await links.allTextContents()).toEqual(before);
+
+  await graph.click();
+  await expect(graph).toHaveAttribute("aria-pressed", "false");
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {

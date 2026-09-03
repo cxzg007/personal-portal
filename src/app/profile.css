@@ -887,6 +887,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 
 .open-source-spotlight-domain {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
   padding: 1.2rem 1.4rem;
   border: 1px solid var(--profile-line);
@@ -931,6 +932,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   text-decoration: none;
   font-family: var(--font-mono);
   font-size: 0.75rem;
+  overflow-wrap: anywhere;
   transition: border-color 240ms ease;
 }
 
@@ -1186,6 +1188,8 @@ html[data-profile-motion="static"] .profile-reveal {
   .open-source-spotlight-domain,
   .open-source-pr-link {
     transition: none;
+    /* explicit 0s beats the global 0.01ms !important fallback */
+    transition-duration: 0s !important;
   }
 }
 
@@ -1239,6 +1243,8 @@ html[data-profile-motion="static"] .profile-reveal {
   .open-source-spotlight-domain,
   .open-source-pr-link {
     transition: none;
+    /* explicit 0s beats the global 0.01ms !important fallback */
+    transition-duration: 0s !important;
   }
 
   .profile-info-facts:hover,

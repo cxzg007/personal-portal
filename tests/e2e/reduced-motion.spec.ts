@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { expectNoRotation } from "./helpers/css";
+
 const NAV_SECTIONS = ["info", "internships", "systems", "open-source", "writing", "contact"];
 
 test("reduced motion preference keeps the layout static without hiding content", async ({ page }) => {
@@ -14,6 +16,31 @@ test("reduced motion preference keeps the layout static without hiding content",
   await expect(page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ })).toBeVisible();
   await expect(page.getByRole("link", { name: "查看实习" })).toBeVisible();
   await expect(page.locator("main > section#internships .sticky-internship-card")).toHaveCount(3);
+
+  const map = page.getByRole("region", { name: "Semantica 双层能力地图" });
+  const motionTargets = map.locator(
+    ".open-source-capability-node, .open-source-contribution-domain, .open-source-pr-link",
+  );
+  const transitionDurations = await motionTargets.evaluateAll((elements) =>
+    elements.map((element) => getComputedStyle(element).transitionDuration),
+  );
+  expect(transitionDurations.length).toBeGreaterThan(0);
+  expect(transitionDurations.every((duration) => duration === "0s")).toBe(true);
+
+  const cards = page.locator(
+    ".profile-info-facts, .sticky-internship-card, .system-project-panel, .open-source-showcase, #writing article, #contact > section, .blog-card",
+  );
+  await expectNoRotation(cards);
+  const transformsBeforeHover = await cards.evaluateAll((elements) =>
+    elements.map((element) => getComputedStyle(element).transform),
+  );
+  for (const [index, before] of transformsBeforeHover.entries()) {
+    await cards.nth(index).hover();
+    const after = await cards.nth(index).evaluate(
+      (element) => getComputedStyle(element).transform,
+    );
+    expect(after).toBe(before);
+  }
 
   const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
   expect(documentWidth).toBeLessThanOrEqual(page.viewportSize()?.width ?? 0);

@@ -1,11 +1,14 @@
 import { expect, test } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 
+import { expectSemanticaMapComplete } from "./helpers/semantica-map";
+
 const viewports = [
   { label: "mobile", width: 390, height: 844 },
   { label: "tablet", width: 768, height: 1024 },
   { label: "laptop", width: 1280, height: 800 },
   { label: "desktop", width: 1440, height: 900 },
+  { label: "wide", width: 1920, height: 1080 },
 ] as const;
 
 async function expectNoHorizontalOverflow(page: Page) {
@@ -130,7 +133,23 @@ for (const viewport of viewports) {
 
     const openSource = page.locator("main > section#open-source");
     await expectHorizontallyContained(openSource.locator(".open-source-showcase"));
-    await expectHorizontallyContained(openSource.getByLabel("Semantica 能力链路"));
+    const map = openSource.getByRole("region", { name: "Semantica 双层能力地图" });
+    const nodes = map.getByRole("button", { name: /^能力节点/ });
+    await expectSemanticaMapComplete(map);
+    await expectHorizontallyContained(map);
+    await expect(nodes).toHaveCount(5);
+    await expect(map.getByTestId("contribution-domain")).toHaveCount(6);
+    await expect(map.getByRole("link", { name: /^PR #/ })).toHaveCount(13);
+
+    if (viewport.width === 390) {
+      const boxes = await Promise.all(
+        (await nodes.all()).map((node) => node.boundingBox()),
+      );
+      expect(boxes.every((box) => box !== null)).toBe(true);
+      for (let index = 1; index < boxes.length; index += 1) {
+        expect(boxes[index]!.y).toBeGreaterThan(boxes[index - 1]!.y);
+      }
+    }
     await expectHorizontallyContained(openSource.getByLabel("Semantica 公开资料"));
 
     await expectHorizontallyContained(page.locator("main > section#writing").getByRole("article"));

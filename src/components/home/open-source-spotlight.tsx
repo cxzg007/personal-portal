@@ -22,8 +22,9 @@ export function OpenSourceSpotlight({
   contributions,
 }: OpenSourceSpotlightProps) {
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-  const effectiveNodeId = activeNodeId ?? hoveredNodeId;
+  const effectiveNodeId = activeNodeId ?? focusedNodeId ?? hoveredNodeId;
   const contributionsByNumber = new Map<number, OpenSourceContribution>(
     contributions.map((contribution) => [contribution.number, contribution]),
   );
@@ -38,6 +39,9 @@ export function OpenSourceSpotlight({
       className="open-source-spotlight"
       data-selected-node={activeNodeId ?? "all"}
       data-testid="open-source-spotlight"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") setActiveNodeId(null);
+      }}
     >
       <ol aria-label="Semantica 项目工作链" className="open-source-spotlight-chain">
         {graphNodes.map((node) => (
@@ -49,6 +53,8 @@ export function OpenSourceSpotlight({
               onClick={() => setActiveNodeId(activeNodeId === node.id ? null : node.id)}
               onMouseEnter={() => setHoveredNodeId(node.id)}
               onMouseLeave={() => setHoveredNodeId(null)}
+              onFocus={() => setFocusedNodeId(node.id)}
+              onBlur={() => setFocusedNodeId(null)}
             >
               {`能力节点：${node.title}`}
             </button>
