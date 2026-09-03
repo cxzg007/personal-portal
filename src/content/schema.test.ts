@@ -6,6 +6,21 @@ import { validateSiteContent, validateCapabilityMap } from "./schema";
 
 describe("validateSiteContent", () => {
   it("accepts complete public site content", () => {
+    expect(validSiteContent.openSource.contributions.map(({ number, status, summary, url }) => ({ number, status, summary, url }))).toEqual([
+      { number: 1077, status: "merged", summary: "用 RETE Token 模型解释规则执行。", url: "https://github.com/semantica-agi/semantica/pull/1077" },
+      { number: 1081, status: "merged", summary: "为 ContextGraph 提供标准适配器。", url: "https://github.com/semantica-agi/semantica/pull/1081" },
+      { number: 1094, status: "merged", summary: "解释 SHACL 真实约束来源。", url: "https://github.com/semantica-agi/semantica/pull/1094" },
+      { number: 1096, status: "merged", summary: "将规则 Action 与 provenance 关联。", url: "https://github.com/semantica-agi/semantica/pull/1096" },
+      { number: 1113, status: "merged", summary: "统一 RDF name 到 label 的规范化。", url: "https://github.com/semantica-agi/semantica/pull/1113" },
+      { number: 1143, status: "merged", summary: "为时间图补充指标说明。", url: "https://github.com/semantica-agi/semantica/pull/1143" },
+      { number: 1215, status: "merged", summary: "修正 pipeline 注册 handler 接线。", url: "https://github.com/semantica-agi/semantica/pull/1215" },
+      { number: 1217, status: "merged", summary: "保证 serializer round-trip 依赖与 delta 元数据。", url: "https://github.com/semantica-agi/semantica/pull/1217" },
+      { number: 1226, status: "merged", summary: "按依赖层实现 set_parallelism 并行执行。", url: "https://github.com/semantica-agi/semantica/pull/1226" },
+      { number: 1153, status: "open", summary: "补齐决策模型契约。", url: "https://github.com/semantica-agi/semantica/pull/1153" },
+      { number: 1160, status: "open", summary: "将 PolicyEngine compliance 失败改为显式抛出。", url: "https://github.com/semantica-agi/semantica/pull/1160" },
+      { number: 1208, status: "review", summary: "修复冲突解决 unhashable TypeError。", url: "https://github.com/semantica-agi/semantica/pull/1208" },
+      { number: 1243, status: "review", summary: "实现 SPARQLReasoner.execute_query 三路径。", url: "https://github.com/semantica-agi/semantica/pull/1243" },
+    ]);
     expect(validateSiteContent(validSiteContent)).toEqual({ ok: true });
   });
 

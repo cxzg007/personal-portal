@@ -51,7 +51,8 @@ export type OpenSourceProject = {
   starsSnapshot: number;
   honors: Array<{ platform: string; rank: string; period: string; evidence: string }>;
   contributions: OpenSourceContribution[];
-  graphNodes: [string, string, string, string, string];
+  graphNodes: [ProjectGraphNode, ProjectGraphNode, ProjectGraphNode, ProjectGraphNode, ProjectGraphNode];
+  contributionDomains: ContributionDomain[];
   repositoryUrl: string;
   articlePath: `/blog/${string}`;
 };
@@ -377,8 +378,7 @@ export function validateSiteContent(input: unknown): ValidationResult {
         errors.push("openSource.contributions must contain exactly 9 merged entries");
       }
     }
-    if (!Array.isArray(openSource.graphNodes) || openSource.graphNodes.length !== 5) errors.push("openSource.graphNodes must contain exactly 5 entries");
-    else openSource.graphNodes.forEach((node, index) => checkText(node, `openSource.graphNodes[${index}]`));
+    errors.push(...validateCapabilityMap(openSource.graphNodes, openSource.contributionDomains, openSource.contributions));
     checkHttpsUrl(openSource.repositoryUrl, "openSource.repositoryUrl");
     const articlePath = checkText(openSource.articlePath, "openSource.articlePath");
     if (articlePath && !/^\/blog\/.+/.test(articlePath)) errors.push("openSource.articlePath must be a /blog/ path");

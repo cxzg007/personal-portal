@@ -306,7 +306,21 @@
         "url": "https://github.com/semantica-agi/semantica/pull/1243"
       }
     ],
-    "graphNodes": ["ContextGraph", "RDF / SHACL", "Temporal Graph", "Rule Inference", "cxzg007 contributions"],
+    "graphNodes": [
+      { "id": "agent-context", "title": "Agent Context", "description": "接收 Agent 运行所需上下文。" },
+      { "id": "context-graph", "title": "ContextGraph", "description": "将上下文组织为图结构。" },
+      { "id": "semantic-validation", "title": "RDF / SHACL / Temporal", "description": "完成语义表达、约束验证和时间处理。" },
+      { "id": "rule-decision", "title": "Rule & Decision", "description": "执行规则推理、策略与决策契约。" },
+      { "id": "auditable-execution", "title": "Auditable Execution", "description": "形成可追溯、可并行的执行链路。" }
+    ],
+    "contributionDomains": [
+      { "id": "graph-data-adapters", "title": "图数据适配", "outcome": "统一图数据输入、标签规范化与序列化往返。", "nodeIds": ["context-graph", "semantic-validation"], "prNumbers": [1081, 1113, 1217] },
+      { "id": "constraint-explanation", "title": "约束解释", "outcome": "让约束失败具备可读、可追踪的解释。", "nodeIds": ["semantic-validation"], "prNumbers": [1094] },
+      { "id": "temporal-stability", "title": "时间稳定性", "outcome": "补齐时间图指标并稳定时间语义。", "nodeIds": ["semantic-validation"], "prNumbers": [1143] },
+      { "id": "rule-query-reasoning", "title": "规则与查询推理", "outcome": "完善规则溯源、冲突处理与查询执行路径。", "nodeIds": ["rule-decision"], "prNumbers": [1077, 1096, 1208, 1243] },
+      { "id": "decision-model-contracts", "title": "决策模型契约", "outcome": "明确决策模型与合规失败契约。", "nodeIds": ["rule-decision"], "prNumbers": [1153, 1160] },
+      { "id": "execution-pipeline", "title": "执行链路", "outcome": "修正执行接线并按依赖层支持并行。", "nodeIds": ["auditable-execution"], "prNumbers": [1215, 1226] }
+    ],
     "repositoryUrl": "https://github.com/semantica-agi/semantica",
     "articlePath": "/blog/first-agent-system"
   },
