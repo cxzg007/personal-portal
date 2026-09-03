@@ -71,7 +71,11 @@ export function OpenSourceSpotlight({
             data-testid={`domain-${domain.id}`}
             data-emphasis={emphasisFor(domain)}
           >
-            <div className="open-source-spotlight-domain" data-testid="contribution-domain">
+            <div
+              className="open-source-spotlight-domain"
+              data-domain-id={domain.id}
+              data-testid="contribution-domain"
+            >
               <h4>{domain.title}</h4>
               <p>{domain.outcome}</p>
               <ul>
@@ -81,7 +85,10 @@ export function OpenSourceSpotlight({
                   return (
                     <li key={prNumber}>
                       <a href={contribution.url} rel="noreferrer" target="_blank">
-                        {`PR #${contribution.number}：${contribution.summary}，${contribution.status.toUpperCase()}`}
+                        {`PR #${contribution.number}：${contribution.summary}，`}
+                        <span className={`open-source-spotlight-status contribution-${contribution.status}`}>
+                          {contribution.status.toUpperCase()}
+                        </span>
                       </a>
                     </li>
                   );

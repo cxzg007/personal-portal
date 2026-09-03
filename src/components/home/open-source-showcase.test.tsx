@@ -35,32 +35,38 @@ describe("OpenSourceShowcase", () => {
     }
   });
 
-  it("renders thirteen PR links with exact hrefs and visible status badges", () => {
+  it("renders thirteen PR links with exact hrefs and visible status text", () => {
     render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 
-    expect(screen.getAllByRole("link", { name: /PR #/ })).toHaveLength(13);
+    const map = screen.getByRole("region", { name: "Semantica 双层能力地图" });
+    expect(within(map).getAllByRole("link", { name: /^PR #/ })).toHaveLength(13);
     openSource.contributions.forEach((contribution) => {
       expect(
-        screen.getByRole("link", { name: `PR #${contribution.number}：${contribution.summary}` }),
+        within(map).getByRole("link", {
+          name: `PR #${contribution.number}：${contribution.summary}，${contribution.status.toUpperCase()}`,
+        }),
       ).toHaveAttribute("href", contribution.url);
     });
-    expect(screen.getAllByText("MERGED")).toHaveLength(9);
-    expect(screen.getAllByText("OPEN")).toHaveLength(4);
   });
 
-  it("orders merged contributions first, newest PR number within each group", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
-
-    const numbers = screen
-      .getAllByRole("link", { name: /PR #/ })
-      .map((link) => Number(link.textContent!.match(/#(\d+)/)![1]));
-    const merged = openSource.contributions.filter((c) => c.status === "merged");
-    const expected = [
-      ...merged.toSorted((a, b) => b.number - a.number).map((c) => c.number),
-      ...openSource.contributions.filter((c) => c.status !== "merged").map((c) => c.number),
-    ];
-    expect(numbers).toEqual(expected);
-    expect(numbers[0]).toBe(Math.max(...merged.map((c) => c.number)));
+  it("renders the capability map in domain order with complete server content", () => {
+    render(
+      <OpenSourceShowcase
+        project={openSource}
+        stars={openSource.starsSnapshot}
+      />,
+    );
+    const map = screen.getByRole("region", { name: "Semantica 双层能力地图" });
+    expect(within(map).getAllByRole("button", { name: /^能力节点/ })).toHaveLength(5);
+    expect(within(map).getAllByTestId("contribution-domain").map((domain) => domain.getAttribute("data-domain-id"))).toEqual([
+      "graph-data-adapters", "constraint-explanation", "temporal-stability", "rule-query-reasoning", "decision-model-contracts", "execution-pipeline",
+    ]);
+    expect(within(map).getAllByRole("link", { name: /^PR #/ })).toHaveLength(13);
+    expect(within(map).getByRole("link", { name: /PR #1208/ })).toHaveAttribute("href", expect.stringContaining("/pull/1208"));
+    expect(within(map).getAllByText("MERGED")).toHaveLength(9);
+    expect(within(map).getAllByText("OPEN")).toHaveLength(4);
+    expect(screen.getByRole("link", { name: /repository/i })).toHaveAttribute("href", openSource.repositoryUrl);
+    expect(screen.getByRole("link", { name: /贡献复盘/ })).toHaveAttribute("href", openSource.articlePath);
   });
 
   it("states the dated snapshot boundary computed from contribution statuses", () => {
@@ -71,21 +77,10 @@ describe("OpenSourceShowcase", () => {
     ).toBeVisible();
   });
 
-  it("renders the five-node capability chain as a named list", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
-
-    const chain = screen.getByRole("list", { name: "Semantica 能力链路" });
-    expect(chain).toHaveTextContent("cxzg007");
-    expect(within(chain).getAllByRole("listitem")).toHaveLength(5);
-    openSource.graphNodes.forEach((node) => {
-      expect(within(chain).getByText(node)).toBeVisible();
-    });
-  });
-
   it("links to the external repository and the internal article", () => {
     render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
 
-    const repositoryLink = screen.getByRole("link", { name: "Semantica GitHub 仓库" });
+    const repositoryLink = screen.getByRole("link", { name: "Semantica GitHub repository" });
     expect(repositoryLink).toHaveAttribute("href", "https://github.com/semantica-agi/semantica");
 
     const articleLink = screen.getByRole("link", { name: "阅读 Semantica 贡献复盘" });
