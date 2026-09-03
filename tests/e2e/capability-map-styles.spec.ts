@@ -20,9 +20,12 @@ test("capability map uses five, three, and one column without unreadable muting"
   await page.goto("/");
   const map = page.getByRole("region", { name: "Semantica 双层能力地图" });
   await map.getByRole("button", { name: "能力节点：Rule & Decision" }).click();
-  const opacity = await map.getByTestId("domain-graph-data-adapters").evaluate(
-    (element) => Number(getComputedStyle(element).opacity),
-  );
+  const domainGraph = map.getByTestId("domain-graph-data-adapters");
+  const readOpacity = () => domainGraph.evaluate((element) => Number(getComputedStyle(element).opacity));
+  // The 240ms opacity transition may not have rendered its first frame right
+  // after the click, so poll until the muted state settles below 1.
+  await expect.poll(readOpacity, { timeout: 5_000 }).toBeLessThan(1);
+  const opacity = await readOpacity();
   expect(opacity).toBeGreaterThanOrEqual(0.65);
   expect(opacity).toBeLessThan(1);
 });
