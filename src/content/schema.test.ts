@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { SiteContent } from "@/content/schema";
 import { validSiteContent } from "@/test/fixtures/site-content";
-import { validateSiteContent } from "./schema";
+import { validateSiteContent, validateCapabilityMap } from "./schema";
 
 describe("validateSiteContent", () => {
   it("accepts complete public site content", () => {
@@ -194,4 +194,45 @@ describe("validateSiteContent", () => {
     mutate(copy);
     expect(validateSiteContent(copy)).toEqual(expect.objectContaining({ ok: false }));
   });
+});
+
+const nodes = [
+  { id: "agent-context", title: "Agent Context", description: "接收上下文" },
+  { id: "context-graph", title: "ContextGraph", description: "组织图结构" },
+  { id: "semantic-validation", title: "RDF / SHACL / Temporal", description: "语义验证" },
+  { id: "rule-decision", title: "Rule & Decision", description: "规则决策" },
+  { id: "auditable-execution", title: "Auditable Execution", description: "可审计执行" },
+];
+const contributions = Array.from({ length: 13 }, (_, index) => ({
+  number: index + 1,
+  status: "merged",
+  summary: `PR ${index + 1}`,
+  url: `https://github.com/cx-org/semantica/pull/${index + 1}`,
+}));
+const domains = [
+  { id: "graph-data-adapters", title: "图数据适配", outcome: "统一输入", nodeIds: ["context-graph"], prNumbers: [1, 2, 3] },
+  { id: "constraint-explanation", title: "约束解释", outcome: "解释失败", nodeIds: ["semantic-validation"], prNumbers: [4] },
+  { id: "temporal-stability", title: "时间稳定性", outcome: "稳定时间语义", nodeIds: ["semantic-validation"], prNumbers: [5] },
+  { id: "rule-query-reasoning", title: "规则与查询推理", outcome: "完善推理", nodeIds: ["rule-decision"], prNumbers: [6, 7, 8, 9] },
+  { id: "decision-model-contracts", title: "决策模型契约", outcome: "明确契约", nodeIds: ["rule-decision"], prNumbers: [10, 11] },
+  { id: "execution-pipeline", title: "执行链路", outcome: "支持执行", nodeIds: ["auditable-execution"], prNumbers: [12, 13] },
+];
+
+it.each([
+  ["unknown node", (copy: typeof domains) => { copy[0].nodeIds = ["missing-node"]; }, "openSource.contributionDomains[0].nodeIds[0] must reference an existing graph node"],
+  ["unknown PR", (copy: typeof domains) => { copy[0].prNumbers = [9999]; }, "openSource.contributionDomains[0].prNumbers[0] must reference an existing contribution"],
+  ["unmapped PR", (copy: typeof domains) => { copy.forEach((domain) => { domain.prNumbers = domain.prNumbers.filter((number) => number !== 1); }); }, "openSource.contributions PR #1 must belong to at least one contribution domain"],
+])("rejects capability map with %s", (_label, mutate, expectedError) => {
+  const copy = structuredClone(domains);
+  mutate(copy);
+  expect(validateCapabilityMap(nodes, copy, contributions)).toContain(expectedError);
+});
+
+it("rejects duplicate or misordered nodes and a non-six or misordered domain map", () => {
+  const duplicateNodes = structuredClone(nodes);
+  duplicateNodes[1].id = duplicateNodes[0].id;
+  expect(validateCapabilityMap(duplicateNodes, domains, contributions)).toContain("openSource.graphNodes must not contain duplicate ids");
+  expect(validateCapabilityMap(nodes.toReversed(), domains, contributions)).toContain("openSource.graphNodes must use the required ordered ids");
+  expect(validateCapabilityMap(nodes, domains.slice(0, 5), contributions)).toContain("openSource.contributionDomains must contain exactly 6 entries");
+  expect(validateCapabilityMap(nodes, domains.toReversed(), contributions)).toContain("openSource.contributionDomains must use the required ordered ids");
 });

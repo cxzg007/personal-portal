@@ -28,6 +28,20 @@ export type OpenSourceContribution = {
   url: string;
 };
 
+export type ProjectGraphNode = {
+  id: string;
+  title: string;
+  description: string;
+};
+
+export type ContributionDomain = {
+  id: string;
+  title: string;
+  outcome: string;
+  nodeIds: string[];
+  prNumbers: number[];
+};
+
 export type OpenSourceProject = {
   name: string;
   logo: BrandAsset;
@@ -123,6 +137,21 @@ const CONTRIBUTION_STATUSES = new Set<OpenSourceContribution["status"]>([
   "review",
 ]);
 const GITHUB_PR_URL_PATTERN = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+$/;
+const CAPABILITY_NODE_ORDER = [
+  "agent-context",
+  "context-graph",
+  "semantic-validation",
+  "rule-decision",
+  "auditable-execution",
+] as const;
+const CONTRIBUTION_DOMAIN_ORDER = [
+  "graph-data-adapters",
+  "constraint-explanation",
+  "temporal-stability",
+  "rule-query-reasoning",
+  "decision-model-contracts",
+  "execution-pipeline",
+] as const;
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -405,4 +434,121 @@ export function validateSiteContent(input: unknown): ValidationResult {
   checkStringArray(siteContent.about, "about", 1);
 
   return errors.length === 0 ? { ok: true } : { ok: false, errors };
+}
+
+export function validateCapabilityMap(
+  graphNodes: unknown,
+  contributionDomains: unknown,
+  contributions: unknown,
+): string[] {
+  const errors: string[] = [];
+  const checkCapabilityRecord = (value: unknown, path: string): UnknownRecord | undefined => {
+    if (!isRecord(value)) {
+      errors.push(`${path} must be an object`);
+      return undefined;
+    }
+    return value;
+  };
+  const checkCapabilityText = (value: unknown, path: string): string | undefined => {
+    if (typeof value !== "string" || value.trim() === "") {
+      errors.push(`${path} must be a non-empty string`);
+      return undefined;
+    }
+    return value;
+  };
+
+  const validNodeIds = new Set<string>();
+  if (!Array.isArray(graphNodes)) {
+    errors.push("openSource.graphNodes must be an array");
+  } else {
+    const orderedNodeIds: string[] = [];
+    graphNodes.forEach((node, index) => {
+      const value = checkCapabilityRecord(node, `openSource.graphNodes[${index}]`);
+      if (!value) return;
+      const id = checkCapabilityText(value.id, `openSource.graphNodes[${index}].id`);
+      if (id === undefined) return;
+      if (validNodeIds.has(id)) {
+        errors.push("openSource.graphNodes must not contain duplicate ids");
+      } else {
+        validNodeIds.add(id);
+      }
+      orderedNodeIds.push(id);
+      checkCapabilityText(value.title, `openSource.graphNodes[${index}].title`);
+      checkCapabilityText(value.description, `openSource.graphNodes[${index}].description`);
+    });
+    if (
+      orderedNodeIds.length !== CAPABILITY_NODE_ORDER.length ||
+      orderedNodeIds.some((id, index) => id !== CAPABILITY_NODE_ORDER[index])
+    ) {
+      errors.push("openSource.graphNodes must use the required ordered ids");
+    }
+  }
+
+  const validPrNumbers = new Set<number>();
+  if (!Array.isArray(contributions)) {
+    errors.push("openSource.contributions must be an array");
+  } else {
+    contributions.forEach((contribution, index) => {
+      const value = checkCapabilityRecord(contribution, `openSource.contributions[${index}]`);
+      if (!value) return;
+      if (typeof value.number === "number" && Number.isInteger(value.number) && value.number > 0) {
+        validPrNumbers.add(value.number);
+      }
+    });
+  }
+
+  const mappedPrNumbers = new Set<number>();
+  if (!Array.isArray(contributionDomains)) {
+    errors.push("openSource.contributionDomains must be an array");
+  } else {
+    if (contributionDomains.length !== CONTRIBUTION_DOMAIN_ORDER.length) {
+      errors.push("openSource.contributionDomains must contain exactly 6 entries");
+    }
+    const orderedDomainIds: string[] = [];
+    contributionDomains.forEach((domain, index) => {
+      const value = checkCapabilityRecord(domain, `openSource.contributionDomains[${index}]`);
+      if (!value) return;
+      const id = checkCapabilityText(value.id, `openSource.contributionDomains[${index}].id`);
+      if (id !== undefined) orderedDomainIds.push(id);
+      checkCapabilityText(value.title, `openSource.contributionDomains[${index}].title`);
+      checkCapabilityText(value.outcome, `openSource.contributionDomains[${index}].outcome`);
+      if (!Array.isArray(value.nodeIds)) {
+        errors.push(`openSource.contributionDomains[${index}].nodeIds must be an array`);
+      } else {
+        value.nodeIds.forEach((nodeId, nodeIndex) => {
+          if (typeof nodeId === "string" && validNodeIds.has(nodeId)) return;
+          errors.push(
+            `openSource.contributionDomains[${index}].nodeIds[${nodeIndex}] must reference an existing graph node`,
+          );
+        });
+      }
+      if (!Array.isArray(value.prNumbers)) {
+        errors.push(`openSource.contributionDomains[${index}].prNumbers must be an array`);
+      } else {
+        value.prNumbers.forEach((prNumber, prIndex) => {
+          if (typeof prNumber === "number" && validPrNumbers.has(prNumber)) {
+            mappedPrNumbers.add(prNumber);
+            return;
+          }
+          errors.push(
+            `openSource.contributionDomains[${index}].prNumbers[${prIndex}] must reference an existing contribution`,
+          );
+        });
+      }
+    });
+    if (
+      orderedDomainIds.length !== CONTRIBUTION_DOMAIN_ORDER.length ||
+      orderedDomainIds.some((id, index) => id !== CONTRIBUTION_DOMAIN_ORDER[index])
+    ) {
+      errors.push("openSource.contributionDomains must use the required ordered ids");
+    }
+  }
+
+  validPrNumbers.forEach((prNumber) => {
+    if (!mappedPrNumbers.has(prNumber)) {
+      errors.push(`openSource.contributions PR #${prNumber} must belong to at least one contribution domain`);
+    }
+  });
+
+  return errors;
 }
