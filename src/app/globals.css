@@ -1162,6 +1162,10 @@ main {
     margin-top: 0;
   }
 
+  .blog-card:hover {
+    transform: none;
+  }
+
   .blog-hero::before,
   .blog-hero::after {
     display: none;

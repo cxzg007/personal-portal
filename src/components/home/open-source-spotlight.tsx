@@ -44,6 +44,7 @@ export function OpenSourceSpotlight({
           <li key={node.id}>
             <button
               type="button"
+              className="open-source-capability-node"
               aria-pressed={activeNodeId === node.id}
               onClick={() => setActiveNodeId(activeNodeId === node.id ? null : node.id)}
               onMouseEnter={() => setHoveredNodeId(node.id)}
@@ -72,7 +73,7 @@ export function OpenSourceSpotlight({
             data-emphasis={emphasisFor(domain)}
           >
             <div
-              className="open-source-spotlight-domain"
+              className="open-source-spotlight-domain open-source-contribution-domain"
               data-domain-id={domain.id}
               data-testid="contribution-domain"
             >
@@ -84,7 +85,7 @@ export function OpenSourceSpotlight({
                   if (!contribution) return null;
                   return (
                     <li key={prNumber}>
-                      <a href={contribution.url} rel="noreferrer" target="_blank">
+                      <a className="open-source-pr-link" href={contribution.url} rel="noreferrer" target="_blank">
                         {`PR #${contribution.number}：${contribution.summary}，`}
                         <span className={`open-source-spotlight-status contribution-${contribution.status}`}>
                           {contribution.status.toUpperCase()}

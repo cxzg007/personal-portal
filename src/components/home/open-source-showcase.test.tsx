@@ -69,8 +69,17 @@ describe("OpenSourceShowcase", () => {
     expect(screen.getByRole("link", { name: /贡献复盘/ })).toHaveAttribute("href", openSource.articlePath);
   });
 
+  it("exposes stable styling hooks without removing map content", () => {
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
+    expect(screen.getByTestId("open-source-spotlight")).toHaveClass("open-source-spotlight");
+    expect(screen.getAllByRole("button", { name: /^能力节点/ })[0]).toHaveClass("open-source-capability-node");
+    expect(screen.getAllByTestId("contribution-domain")[0]).toHaveClass("open-source-contribution-domain");
+    expect(screen.getAllByRole("link", { name: /^PR #/ })[0]).toHaveClass("open-source-pr-link");
+  });
+
   it("states the dated snapshot boundary computed from contribution statuses", () => {
     render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
+
 
     expect(
       screen.getByText("截至 2026-08-31：9 个贡献已合并，其余处于开放或审阅状态。"),
