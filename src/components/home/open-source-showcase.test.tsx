@@ -6,16 +6,22 @@ import { loadSiteContent } from "@/content/load-site-content";
 import { OpenSourceShowcase } from "./open-source-showcase";
 
 const { openSource } = loadSiteContent();
+const merged = openSource.contributions.filter(({ status }) => status === "merged");
+const openPullRequests = openSource.contributions.filter(({ status }) => status === "open");
 
 afterEach(cleanup);
 
+function renderShowcase() {
+  return render(<OpenSourceShowcase project={openSource} />);
+}
+
 describe("OpenSourceShowcase", () => {
   it("presents the official Semantica logo, identity and background", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
+    renderShowcase();
 
     expect(screen.getByRole("img", { name: "Semantica 项目标志" })).toBeVisible();
     expect(screen.getByText("Open-source Contributor · cxzg007")).toBeVisible();
-    expect(screen.getByText("11.4k+ GitHub Stars", { selector: ".open-source-stars" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Semantica" })).toBeVisible();
     expect(
       screen.getByText(
         "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约与执行链路并行化。",
@@ -23,67 +29,65 @@ describe("OpenSourceShowcase", () => {
     ).toBeVisible();
   });
 
-  it("renders trending honor badges as shields.io images", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
+  it("renders the four architecture layers with titles in schema order", () => {
+    const { container } = renderShowcase();
+    expect(screen.getByRole("region", { name: "Semantica 核心架构" })).toBeInTheDocument();
 
-    const badges = screen.getAllByRole("img", { name: /Trending|Trendshift/ });
-    expect(badges).toHaveLength(2);
-    expect(badges[0]).toHaveAttribute("alt", "GitHub Trending #1 Repository of the Day");
-    expect(badges[1]).toHaveAttribute("alt", "Trendshift · Python #3 Repository of the Week");
-    for (const badge of badges) {
-      expect(badge).toHaveAttribute("src", expect.stringContaining("img.shields.io/badge/"));
+    expect(container.querySelectorAll(".arch-layer")).toHaveLength(4);
+    expect(Array.from(container.querySelectorAll(".arch-layer-title")).map((node) => node.textContent)).toEqual([
+      "数据与知识层",
+      "推理层",
+      "治理层",
+      "决策层",
+    ]);
+  });
+
+  it("renders all six capability labels with the spanning end-to-end traceability bar", () => {
+    const { container } = renderShowcase();
+    const map = screen.getByRole("region", { name: "Semantica 核心架构" });
+
+    for (const label of ["上下文管理", "知识建模", "确定性推理", "本体治理", "决策智能", "端到端溯源"]) {
+      expect(within(map).getByText(label)).toBeVisible();
+    }
+
+    const capabilityTags = container.querySelectorAll(".arch-capability");
+    expect(capabilityTags).toHaveLength(5);
+    expect(
+      Array.from(capabilityTags).map((tag) => tag.textContent),
+    ).toEqual(["上下文管理", "知识建模", "确定性推理", "本体治理", "决策智能"]);
+
+    const spanning = container.querySelectorAll(".arch-spanning");
+    expect(spanning).toHaveLength(1);
+    expect(spanning[0].textContent).toBe("端到端溯源");
+  });
+
+  it("renders exactly the ten merged contributions as plain external links", () => {
+    renderShowcase();
+    const list = screen.getByRole("list", { name: "Semantica 已合并贡献" });
+    const links = within(list).getAllByRole("link", { name: /^PR #/ });
+    expect(links).toHaveLength(10);
+
+    for (const contribution of merged) {
+      const link = within(list).getByRole("link", {
+        name: `PR #${contribution.number} · ${contribution.title}`,
+      });
+      expect(link).toHaveAttribute("href", contribution.url);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noreferrer");
+    }
+
+    for (const pullRequest of openPullRequests) {
+      expect(screen.queryByText(new RegExp(`PR #${pullRequest.number}\\b`))).toBeNull();
     }
   });
 
-  it("renders ten merged PR links with exact hrefs and visible status text", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
-    const map = screen.getByRole("region", { name: "Semantica 架构与合并贡献" });
-    const links = within(map).getAllByRole("link", { name: /^PR #/ });
-    expect(links).toHaveLength(10);
-    const merged = openSource.contributions.filter(({ status }) => status === "merged");
-    merged.forEach((contribution) => {
-      expect(
-        within(map).getByRole("link", {
-          name: `PR #${contribution.number}：${contribution.summary}（${contribution.kind.toUpperCase()} · ${contribution.scale}）MERGED`,
-        }),
-      ).toHaveAttribute("href", contribution.url);
-    });
-  });
-
-  it("renders highlights and the pillar map in schema order with merged-only content", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
-    const highlights = screen.getByRole("list", { name: "Semantica 项目亮点" });
-    expect(highlights).toBeVisible();
-    openSource.highlights.forEach((highlight) => {
-      expect(within(highlights).getByText(highlight, { exact: true })).toBeVisible();
-    });
-    const map = screen.getByRole("region", { name: "Semantica 架构与合并贡献" });
-    expect(within(map).getByRole("heading", { name: "核心架构与合并贡献" })).toBeVisible();
-    expect(within(map).getAllByRole("button", { name: /^架构支柱/ })).toHaveLength(6);
-    expect(
-      within(map)
-        .getAllByTestId("merged-contribution")
-        .map((item) => item.getAttribute("data-pr-number")),
-    ).toEqual(["1096", "1081", "1226", "1077", "1113", "1217", "1094", "1153", "1215", "1143"]);
-    expect(within(map).getAllByText("MERGED")).toHaveLength(10);
-    expect(within(map).queryByText("OPEN")).toBeNull();
-  });
-
-  it("exposes stable styling hooks without removing map content", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
-    expect(screen.getByTestId("open-source-spotlight")).toHaveClass("open-source-spotlight");
-    expect(screen.getAllByRole("button", { name: /^架构支柱/ })[0]).toHaveClass("open-source-architecture-pillar");
-    expect(screen.getAllByTestId("merged-contribution")[0]).toHaveClass("open-source-merged-contribution");
-    expect(screen.getAllByRole("link", { name: /^PR #/ })[0]).toHaveClass("open-source-pr-link");
-  });
-
   it("states the dated snapshot boundary computed from merged contributions", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
-    expect(screen.getByText("截至 2026-09-04：10 个贡献已合并。")).toBeVisible();
+    renderShowcase();
+    expect(screen.getByText("截至 2026-09-04：10 个贡献已合并")).toBeVisible();
   });
 
   it("links to the external repository and the internal article", () => {
-    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
+    renderShowcase();
 
     const repositoryLink = screen.getByRole("link", { name: "Semantica GitHub repository" });
     expect(repositoryLink).toHaveAttribute("href", "https://github.com/semantica-agi/semantica");
@@ -92,5 +96,21 @@ describe("OpenSourceShowcase", () => {
     expect(articleLink).toHaveAttribute("href", "/blog/first-agent-system");
     expect(articleLink).not.toHaveAttribute("target");
     expect(articleLink).not.toHaveAttribute("rel");
+  });
+
+  it("omits the retired interactive-branch visuals and wording", () => {
+    const { container } = renderShowcase();
+    const text = container.textContent ?? "";
+
+    expect(text).not.toMatch(/stars/i);
+    expect(text).not.toContain("Trending");
+    expect(text).not.toContain("零锁定");
+    expect(text).not.toContain("FEAT");
+    expect(text).not.toContain("FIX");
+    expect(text).not.toContain("MERGED");
+    expect(text).not.toContain("架构支柱");
+    expect(text).not.toContain("点击");
+
+    expect(screen.queryByRole("button")).toBeNull();
   });
 });
