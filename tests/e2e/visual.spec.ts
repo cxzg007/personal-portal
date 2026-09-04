@@ -127,16 +127,16 @@ test("article detail visual", async ({ page }) => {
   await expect(page.locator(".article-layout")).toHaveScreenshot("article-detail.png");
 });
 
-test("Semantica capability map remains stable", async ({ page }) => {
+test("Semantica architecture map remains stable", async ({ page }) => {
   await prepareStablePage(page, "/");
-  const map = page.getByRole("region", { name: "Semantica 双层能力地图" });
+  const map = page.getByRole("region", { name: "Semantica 架构与合并贡献" });
   await expect(map).toBeVisible();
-  await expect(map).toHaveScreenshot("semantica-capability-map.png", {
+  await expect(map).toHaveScreenshot("semantica-architecture-map.png", {
     animations: "disabled",
   });
 
-  await map.getByRole("button", { name: "能力节点：Rule & Decision" }).click();
-  await expect(map).toHaveScreenshot("semantica-rule-decision.png", {
+  await map.getByRole("button", { name: /^架构支柱：确定性推理/ }).click();
+  await expect(map).toHaveScreenshot("semantica-deterministic-reasoning.png", {
     animations: "disabled",
   });
 });
