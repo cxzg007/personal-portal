@@ -3,60 +3,54 @@
 import { useState } from "react";
 
 import type {
-  ContributionDomain,
+  ArchitecturePillar,
   OpenSourceContribution,
-  ProjectGraphNode,
 } from "@/content/schema";
 
 type OpenSourceSpotlightProps = {
-  graphNodes: ProjectGraphNode[];
-  contributionDomains: ContributionDomain[];
+  pillars: ArchitecturePillar[];
   contributions: OpenSourceContribution[];
 };
 
-type DomainEmphasis = "active" | "muted" | "default";
+type Emphasis = "active" | "muted" | "default";
 
-export function OpenSourceSpotlight({
-  graphNodes,
-  contributionDomains,
-  contributions,
-}: OpenSourceSpotlightProps) {
-  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
-  const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
-  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-  const effectiveNodeId = activeNodeId ?? focusedNodeId ?? hoveredNodeId;
-  const contributionsByNumber = new Map<number, OpenSourceContribution>(
-    contributions.map((contribution) => [contribution.number, contribution]),
-  );
+export function OpenSourceSpotlight({ pillars, contributions }: OpenSourceSpotlightProps) {
+  const [activePillarId, setActivePillarId] = useState<string | null>(null);
+  const [focusedPillarId, setFocusedPillarId] = useState<string | null>(null);
+  const [hoveredPillarId, setHoveredPillarId] = useState<string | null>(null);
+  const effectivePillarId = activePillarId ?? focusedPillarId ?? hoveredPillarId;
+  const mergedContributions = contributions.filter(({ status }) => status === "merged");
+  const pillarById = new Map(pillars.map((pillar) => [pillar.id, pillar]));
 
-  const emphasisFor = (domain: ContributionDomain): DomainEmphasis => {
-    if (effectiveNodeId === null) return "default";
-    return domain.nodeIds.includes(effectiveNodeId) ? "active" : "muted";
+  const emphasisFor = (prNumber: number): Emphasis => {
+    if (effectivePillarId === null) return "default";
+    return pillarById.get(effectivePillarId)?.prNumbers.includes(prNumber) ? "active" : "muted";
   };
 
   return (
     <section
       className="open-source-spotlight"
-      data-selected-node={activeNodeId ?? "all"}
+      data-selected-pillar={activePillarId ?? "all"}
       data-testid="open-source-spotlight"
       onKeyDown={(event) => {
-        if (event.key === "Escape") setActiveNodeId(null);
+        if (event.key === "Escape") setActivePillarId(null);
       }}
     >
-      <ol aria-label="Semantica 项目工作链" className="open-source-spotlight-chain">
-        {graphNodes.map((node) => (
-          <li key={node.id}>
+      <ol aria-label="Semantica 架构支柱" className="open-source-spotlight-pillars">
+        {pillars.map((pillar) => (
+          <li key={pillar.id}>
             <button
               type="button"
-              className="open-source-capability-node"
-              aria-pressed={activeNodeId === node.id}
-              onClick={() => setActiveNodeId(activeNodeId === node.id ? null : node.id)}
-              onMouseEnter={() => setHoveredNodeId(node.id)}
-              onMouseLeave={() => setHoveredNodeId(null)}
-              onFocus={() => setFocusedNodeId(node.id)}
-              onBlur={() => setFocusedNodeId(null)}
+              className="open-source-architecture-pillar"
+              aria-pressed={activePillarId === pillar.id}
+              onClick={() => setActivePillarId(activePillarId === pillar.id ? null : pillar.id)}
+              onMouseEnter={() => setHoveredPillarId(pillar.id)}
+              onMouseLeave={() => setHoveredPillarId(null)}
+              onFocus={() => setFocusedPillarId(pillar.id)}
+              onBlur={() => setFocusedPillarId(null)}
             >
-              {`能力节点：${node.title}`}
+              <span className="open-source-architecture-pillar-title">{`架构支柱：${pillar.title}`}</span>
+              <span className="open-source-architecture-pillar-summary">{pillar.summary}</span>
             </button>
           </li>
         ))}
@@ -65,43 +59,27 @@ export function OpenSourceSpotlight({
       <button
         type="button"
         className="open-source-spotlight-reset"
-        aria-disabled={activeNodeId === null}
-        onClick={() => setActiveNodeId(null)}
+        aria-disabled={activePillarId === null}
+        onClick={() => setActivePillarId(null)}
       >
         查看全部贡献
       </button>
 
-      <ol aria-label="Semantica 贡献领域" className="open-source-spotlight-domains">
-        {contributionDomains.map((domain) => (
+      <ol aria-label="Semantica 已合并贡献" className="open-source-spotlight-contributions">
+        {mergedContributions.map((contribution) => (
           <li
-            key={domain.id}
-            data-testid={`domain-${domain.id}`}
-            data-emphasis={emphasisFor(domain)}
+            key={contribution.number}
+            className="open-source-merged-contribution"
+            data-emphasis={emphasisFor(contribution.number)}
+            data-pr-number={contribution.number}
+            data-testid="merged-contribution"
           >
-            <div
-              className="open-source-spotlight-domain open-source-contribution-domain"
-              data-domain-id={domain.id}
-              data-testid="contribution-domain"
-            >
-              <h4>{domain.title}</h4>
-              <p>{domain.outcome}</p>
-              <ul>
-                {domain.prNumbers.map((prNumber) => {
-                  const contribution = contributionsByNumber.get(prNumber);
-                  if (!contribution) return null;
-                  return (
-                    <li key={prNumber}>
-                      <a className="open-source-pr-link" href={contribution.url} rel="noreferrer" target="_blank">
-                        {`PR #${contribution.number}：${contribution.summary}，`}
-                        <span className={`open-source-spotlight-status contribution-${contribution.status}`}>
-                          {contribution.status.toUpperCase()}
-                        </span>
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            <a className="open-source-pr-link" href={contribution.url} rel="noreferrer" target="_blank">
+              {`PR #${contribution.number}：${contribution.summary}（${contribution.kind.toUpperCase()} · ${contribution.scale}）`}
+              <span className={`open-source-spotlight-status contribution-${contribution.status}`}>
+                {contribution.status.toUpperCase()}
+              </span>
+            </a>
           </li>
         ))}
       </ol>
