@@ -18,10 +18,10 @@ test("core recruiting content is server rendered", async ({ page }) => {
 
 test("server HTML keeps the complete Semantica map", async ({ page }) => {
   await page.goto("/");
-  const map = page.getByRole("region", { name: "Semantica 双层能力地图" });
+  const map = page.getByRole("region", { name: "Semantica 架构与合并贡献" });
   await expectSemanticaMapComplete(map);
-  await expect(map.getByRole("button", { name: /^能力节点/ })).toHaveCount(5);
-  await expect(map.getByTestId("contribution-domain")).toHaveCount(6);
-  await expect(map.getByRole("link", { name: /^PR #/ })).toHaveCount(13);
-  await expect(map.getByRole("link", { name: /PR #1208/ })).toHaveAttribute("href", /\/pull\/1208$/);
+  await expect(map.getByRole("button", { name: /^架构支柱/ })).toHaveCount(6);
+  await expect(map.getByTestId("merged-contribution")).toHaveCount(10);
+  await expect(map.getByRole("link", { name: /^PR #/ })).toHaveCount(10);
+  await expect(map.getByRole("link", { name: /PR #1226/ })).toHaveAttribute("href", /\/pull\/1226$/);
 });

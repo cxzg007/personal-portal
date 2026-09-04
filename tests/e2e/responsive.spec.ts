@@ -133,17 +133,17 @@ for (const viewport of viewports) {
 
     const openSource = page.locator("main > section#open-source");
     await expectHorizontallyContained(openSource.locator(".open-source-showcase"));
-    const map = openSource.getByRole("region", { name: "Semantica 双层能力地图" });
-    const nodes = map.getByRole("button", { name: /^能力节点/ });
+    const map = openSource.getByRole("region", { name: "Semantica 架构与合并贡献" });
+    const pillars = map.getByRole("button", { name: /^架构支柱/ });
     await expectSemanticaMapComplete(map);
     await expectHorizontallyContained(map);
-    await expect(nodes).toHaveCount(5);
-    await expect(map.getByTestId("contribution-domain")).toHaveCount(6);
-    await expect(map.getByRole("link", { name: /^PR #/ })).toHaveCount(13);
+    await expect(pillars).toHaveCount(6);
+    await expect(map.getByTestId("merged-contribution")).toHaveCount(10);
+    await expect(map.getByRole("link", { name: /^PR #/ })).toHaveCount(10);
 
     if (viewport.width === 390) {
       const boxes = await Promise.all(
-        (await nodes.all()).map((node) => node.boundingBox()),
+        (await pillars.all()).map((node) => node.boundingBox()),
       );
       expect(boxes.every((box) => box !== null)).toBe(true);
       for (let index = 1; index < boxes.length; index += 1) {

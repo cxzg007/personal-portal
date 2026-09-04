@@ -2,25 +2,25 @@ import { expect, test } from "@playwright/test";
 import { expectNoRotation } from "./helpers/css";
 
 const columnCount = async (page: import("@playwright/test").Page) => {
-  const value = await page.getByLabel("Semantica 项目工作链").evaluate(
+  const value = await page.getByLabel("Semantica 架构支柱").evaluate(
     (element) => getComputedStyle(element).gridTemplateColumns,
   );
   return value.split(" ").filter(Boolean).length;
 };
 
-test("capability map uses five, three, and one column without unreadable muting", async ({ page }) => {
-  for (const [width, expectedColumns] of [[1280, 5], [768, 3], [390, 1]] as const) {
+test("capability map uses six, three, and one column without unreadable muting", async ({ page }) => {
+  for (const [width, expectedColumns] of [[1280, 6], [768, 3], [390, 1]] as const) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/");
-    await expect(page.getByLabel("Semantica 项目工作链")).toBeVisible();
+    await expect(page.getByLabel("Semantica 架构支柱")).toBeVisible();
     expect(await columnCount(page)).toBe(expectedColumns);
   }
 
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.goto("/");
-  const map = page.getByRole("region", { name: "Semantica 双层能力地图" });
-  await map.getByRole("button", { name: "能力节点：Rule & Decision" }).click();
-  const domainGraph = map.getByTestId("domain-graph-data-adapters");
+  const map = page.getByRole("region", { name: "Semantica 架构与合并贡献" });
+  await map.getByRole("button", { name: /^架构支柱：确定性推理/ }).click();
+  const domainGraph = map.locator('[data-testid="merged-contribution"][data-pr-number="1081"]');
   const readOpacity = () => domainGraph.evaluate((element) => Number(getComputedStyle(element).opacity));
   // The 240ms opacity transition may not have rendered its first frame right
   // after the click, so poll until the muted state settles below 1.
