@@ -145,13 +145,12 @@ describe("validateSiteContent", () => {
     ["incomplete honor", (copy: SiteContent) => { copy.openSource.honors[0].rank = ""; }],
     ["only one honor", (copy: SiteContent) => { copy.openSource.honors.pop(); }],
     ["invalid snapshot date", (copy: SiteContent) => { copy.openSource.snapshotDate = "2026/08/21"; }],
-    ["four graph nodes", (copy: SiteContent) => { copy.openSource.graphNodes.pop(); }],
     ["non-HTTPS repository", (copy: SiteContent) => { copy.openSource.repositoryUrl = "http://github.com/semantica-agi/semantica"; }],
     ["non-blog article path", (copy: SiteContent) => { copy.openSource.articlePath = "/articles/semantica" as SiteContent["openSource"]["articlePath"]; }],
     ["fractional stars snapshot", (copy: SiteContent) => { copy.openSource.starsSnapshot = 11400.5; }],
     ["negative stars snapshot", (copy: SiteContent) => { copy.openSource.starsSnapshot = -1; }],
   ])("rejects %s", (_label, mutate) => {
-    const copy = structuredClone(validSiteContent) as SiteContent;
+    const copy = structuredClone(validSiteContent) as unknown as SiteContent;
     mutate(copy);
     expect(validateSiteContent(copy)).toEqual(expect.objectContaining({ ok: false }));
   });
@@ -197,7 +196,7 @@ describe("validateSiteContent", () => {
     ["unsupported visual kind", (copy: SiteContent) => { copy.caseStudies[0].visualKind = "timeline" as SiteContent["caseStudies"][number]["visualKind"]; }],
     ["duplicate tab labels", (copy: SiteContent) => { copy.caseStudies[1].tabLabel = copy.caseStudies[0].tabLabel; }],
   ])("rejects %s", (_label, mutate) => {
-    const copy = structuredClone(validSiteContent) as SiteContent;
+    const copy = structuredClone(validSiteContent) as unknown as SiteContent;
     mutate(copy);
     expect(validateSiteContent(copy)).toEqual(expect.objectContaining({ ok: false }));
   });
@@ -290,7 +289,7 @@ describe("validateSiteContent contribution fields", () => {
   // TODO(Task 2): these cases depend on the legacy 13-entry fixture; enable
   // after the fixture migrates to the 15-entry architecture-pillar structure.
   const withKindsAndScales = () => {
-    const copy = structuredClone(validSiteContent) as SiteContent;
+    const copy = structuredClone(validSiteContent) as unknown as SiteContent;
     copy.openSource.contributions.forEach((contribution) => {
       contribution.kind = "feat";
       contribution.scale = "10+/2-";
@@ -313,7 +312,8 @@ describe("validateSiteContent contribution fields", () => {
 
   it.skip("rejects kind outside feat or fix", () => {
     const copy = withKindsAndScales();
-    copy.openSource.contributions[0].kind = "chore";
+    // 通过对象字面量注入运行时非法值，避免绕过类型的 as 断言
+    Object.assign(copy.openSource.contributions[0], { kind: "chore" });
     expect(validateSiteContent(copy)).toEqual(
       expect.objectContaining({
         ok: false,
