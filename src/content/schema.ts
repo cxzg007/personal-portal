@@ -23,18 +23,27 @@ export type InternshipProject = {
 
 export type OpenSourceContribution = {
   number: number;
-  status: "merged" | "open" | "review";
-  summary: string;
+  title: string;
   url: string;
-  kind: "feat" | "fix";
-  scale: string;
+  status: "merged" | "open";
 };
 
-export type ArchitecturePillar = {
+export type ArchitectureCapability = {
+  id: string;
+  label: string;
+};
+
+export type ArchitectureLayer = {
   id: string;
   title: string;
-  summary: string;
-  prNumbers: number[];
+  summary?: string;
+  capabilityIds: string[];
+};
+
+export type OpenSourceArchitecture = {
+  layers: ArchitectureLayer[];
+  capabilities: ArchitectureCapability[];
+  spanningCapabilityIds: string[];
 };
 
 export type OpenSourceProject = {
@@ -43,11 +52,8 @@ export type OpenSourceProject = {
   identity: string;
   background: string;
   snapshotDate: string;
-  starsSnapshot: number;
-  honors: Array<{ platform: string; rank: string; period: string; evidence: string }>;
   contributions: OpenSourceContribution[];
-  highlights: string[];
-  architecturePillars: ArchitecturePillar[];
+  architecture: OpenSourceArchitecture;
   repositoryUrl: string;
   articlePath: `/blog/${string}`;
 };
@@ -127,22 +133,21 @@ const CASE_STUDY_VISUAL_KINDS = new Set<CaseStudy["visualKind"]>([
   "memory",
   "graph",
 ]);
-const CONTRIBUTION_STATUSES = new Set<OpenSourceContribution["status"]>([
-  "merged",
-  "open",
-  "review",
-]);
+const CONTRIBUTION_STATUSES = new Set<OpenSourceContribution["status"]>(["merged", "open"]);
 const GITHUB_PR_URL_PATTERN = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+$/;
-const ARCHITECTURE_PILLAR_ORDER = [
-  "context-management",
-  "knowledge-modeling",
-  "deterministic-reasoning",
-  "ontology-management",
-  "decision-intelligence",
-  "end-to-end-traceability",
-] as const;
-const CONTRIBUTION_KINDS = new Set<OpenSourceContribution["kind"]>(["feat", "fix"]);
-const SCALE_PATTERN = /^\d+\+\/\d+-$/;
+const OPEN_SOURCE_FIELDS = new Set([
+  "name",
+  "logo",
+  "identity",
+  "background",
+  "snapshotDate",
+  "contributions",
+  "architecture",
+  "repositoryUrl",
+  "articlePath",
+]);
+const CONTRIBUTION_FIELDS = new Set(["number", "title", "url", "status"]);
+const ARCHITECTURE_FIELDS = new Set(["layers", "capabilities", "spanningCapabilityIds"]);
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -316,6 +321,11 @@ export function validateSiteContent(input: unknown): ValidationResult {
 
   const openSource = checkRecord(siteContent.openSource, "openSource");
   if (openSource) {
+    Object.keys(openSource).forEach((field) => {
+      if (!OPEN_SOURCE_FIELDS.has(field)) {
+        errors.push(`openSource.${field} is not an allowed field`);
+      }
+    });
     ["name", "identity", "background"].forEach((field) => checkText(openSource[field], `openSource.${field}`));
     const logo = checkRecord(openSource.logo, "openSource.logo");
     if (logo) {
@@ -326,46 +336,27 @@ export function validateSiteContent(input: unknown): ValidationResult {
     }
     const snapshotDate = checkText(openSource.snapshotDate, "openSource.snapshotDate");
     if (snapshotDate && !/^\d{4}-\d{2}-\d{2}$/.test(snapshotDate)) errors.push("openSource.snapshotDate must use YYYY-MM-DD");
-    if (!Number.isInteger(openSource.starsSnapshot) || (openSource.starsSnapshot as number) < 0) {
-      errors.push("openSource.starsSnapshot must be a non-negative integer");
-    }
-    if (!Array.isArray(openSource.honors) || openSource.honors.length < 2) {
-      errors.push("openSource.honors must contain at least 2 entries");
-    } else {
-      openSource.honors.forEach((honor, index) => {
-        const value = checkRecord(honor, `openSource.honors[${index}]`);
-        if (!value) return;
-        ["platform", "rank", "period", "evidence"].forEach((field) => checkText(value[field], `openSource.honors[${index}].${field}`));
-      });
-    }
-    checkStringArray(openSource.highlights, "openSource.highlights", 1);
     if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 15) {
       errors.push("openSource.contributions must contain exactly 15 entries");
     } else {
-      const seenPrNumbers = new Set<number>();
       let mergedCount = 0;
       openSource.contributions.forEach((contribution, index) => {
         const value = checkRecord(contribution, `openSource.contributions[${index}]`);
         if (!value) return;
+        Object.keys(value).forEach((field) => {
+          if (!CONTRIBUTION_FIELDS.has(field)) {
+            errors.push(`openSource.contributions[${index}].${field} is not an allowed field`);
+          }
+        });
         if (!Number.isInteger(value.number) || (value.number as number) <= 0) {
           errors.push(`openSource.contributions[${index}].number must be a positive integer`);
-        } else if (seenPrNumbers.has(value.number as number)) {
-          errors.push("openSource.contributions must not contain duplicate PR numbers");
-        } else {
-          seenPrNumbers.add(value.number as number);
         }
         if (typeof value.status !== "string" || !CONTRIBUTION_STATUSES.has(value.status as OpenSourceContribution["status"])) {
-          errors.push(`openSource.contributions[${index}].status must be merged, open, or review`);
+          errors.push(`openSource.contributions[${index}].status must be merged or open`);
         } else if (value.status === "merged") {
           mergedCount += 1;
         }
-        if (typeof value.kind !== "string" || !CONTRIBUTION_KINDS.has(value.kind as OpenSourceContribution["kind"])) {
-          errors.push(`openSource.contributions[${index}].kind must be feat or fix`);
-        }
-        if (typeof value.scale !== "string" || !SCALE_PATTERN.test(value.scale)) {
-          errors.push(`openSource.contributions[${index}].scale must match the NNN+/NNN- format`);
-        }
-        checkText(value.summary, `openSource.contributions[${index}].summary`);
+        checkText(value.title, `openSource.contributions[${index}].title`);
         const url = checkText(value.url, `openSource.contributions[${index}].url`);
         if (url && !GITHUB_PR_URL_PATTERN.test(url)) {
           errors.push(`openSource.contributions[${index}].url must be an HTTPS GitHub PR URL`);
@@ -375,7 +366,7 @@ export function validateSiteContent(input: unknown): ValidationResult {
         errors.push("openSource.contributions must contain exactly 10 merged entries");
       }
     }
-    errors.push(...validateCapabilityMap(openSource.architecturePillars, openSource.contributions));
+    errors.push(...validateArchitecture(openSource.architecture, openSource.contributions));
     checkHttpsUrl(openSource.repositoryUrl, "openSource.repositoryUrl");
     const articlePath = checkText(openSource.articlePath, "openSource.articlePath");
     if (articlePath && !/^\/blog\/.+/.test(articlePath)) errors.push("openSource.articlePath must be a /blog/ path");
@@ -433,8 +424,8 @@ export function validateSiteContent(input: unknown): ValidationResult {
   return errors.length === 0 ? { ok: true } : { ok: false, errors };
 }
 
-export function validateCapabilityMap(
-  architecturePillars: unknown,
+export function validateArchitecture(
+  architecture: unknown,
   contributions: unknown,
 ): string[] {
   const errors: string[] = [];
@@ -452,94 +443,127 @@ export function validateCapabilityMap(
     }
     return value;
   };
-  const scaleValue = (scale: string): number =>
-    scale.split("/").reduce((sum, part) => sum + Number(part.replace(/\D/g, "")), 0);
 
-  // 1. 收集 PR 编号与 merged 排序合规
-  const mergedOrder: Array<{ number: number; kind: string; scale: number }> = [];
+  // 1. 贡献校验：PR 编号唯一、降序、状态收窄
   if (!Array.isArray(contributions)) {
     errors.push("openSource.contributions must be an array");
   } else {
+    const seenPrNumbers = new Set<number>();
     contributions.forEach((contribution, index) => {
       const value = checkRecord(contribution, `openSource.contributions[${index}]`);
       if (!value) return;
-      if (value.status === "merged") {
-        mergedOrder.push({
-          number: value.number as number,
-          kind: value.kind as string,
-          scale: scaleValue(String(value.scale ?? "0+/0-")),
-        });
+      const number = typeof value.number === "number" ? value.number : undefined;
+      if (number !== undefined) {
+        if (seenPrNumbers.has(number)) {
+          errors.push("openSource.contributions must not contain duplicate PR numbers");
+        } else {
+          seenPrNumbers.add(number);
+        }
+      }
+      if (typeof value.status !== "string" || !CONTRIBUTION_STATUSES.has(value.status as OpenSourceContribution["status"])) {
+        errors.push(`openSource.contributions[${index}].status must be merged or open`);
       }
     });
-    const rank = (kind: string) => (kind === "feat" ? 0 : 1);
-    for (let i = 1; i < mergedOrder.length; i += 1) {
-      const prev = mergedOrder[i - 1];
-      const curr = mergedOrder[i];
-      const outOfOrder =
-        rank(prev.kind) > rank(curr.kind) ||
-        (rank(prev.kind) === rank(curr.kind) && prev.scale < curr.scale);
-      if (outOfOrder) {
-        errors.push("openSource.contributions merged entries must be ordered: feat before fix, then descending scale");
-        break;
-      }
+    const numbers = contributions
+      .map((c) => (typeof (c as Record<string, unknown>).number === "number" ? (c as Record<string, unknown>).number as number : undefined))
+      .filter((n): n is number => n !== undefined);
+    if (numbers.some((number, index) => index > 0 && numbers[index - 1] < number)) {
+      errors.push("openSource.contributions must be sorted by descending PR number");
     }
   }
 
-  // 2. 支柱校验
-  const validPrNumbers = new Set<number>(
-    Array.isArray(contributions)
-      ? contributions
-          .map((c) => (typeof (c as Record<string, unknown>).number === "number" ? (c as Record<string, unknown>).number as number : undefined))
-          .filter((n): n is number => n !== undefined)
-      : [],
-  );
+  // 2. 架构结构校验
+  const architectureRecord = checkRecord(architecture, "openSource.architecture");
+  if (!architectureRecord) return errors;
+  Object.keys(architectureRecord).forEach((field) => {
+    if (!ARCHITECTURE_FIELDS.has(field)) {
+      errors.push(`openSource.architecture.${field} is not an allowed field`);
+    }
+  });
 
-  const mappedPrNumbers = new Set<number>();
-  const orderedPillarIds: string[] = [];
-  const seenPillarIds = new Set<string>();
-  if (!Array.isArray(architecturePillars)) {
-    errors.push("openSource.architecturePillars must be an array");
+  const capabilityIds = new Set<string>();
+  if (!Array.isArray(architectureRecord.capabilities)) {
+    errors.push("openSource.architecture.capabilities must be an array");
   } else {
-    if (architecturePillars.length !== ARCHITECTURE_PILLAR_ORDER.length) {
-      errors.push("openSource.architecturePillars must contain exactly 6 entries");
+    if (architectureRecord.capabilities.length === 0) {
+      errors.push("openSource.architecture.capabilities must contain at least one entry");
     }
-    architecturePillars.forEach((pillar, index) => {
-      const value = checkRecord(pillar, `openSource.architecturePillars[${index}]`);
+    const seenCapabilityIds = new Set<string>();
+    architectureRecord.capabilities.forEach((capability, index) => {
+      const value = checkRecord(capability, `openSource.architecture.capabilities[${index}]`);
       if (!value) return;
-      const id = checkText(value.id, `openSource.architecturePillars[${index}].id`);
+      const id = checkText(value.id, `openSource.architecture.capabilities[${index}].id`);
       if (id !== undefined) {
-        orderedPillarIds.push(id);
-        if (seenPillarIds.has(id)) errors.push("openSource.architecturePillars must not contain duplicate ids");
-        else seenPillarIds.add(id);
+        if (seenCapabilityIds.has(id)) {
+          errors.push("openSource.architecture.capabilities must not contain duplicate ids");
+        } else {
+          seenCapabilityIds.add(id);
+          capabilityIds.add(id);
+        }
       }
-      checkText(value.title, `openSource.architecturePillars[${index}].title`);
-      checkText(value.summary, `openSource.architecturePillars[${index}].summary`);
-      if (!Array.isArray(value.prNumbers)) {
-        errors.push(`openSource.architecturePillars[${index}].prNumbers must be an array`);
+      checkText(value.label, `openSource.architecture.capabilities[${index}].label`);
+    });
+  }
+
+  const referencedCapabilityIds = new Set<string>();
+  if (!Array.isArray(architectureRecord.layers)) {
+    errors.push("openSource.architecture.layers must be an array");
+  } else {
+    if (architectureRecord.layers.length === 0) {
+      errors.push("openSource.architecture.layers must contain at least one entry");
+    }
+    const seenLayerIds = new Set<string>();
+    architectureRecord.layers.forEach((layer, index) => {
+      const value = checkRecord(layer, `openSource.architecture.layers[${index}]`);
+      if (!value) return;
+      const id = checkText(value.id, `openSource.architecture.layers[${index}].id`);
+      if (id !== undefined) {
+        if (seenLayerIds.has(id)) {
+          errors.push("openSource.architecture.layers must not contain duplicate ids");
+        } else {
+          seenLayerIds.add(id);
+        }
+      }
+      checkText(value.title, `openSource.architecture.layers[${index}].title`);
+      if (value.summary !== undefined) {
+        checkText(value.summary, `openSource.architecture.layers[${index}].summary`);
+      }
+      if (!Array.isArray(value.capabilityIds)) {
+        errors.push(`openSource.architecture.layers[${index}].capabilityIds must be an array`);
       } else {
-        value.prNumbers.forEach((prNumber, prIndex) => {
-          if (typeof prNumber === "number" && validPrNumbers.has(prNumber)) {
-            mappedPrNumbers.add(prNumber);
-            return;
+        if (value.capabilityIds.length === 0) {
+          errors.push(`openSource.architecture.layers[${index}].capabilityIds must contain at least 1 entry`);
+        }
+        value.capabilityIds.forEach((capabilityId, capabilityIndex) => {
+          if (typeof capabilityId === "string" && capabilityIds.has(capabilityId)) {
+            referencedCapabilityIds.add(capabilityId);
+          } else {
+            errors.push(`openSource.architecture.layers[${index}].capabilityIds[${capabilityIndex}] must reference an existing capability`);
           }
-          errors.push(`openSource.architecturePillars[${index}].prNumbers[${prIndex}] must reference an existing contribution`);
         });
       }
     });
-    if (
-      orderedPillarIds.length !== ARCHITECTURE_PILLAR_ORDER.length ||
-      orderedPillarIds.some((id, index) => id !== ARCHITECTURE_PILLAR_ORDER[index])
-    ) {
-      errors.push("openSource.architecturePillars must use the required ordered ids");
-    }
   }
 
-  // 3. merged PR 归属覆盖
-  if (Array.isArray(contributions)) {
-    contributions.forEach((contribution) => {
-      const value = contribution as Record<string, unknown>;
-      if (value.status === "merged" && !mappedPrNumbers.has(value.number as number)) {
-        errors.push(`openSource.contributions PR #${value.number} must belong to at least one architecture pillar`);
+  if (!Array.isArray(architectureRecord.spanningCapabilityIds)) {
+    errors.push("openSource.architecture.spanningCapabilityIds must be an array");
+  } else {
+    architectureRecord.spanningCapabilityIds.forEach((capabilityId, index) => {
+      if (typeof capabilityId === "string" && capabilityIds.has(capabilityId)) {
+        referencedCapabilityIds.add(capabilityId);
+      } else {
+        errors.push(`openSource.architecture.spanningCapabilityIds[${index}] must reference an existing capability`);
+      }
+    });
+  }
+
+  // 3. 能力域全覆盖：每个能力域必须被某个层或贯穿条引用
+  if (Array.isArray(architectureRecord.capabilities)) {
+    architectureRecord.capabilities.forEach((capability, index) => {
+      const value = checkRecord(capability, `openSource.architecture.capabilities[${index}]`);
+      if (!value) return;
+      if (typeof value.id === "string" && !referencedCapabilityIds.has(value.id)) {
+        errors.push(`openSource.architecture.capabilities[${index}] (${value.id}) must be referenced by a layer or the spanning bar`);
       }
     });
   }

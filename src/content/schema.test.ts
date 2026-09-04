@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import type { SiteContent } from "@/content/schema";
 import { validSiteContent } from "@/test/fixtures/site-content";
-import { validateCapabilityMap, validateSiteContent } from "@/content/schema";
+import { validateArchitecture, validateSiteContent } from "@/content/schema";
 
 describe("validateSiteContent", () => {
-  it("accepts the migrated 15-entry open source fixture", () => {
+  it("accepts the static architecture fixture", () => {
     expect(validateSiteContent(validSiteContent)).toEqual({ ok: true });
   });
 
@@ -129,21 +129,18 @@ describe("validateSiteContent", () => {
       errors: expect.arrayContaining(["about[0] contains secret-like text"]),
     });
   });
+
   it.each([
     ["empty logo alt", (copy: SiteContent) => { copy.internships[0].logo.alt = ""; }],
     ["non-local logo", (copy: SiteContent) => { copy.internships[0].logo.src = "https://cdn.example/logo.png" as SiteContent["internships"][number]["logo"]["src"]; }],
     ["two-node journey", (copy: SiteContent) => { copy.internships[0].journey.pop(); }],
     ["empty highlights", (copy: SiteContent) => { copy.internships[0].highlights = []; }],
     ["project with empty highlights", (copy: SiteContent) => { copy.internships[0].projects![0].highlights = []; }],
-    ["incomplete honor", (copy: SiteContent) => { copy.openSource.honors[0].rank = ""; }],
-    ["only one honor", (copy: SiteContent) => { copy.openSource.honors.pop(); }],
     ["invalid snapshot date", (copy: SiteContent) => { copy.openSource.snapshotDate = "2026/08/21"; }],
     ["non-HTTPS repository", (copy: SiteContent) => { copy.openSource.repositoryUrl = "http://github.com/semantica-agi/semantica"; }],
     ["non-blog article path", (copy: SiteContent) => { copy.openSource.articlePath = "/articles/semantica" as SiteContent["openSource"]["articlePath"]; }],
-    ["fractional stars snapshot", (copy: SiteContent) => { copy.openSource.starsSnapshot = 11400.5; }],
-    ["negative stars snapshot", (copy: SiteContent) => { copy.openSource.starsSnapshot = -1; }],
   ])("rejects %s", (_label, mutate) => {
-    const copy = structuredClone(validSiteContent) as unknown as SiteContent;
+    const copy = structuredClone(validSiteContent);
     mutate(copy);
     expect(validateSiteContent(copy)).toEqual(expect.objectContaining({ ok: false }));
   });
@@ -159,7 +156,7 @@ describe("validateSiteContent", () => {
 
   it("rejects an invalid structured open-source contribution", () => {
     const input = structuredClone(validSiteContent);
-    input.openSource.contributions[0].status = "done" as "merged";
+    Object.assign(input.openSource.contributions[0], { status: "done" });
     input.openSource.contributions[0].url = "http://github.com/example/pr/1";
     expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
   });
@@ -173,145 +170,178 @@ describe("validateSiteContent", () => {
     });
   });
 
-  it("rejects zero merged contributions", () => {
-    const input = structuredClone(validSiteContent);
-    input.openSource.contributions.forEach((contribution) => {
-      contribution.status = "open";
-    });
-    expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
-  });
-
   it.each([
     ["duplicate PR numbers", (copy: SiteContent) => { copy.openSource.contributions[1].number = copy.openSource.contributions[0].number; }],
     ["non-GitHub PR url", (copy: SiteContent) => { copy.openSource.contributions[0].url = "https://example.com/semantica/pull/1081"; }],
     ["non-positive PR number", (copy: SiteContent) => { copy.openSource.contributions[0].number = 0; }],
     ["twelve contributions", (copy: SiteContent) => { copy.openSource.contributions.pop(); }],
+    ["contributions ordered ascending", (copy: SiteContent) => { copy.openSource.contributions.reverse(); }],
     ["unsupported visual kind", (copy: SiteContent) => { copy.caseStudies[0].visualKind = "timeline" as SiteContent["caseStudies"][number]["visualKind"]; }],
     ["duplicate tab labels", (copy: SiteContent) => { copy.caseStudies[1].tabLabel = copy.caseStudies[0].tabLabel; }],
   ])("rejects %s", (_label, mutate) => {
-    const copy = structuredClone(validSiteContent) as unknown as SiteContent;
+    const copy = structuredClone(validSiteContent);
     mutate(copy);
     expect(validateSiteContent(copy)).toEqual(expect.objectContaining({ ok: false }));
   });
 });
 
-const PILLARS = [
-  { id: "context-management", title: "上下文管理", summary: "ContextGraph 结构化、可查询。", prNumbers: [1081] },
-  { id: "knowledge-modeling", title: "知识建模", summary: "冲突检测与语义去重。", prNumbers: [1113, 1143] },
-  { id: "deterministic-reasoning", title: "确定性推理", summary: "RETE/Datalog/SPARQL 可解释。", prNumbers: [1096, 1077] },
-  { id: "ontology-management", title: "本体治理", summary: "SHACL 真实约束解释。", prNumbers: [1094] },
-  { id: "decision-intelligence", title: "决策智能", summary: "决策为一等公民对象。", prNumbers: [1153] },
-  { id: "end-to-end-traceability", title: "端到端溯源", summary: "执行链路并行与 PROV-O 审计。", prNumbers: [1215, 1217, 1226] },
-];
-
-// 简报原文 6 条 + 5 条补充：PILLARS 引用的 1113/1094/1153/1215/1217 不在简报 6 条样本中，
-// 为使用例 1（返回 []）成立而补充；补充条目的 kind/scale 为维持 merged 排序的测试数据。
-const CONTRIBUTIONS = [
-  { number: 1096, status: "merged", kind: "feat", scale: "1141+/44-", summary: "规则驱动动作。", url: "https://github.com/semantica-agi/semantica/pull/1096" },
-  { number: 1113, status: "merged", kind: "feat", scale: "330+/25-", summary: "RDF 规范化。", url: "https://github.com/semantica-agi/semantica/pull/1113" },
-  { number: 1081, status: "merged", kind: "feat", scale: "277+/28-", summary: "KG 适配器。", url: "https://github.com/semantica-agi/semantica/pull/1081" },
-  { number: 1094, status: "merged", kind: "feat", scale: "210+/18-", summary: "SHACL 约束解释。", url: "https://github.com/semantica-agi/semantica/pull/1094" },
-  { number: 1226, status: "merged", kind: "fix", scale: "1204+/63-", summary: "依赖层并行。", url: "https://github.com/semantica-agi/semantica/pull/1226" },
-  { number: 1215, status: "merged", kind: "fix", scale: "880+/40-", summary: "handler 接线修正。", url: "https://github.com/semantica-agi/semantica/pull/1215" },
-  { number: 1217, status: "merged", kind: "fix", scale: "745+/51-", summary: "round-trip 序列化。", url: "https://github.com/semantica-agi/semantica/pull/1217" },
-  { number: 1077, status: "merged", kind: "fix", scale: "620+/93-", summary: "RETE Token 模型。", url: "https://github.com/semantica-agi/semantica/pull/1077" },
-  { number: 1143, status: "merged", kind: "fix", scale: "77+/3-", summary: "时间稳定性。", url: "https://github.com/semantica-agi/semantica/pull/1143" },
-  { number: 1160, status: "open", kind: "fix", scale: "113+/20-", summary: "合规检查抛错。", url: "https://github.com/semantica-agi/semantica/pull/1160" },
-  { number: 1153, status: "open", kind: "feat", scale: "510+/35-", summary: "决策模型契约。", url: "https://github.com/semantica-agi/semantica/pull/1153" },
-];
-
-describe("validateCapabilityMap", () => {
-  it("accepts six ordered pillars whose prNumbers all resolve", () => {
-    expect(validateCapabilityMap(PILLARS, CONTRIBUTIONS)).toEqual([]);
-  });
-
-  it("rejects pillar prNumbers that reference an unknown contribution", () => {
-    const copy = structuredClone(PILLARS);
-    copy[0].prNumbers = [9999];
-    expect(validateCapabilityMap(copy, CONTRIBUTIONS)).toContain(
-      "openSource.architecturePillars[0].prNumbers[0] must reference an existing contribution",
+describe("openSource strict schema closure", () => {
+  it("rejects contributions carrying removed kind and scale fields", () => {
+    const input = structuredClone(validSiteContent);
+    Object.assign(input.openSource.contributions[0], { kind: "feat", scale: "1141+/44-" });
+    expect(validateSiteContent(input)).toEqual(
+      expect.objectContaining({
+        ok: false,
+        errors: expect.arrayContaining([
+          "openSource.contributions[0].kind is not an allowed field",
+          "openSource.contributions[0].scale is not an allowed field",
+        ]),
+      }),
     );
   });
 
-  it("rejects a merged contribution missing from every pillar", () => {
-    const copy = structuredClone(PILLARS);
-    copy[1].prNumbers = [1113];
-    expect(validateCapabilityMap(copy, CONTRIBUTIONS)).toContain(
-      "openSource.contributions PR #1143 must belong to at least one architecture pillar",
-    );
-  });
+  it.each(["honors", "highlights", "starsSnapshot"] as const)(
+    "rejects openSource with removed field %s",
+    (field) => {
+      const input = structuredClone(validSiteContent);
+      Object.assign(input.openSource, { [field]: field === "starsSnapshot" ? 11400 : [] });
+      expect(validateSiteContent(input)).toEqual(
+        expect.objectContaining({
+          ok: false,
+          errors: expect.arrayContaining([
+            `openSource.${field} is not an allowed field`,
+          ]),
+        }),
+      );
+    },
+  );
 
-  it("rejects duplicate pillar ids", () => {
-    const copy = structuredClone(PILLARS);
-    copy[1].id = copy[0].id;
-    expect(validateCapabilityMap(copy, CONTRIBUTIONS)).toContain(
-      "openSource.architecturePillars must not contain duplicate ids",
-    );
-  });
-
-  it("rejects pillars listed outside the required order", () => {
-    const copy = structuredClone(PILLARS);
-    [copy[0], copy[1]] = [copy[1], copy[0]];
-    expect(validateCapabilityMap(copy, CONTRIBUTIONS)).toContain(
-      "openSource.architecturePillars must use the required ordered ids",
-    );
-  });
-
-  it("rejects a merged fix contribution ordered before a feat", () => {
-    const copy = structuredClone(CONTRIBUTIONS);
-    const fixIndex = copy.findIndex((contribution) => contribution.number === 1143);
-    const [fix] = copy.splice(fixIndex, 1);
-    copy.unshift(fix);
-    expect(validateCapabilityMap(PILLARS, copy)).toContain(
-      "openSource.contributions merged entries must be ordered: feat before fix, then descending scale",
-    );
-  });
-
-  it("rejects feat contributions not ordered by descending scale", () => {
-    const copy = structuredClone(CONTRIBUTIONS);
-    const featIndex = copy.findIndex((contribution) => contribution.number === 1081);
-    const [feat] = copy.splice(featIndex, 1);
-    copy.unshift(feat);
-    expect(validateCapabilityMap(PILLARS, copy)).toContain(
-      "openSource.contributions merged entries must be ordered: feat before fix, then descending scale",
+  it("rejects architecture carrying an unknown field", () => {
+    const input = structuredClone(validSiteContent);
+    Object.assign(input.openSource.architecture, { pillars: [] });
+    expect(validateSiteContent(input)).toEqual(
+      expect.objectContaining({
+        ok: false,
+        errors: expect.arrayContaining([
+          "openSource.architecture.pillars is not an allowed field",
+        ]),
+      }),
     );
   });
 });
 
-describe("validateSiteContent contribution fields", () => {
-  const withKindsAndScales = () => {
-    const copy = structuredClone(validSiteContent) as unknown as SiteContent;
-    copy.openSource.contributions.forEach((contribution) => {
-      contribution.kind = "feat";
-      contribution.scale = "10+/2-";
-    });
-    return copy;
-  };
+const ARCHITECTURE = {
+  layers: [
+    {
+      id: "data-knowledge",
+      title: "数据与知识层",
+      summary: "ContextGraph 结构化与知识建模。",
+      capabilityIds: ["context-management", "knowledge-modeling"],
+    },
+    { id: "reasoning", title: "推理层", capabilityIds: ["deterministic-reasoning"] },
+    { id: "governance", title: "治理层", capabilityIds: ["ontology-management"] },
+    { id: "decision", title: "决策层", capabilityIds: ["decision-intelligence"] },
+  ],
+  capabilities: [
+    { id: "context-management", label: "上下文管理" },
+    { id: "knowledge-modeling", label: "知识建模" },
+    { id: "deterministic-reasoning", label: "确定性推理" },
+    { id: "ontology-management", label: "本体治理" },
+    { id: "decision-intelligence", label: "决策智能" },
+    { id: "end-to-end-traceability", label: "端到端溯源" },
+  ],
+  spanningCapabilityIds: ["end-to-end-traceability"],
+};
 
-  it("rejects scale that does not match the NNN+/NNN- format", () => {
-    const copy = withKindsAndScales();
-    copy.openSource.contributions[0].scale = "1141";
-    expect(validateSiteContent(copy)).toEqual(
-      expect.objectContaining({
-        ok: false,
-        errors: expect.arrayContaining([
-          "openSource.contributions[0].scale must match the NNN+/NNN- format",
-        ]),
-      }),
+const CONTRIBUTIONS = [
+  { number: 1364, title: "对齐 enforce_decision_policy 与 record_decision 的默认推理上限。", url: "https://github.com/semantica-agi/semantica/pull/1364", status: "open" },
+  { number: 1360, title: "决策因果追踪中启发式原因去重。", url: "https://github.com/semantica-agi/semantica/pull/1360", status: "open" },
+  { number: 1226, title: "set_parallelism 依赖层并行执行。", url: "https://github.com/semantica-agi/semantica/pull/1226", status: "merged" },
+  { number: 1143, title: "时间图指标。", url: "https://github.com/semantica-agi/semantica/pull/1143", status: "merged" },
+];
+
+describe("validateArchitecture", () => {
+  it("accepts four ordered layers, six unique capabilities, and a valid spanning reference", () => {
+    expect(validateArchitecture(ARCHITECTURE, CONTRIBUTIONS)).toEqual([]);
+  });
+
+  it("rejects layer capabilityIds that reference an unknown capability", () => {
+    const copy = structuredClone(ARCHITECTURE);
+    copy.layers[0].capabilityIds = ["context-management", "unknown-capability"];
+    expect(validateArchitecture(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecture.layers[0].capabilityIds[1] must reference an existing capability",
     );
   });
 
-  it("rejects kind outside feat or fix", () => {
-    const copy = withKindsAndScales();
-    // 通过对象字面量注入运行时非法值，避免绕过类型的 as 断言
-    Object.assign(copy.openSource.contributions[0], { kind: "chore" });
-    expect(validateSiteContent(copy)).toEqual(
-      expect.objectContaining({
-        ok: false,
-        errors: expect.arrayContaining([
-          "openSource.contributions[0].kind must be feat or fix",
-        ]),
-      }),
+  it("rejects duplicate layer ids", () => {
+    const copy = structuredClone(ARCHITECTURE);
+    copy.layers[1].id = copy.layers[0].id;
+    expect(validateArchitecture(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecture.layers must not contain duplicate ids",
+    );
+  });
+
+  it("rejects spanningCapabilityIds that reference an unknown capability", () => {
+    const copy = structuredClone(ARCHITECTURE);
+    copy.spanningCapabilityIds = ["unknown-capability"];
+    expect(validateArchitecture(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecture.spanningCapabilityIds[0] must reference an existing capability",
+    );
+  });
+
+  it("rejects duplicate capability ids", () => {
+    const copy = structuredClone(ARCHITECTURE);
+    copy.capabilities[1].id = copy.capabilities[0].id;
+    expect(validateArchitecture(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecture.capabilities must not contain duplicate ids",
+    );
+  });
+
+  it("rejects a capability referenced by no layer and no spanning entry", () => {
+    const copy = structuredClone(ARCHITECTURE);
+    copy.layers[2].capabilityIds = ["decision-intelligence"];
+    expect(validateArchitecture(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecture.capabilities[3] (ontology-management) must be referenced by a layer or the spanning bar",
+    );
+  });
+
+  it("rejects an empty layers array", () => {
+    const copy = structuredClone(ARCHITECTURE);
+    copy.layers = [];
+    expect(validateArchitecture(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecture.layers must contain at least one entry",
+    );
+  });
+
+  it("rejects a layer with an empty capabilityIds array", () => {
+    const copy = structuredClone(ARCHITECTURE);
+    copy.layers[0].capabilityIds = [];
+    expect(validateArchitecture(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecture.layers[0].capabilityIds must contain at least 1 entry",
+    );
+  });
+
+  it("rejects contributions with duplicate PR numbers", () => {
+    const copy = structuredClone(CONTRIBUTIONS);
+    copy[1].number = copy[0].number;
+    expect(validateArchitecture(ARCHITECTURE, copy)).toContain(
+      "openSource.contributions must not contain duplicate PR numbers",
+    );
+  });
+
+  it("rejects contributions not sorted by descending number", () => {
+    const copy = structuredClone(CONTRIBUTIONS);
+    copy.reverse();
+    expect(validateArchitecture(ARCHITECTURE, copy)).toContain(
+      "openSource.contributions must be sorted by descending PR number",
+    );
+  });
+
+  it("rejects contributions with an unsupported status", () => {
+    const copy = structuredClone(CONTRIBUTIONS);
+    Object.assign(copy[0], { status: "review" });
+    expect(validateArchitecture(ARCHITECTURE, copy)).toContain(
+      "openSource.contributions[0].status must be merged or open",
     );
   });
 });
