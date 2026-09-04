@@ -793,6 +793,28 @@ html[data-profile-motion="static"] .sticky-internship-card {
   text-underline-offset: 4px;
 }
 
+.open-source-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.open-source-highlights li {
+  color: var(--profile-accent);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.open-source-highlights li:not(:last-child)::after {
+  content: "·";
+  margin-left: 1.2rem;
+  color: var(--profile-line);
+}
+
 /* --- capability map spotlight --- */
 
 .open-source-spotlight {
@@ -800,22 +822,24 @@ html[data-profile-motion="static"] .sticky-internship-card {
   gap: 1.6rem;
 }
 
-.open-source-spotlight-chain {
+.open-source-spotlight-pillars {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.75rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.open-source-spotlight-chain li {
+.open-source-spotlight-pillars li {
   display: flex;
   align-items: center;
 }
 
-.open-source-capability-node {
+.open-source-architecture-pillar {
   flex: 1;
+  display: grid;
+  gap: 0.35rem;
   padding: 0.65rem 0.85rem;
   border: 1px solid var(--profile-line);
   border-radius: 12px;
@@ -828,22 +852,28 @@ html[data-profile-motion="static"] .sticky-internship-card {
   transition: border-color 240ms ease, background-color 240ms ease;
 }
 
-.open-source-capability-node:hover {
+.open-source-architecture-pillar-summary {
+  color: var(--profile-muted);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.open-source-architecture-pillar:hover {
   border-color: var(--profile-accent);
 }
 
-.open-source-capability-node:focus-visible {
+.open-source-architecture-pillar:focus-visible {
   outline: 2px solid var(--profile-accent);
   outline-offset: 2px;
 }
 
-.open-source-capability-node[aria-pressed="true"] {
+.open-source-architecture-pillar[aria-pressed="true"] {
   border-color: var(--profile-accent);
   background: rgb(237 207 130 / 35%);
 }
 
 /* connector line is pure pseudo-element decoration between chain nodes */
-.open-source-spotlight-chain li:not(:last-child)::after {
+.open-source-spotlight-pillars li:not(:last-child)::after {
   content: "";
   flex: 1;
   height: 1px;
@@ -868,7 +898,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   cursor: default;
 }
 
-.open-source-spotlight-domains {
+.open-source-spotlight-contributions {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
@@ -877,15 +907,15 @@ html[data-profile-motion="static"] .sticky-internship-card {
   list-style: none;
 }
 
-.open-source-spotlight-domains li {
+.open-source-spotlight-contributions li {
   transition: opacity 240ms ease;
 }
 
-.open-source-spotlight-domains li[data-emphasis="muted"] {
+.open-source-spotlight-contributions li[data-emphasis="muted"] {
   opacity: 0.65;
 }
 
-.open-source-spotlight-domain {
+.open-source-merged-contribution {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
@@ -896,30 +926,9 @@ html[data-profile-motion="static"] .sticky-internship-card {
   transition: border-color 240ms ease, background-color 240ms ease;
 }
 
-.open-source-spotlight-domains li[data-emphasis="active"] .open-source-spotlight-domain {
+.open-source-spotlight-contributions li[data-emphasis="active"] {
   border-color: var(--profile-accent);
   background: rgb(237 207 130 / 40%);
-}
-
-.open-source-spotlight-domain h4 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.open-source-spotlight-domain p {
-  margin: 0;
-  color: var(--profile-muted);
-  font-size: 0.92rem;
-  line-height: 1.65;
-}
-
-.open-source-spotlight-domain ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 .open-source-pr-link {
@@ -1106,7 +1115,7 @@ html[data-profile-motion="static"] .profile-reveal {
     align-items: flex-start;
   }
 
-  .open-source-spotlight-chain {
+  .open-source-spotlight-pillars {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -1175,17 +1184,17 @@ html[data-profile-motion="static"] .profile-reveal {
     rotate: 0deg;
   }
 
-  .open-source-spotlight-chain {
+  .open-source-spotlight-pillars {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .open-source-spotlight-chain li:not(:last-child)::after {
+  .open-source-spotlight-pillars li:not(:last-child)::after {
     content: none;
   }
 
-  .open-source-capability-node,
-  .open-source-spotlight-domains li,
-  .open-source-spotlight-domain,
+  .open-source-architecture-pillar,
+  .open-source-spotlight-contributions li,
+  .open-source-merged-contribution,
   .open-source-pr-link {
     transition: none;
     /* explicit 0s beats the global 0.01ms !important fallback */
@@ -1238,9 +1247,9 @@ html[data-profile-motion="static"] .profile-reveal {
     transition: none;
   }
 
-  .open-source-capability-node,
-  .open-source-spotlight-domains li,
-  .open-source-spotlight-domain,
+  .open-source-architecture-pillar,
+  .open-source-spotlight-contributions li,
+  .open-source-merged-contribution,
   .open-source-pr-link {
     transition: none;
     /* explicit 0s beats the global 0.01ms !important fallback */

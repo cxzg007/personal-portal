@@ -15,7 +15,7 @@ describe("OpenSourceShowcase", () => {
 
     expect(screen.getByRole("img", { name: "Semantica 项目标志" })).toBeVisible();
     expect(screen.getByText("Open-source Contributor · cxzg007")).toBeVisible();
-    expect(screen.getByText("11.4k+ GitHub Stars")).toBeVisible();
+    expect(screen.getByText("11.4k+ GitHub Stars", { selector: ".open-source-stars" })).toBeVisible();
     expect(
       screen.getByText(
         "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约与执行链路并行化。",
@@ -35,55 +35,51 @@ describe("OpenSourceShowcase", () => {
     }
   });
 
-  it("renders thirteen PR links with exact hrefs and visible status text", () => {
+  it("renders ten merged PR links with exact hrefs and visible status text", () => {
     render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
-
-    const map = screen.getByRole("region", { name: "Semantica 双层能力地图" });
-    expect(within(map).getAllByRole("link", { name: /^PR #/ })).toHaveLength(13);
-    openSource.contributions.forEach((contribution) => {
+    const map = screen.getByRole("region", { name: "Semantica 架构与合并贡献" });
+    const links = within(map).getAllByRole("link", { name: /^PR #/ });
+    expect(links).toHaveLength(10);
+    const merged = openSource.contributions.filter(({ status }) => status === "merged");
+    merged.forEach((contribution) => {
       expect(
         within(map).getByRole("link", {
-          name: `PR #${contribution.number}：${contribution.summary}，${contribution.status.toUpperCase()}`,
+          name: `PR #${contribution.number}：${contribution.summary}（${contribution.kind.toUpperCase()} · ${contribution.scale}）MERGED`,
         }),
       ).toHaveAttribute("href", contribution.url);
     });
   });
 
-  it("renders the capability map in domain order with complete server content", () => {
-    render(
-      <OpenSourceShowcase
-        project={openSource}
-        stars={openSource.starsSnapshot}
-      />,
-    );
-    const map = screen.getByRole("region", { name: "Semantica 双层能力地图" });
-    expect(within(map).getAllByRole("button", { name: /^能力节点/ })).toHaveLength(5);
-    expect(within(map).getAllByTestId("contribution-domain").map((domain) => domain.getAttribute("data-domain-id"))).toEqual([
-      "graph-data-adapters", "constraint-explanation", "temporal-stability", "rule-query-reasoning", "decision-model-contracts", "execution-pipeline",
-    ]);
-    expect(within(map).getAllByRole("link", { name: /^PR #/ })).toHaveLength(13);
-    expect(within(map).getByRole("link", { name: /PR #1208/ })).toHaveAttribute("href", expect.stringContaining("/pull/1208"));
-    expect(within(map).getAllByText("MERGED")).toHaveLength(9);
-    expect(within(map).getAllByText("OPEN")).toHaveLength(4);
-    expect(screen.getByRole("link", { name: /repository/i })).toHaveAttribute("href", openSource.repositoryUrl);
-    expect(screen.getByRole("link", { name: /贡献复盘/ })).toHaveAttribute("href", openSource.articlePath);
+  it("renders highlights and the pillar map in schema order with merged-only content", () => {
+    render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
+    const highlights = screen.getByRole("list", { name: "Semantica 项目亮点" });
+    expect(highlights).toBeVisible();
+    openSource.highlights.forEach((highlight) => {
+      expect(within(highlights).getByText(highlight, { exact: true })).toBeVisible();
+    });
+    const map = screen.getByRole("region", { name: "Semantica 架构与合并贡献" });
+    expect(within(map).getByRole("heading", { name: "核心架构与合并贡献" })).toBeVisible();
+    expect(within(map).getAllByRole("button", { name: /^架构支柱/ })).toHaveLength(6);
+    expect(
+      within(map)
+        .getAllByTestId("merged-contribution")
+        .map((item) => item.getAttribute("data-pr-number")),
+    ).toEqual(["1096", "1081", "1226", "1077", "1113", "1217", "1094", "1153", "1215", "1143"]);
+    expect(within(map).getAllByText("MERGED")).toHaveLength(10);
+    expect(within(map).queryByText("OPEN")).toBeNull();
   });
 
   it("exposes stable styling hooks without removing map content", () => {
     render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
     expect(screen.getByTestId("open-source-spotlight")).toHaveClass("open-source-spotlight");
-    expect(screen.getAllByRole("button", { name: /^能力节点/ })[0]).toHaveClass("open-source-capability-node");
-    expect(screen.getAllByTestId("contribution-domain")[0]).toHaveClass("open-source-contribution-domain");
+    expect(screen.getAllByRole("button", { name: /^架构支柱/ })[0]).toHaveClass("open-source-architecture-pillar");
+    expect(screen.getAllByTestId("merged-contribution")[0]).toHaveClass("open-source-merged-contribution");
     expect(screen.getAllByRole("link", { name: /^PR #/ })[0]).toHaveClass("open-source-pr-link");
   });
 
-  it("states the dated snapshot boundary computed from contribution statuses", () => {
+  it("states the dated snapshot boundary computed from merged contributions", () => {
     render(<OpenSourceShowcase project={openSource} stars={openSource.starsSnapshot} />);
-
-
-    expect(
-      screen.getByText("截至 2026-08-31：9 个贡献已合并，其余处于开放或审阅状态。"),
-    ).toBeVisible();
+    expect(screen.getByText("截至 2026-09-04：10 个贡献已合并。")).toBeVisible();
   });
 
   it("links to the external repository and the internal article", () => {
