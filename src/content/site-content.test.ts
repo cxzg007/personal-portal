@@ -8,13 +8,12 @@ const content = JSON.parse(
   profile: { education: Array<{ school: string }> };
   openSource: {
     snapshotDate: string;
-    architecturePillars: Array<{ id: string; prNumbers: number[] }>;
-    contributions: Array<{
-      number: number;
-      status: string;
-      kind: string;
-      scale: string;
-    }>;
+    architecture: {
+      layers: Array<{ id: string; title: string; capabilityIds: string[] }>;
+      capabilities: Array<{ id: string; label: string }>;
+      spanningCapabilityIds: string[];
+    };
+    contributions: Array<{ number: number; title: string; url: string; status: string }>;
   };
 };
 
@@ -24,34 +23,41 @@ describe("site-content education copy", () => {
       expect(education.school).toBe("同济大学");
     }
   });
+});
 
-  it("stores the fixed Semantica architecture map without changing PR facts", () => {
-    const project = content.openSource;
-    expect(project.snapshotDate).toBe("2026-09-04");
-    expect(project.architecturePillars.map(({ id, prNumbers }) => [id, prNumbers])).toEqual([
-      ["context-management", [1081]],
-      ["knowledge-modeling", [1113, 1143]],
-      ["deterministic-reasoning", [1096, 1077]],
-      ["ontology-management", [1094]],
-      ["decision-intelligence", [1153]],
-      ["end-to-end-traceability", [1215, 1217, 1226]],
+describe("site-content openSource architecture", () => {
+  it("stores 4 layers and 6 capability domains with the spanning capability", () => {
+    const { architecture } = content.openSource;
+    expect(architecture.layers).toHaveLength(4);
+    expect(architecture.layers.map((layer) => [layer.id, layer.title, layer.capabilityIds])).toEqual([
+      ["data-knowledge", "数据与知识层", ["context-management", "knowledge-modeling"]],
+      ["reasoning", "推理层", ["deterministic-reasoning"]],
+      ["governance", "治理层", ["ontology-management"]],
+      ["decision", "决策层", ["decision-intelligence"]],
     ]);
-    expect(project.contributions.map(({ number, status, kind, scale }) => ({ number, status, kind, scale }))).toEqual([
-      { number: 1096, status: "merged", kind: "feat", scale: "1141+/44-" },
-      { number: 1081, status: "merged", kind: "feat", scale: "277+/28-" },
-      { number: 1226, status: "merged", kind: "fix", scale: "1204+/63-" },
-      { number: 1077, status: "merged", kind: "fix", scale: "620+/93-" },
-      { number: 1113, status: "merged", kind: "fix", scale: "200+/6-" },
-      { number: 1217, status: "merged", kind: "fix", scale: "144+/2-" },
-      { number: 1094, status: "merged", kind: "fix", scale: "141+/4-" },
-      { number: 1153, status: "merged", kind: "fix", scale: "106+/14-" },
-      { number: 1215, status: "merged", kind: "fix", scale: "99+/8-" },
-      { number: 1143, status: "merged", kind: "fix", scale: "77+/3-" },
-      { number: 1160, status: "open", kind: "fix", scale: "113+/20-" },
-      { number: 1208, status: "open", kind: "fix", scale: "137+/11-" },
-      { number: 1243, status: "open", kind: "feat", scale: "1095+/53-" },
-      { number: 1360, status: "open", kind: "fix", scale: "46+/3-" },
-      { number: 1364, status: "open", kind: "fix", scale: "82+/5-" },
+    expect(architecture.capabilities).toHaveLength(6);
+    expect(architecture.capabilities.map(({ id, label }) => [id, label])).toEqual([
+      ["context-management", "上下文管理"],
+      ["knowledge-modeling", "知识建模"],
+      ["deterministic-reasoning", "确定性推理"],
+      ["ontology-management", "本体治理"],
+      ["decision-intelligence", "决策智能"],
+      ["end-to-end-traceability", "端到端溯源"],
     ]);
+    expect(architecture.spanningCapabilityIds).toEqual(["end-to-end-traceability"]);
+  });
+
+  it("keeps 15 PR records with only number/title/url/status and merged entries descending by number", () => {
+    const { openSource } = content;
+    expect(openSource.snapshotDate).toBe("2026-09-04");
+    expect(openSource.contributions).toHaveLength(15);
+    for (const contribution of openSource.contributions) {
+      expect(Object.keys(contribution).sort()).toEqual(["number", "status", "title", "url"]);
+    }
+    const numbers = openSource.contributions.map((contribution) => contribution.number);
+    expect(numbers).toEqual([1364, 1360, 1243, 1226, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1096, 1094, 1081, 1077]);
+    const merged = openSource.contributions.filter((contribution) => contribution.status === "merged");
+    expect(merged).toHaveLength(10);
+    expect(merged.map((contribution) => contribution.number)).toEqual([1226, 1217, 1215, 1153, 1143, 1113, 1096, 1094, 1081, 1077]);
   });
 });
