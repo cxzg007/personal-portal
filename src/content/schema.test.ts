@@ -5,15 +5,8 @@ import { validSiteContent } from "@/test/fixtures/site-content";
 import { validateCapabilityMap, validateSiteContent } from "@/content/schema";
 
 describe("validateSiteContent", () => {
-  it("rejects the legacy 13-entry open source fixture until content migration", () => {
-    expect(validateSiteContent(validSiteContent)).toEqual(
-      expect.objectContaining({
-        ok: false,
-        errors: expect.arrayContaining([
-          "openSource.contributions must contain exactly 15 entries",
-        ]),
-      }),
-    );
+  it("accepts the migrated 15-entry open source fixture", () => {
+    expect(validateSiteContent(validSiteContent)).toEqual({ ok: true });
   });
 
   it("rejects content without education", () => {
@@ -286,8 +279,6 @@ describe("validateCapabilityMap", () => {
 });
 
 describe("validateSiteContent contribution fields", () => {
-  // TODO(Task 2): these cases depend on the legacy 13-entry fixture; enable
-  // after the fixture migrates to the 15-entry architecture-pillar structure.
   const withKindsAndScales = () => {
     const copy = structuredClone(validSiteContent) as unknown as SiteContent;
     copy.openSource.contributions.forEach((contribution) => {
@@ -297,7 +288,7 @@ describe("validateSiteContent contribution fields", () => {
     return copy;
   };
 
-  it.skip("rejects scale that does not match the NNN+/NNN- format", () => {
+  it("rejects scale that does not match the NNN+/NNN- format", () => {
     const copy = withKindsAndScales();
     copy.openSource.contributions[0].scale = "1141";
     expect(validateSiteContent(copy)).toEqual(
@@ -310,7 +301,7 @@ describe("validateSiteContent contribution fields", () => {
     );
   });
 
-  it.skip("rejects kind outside feat or fix", () => {
+  it("rejects kind outside feat or fix", () => {
     const copy = withKindsAndScales();
     // 通过对象字面量注入运行时非法值，避免绕过类型的 as 断言
     Object.assign(copy.openSource.contributions[0], { kind: "chore" });
