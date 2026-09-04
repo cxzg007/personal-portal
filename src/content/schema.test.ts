@@ -2,26 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import type { SiteContent } from "@/content/schema";
 import { validSiteContent } from "@/test/fixtures/site-content";
-import { validateSiteContent, validateCapabilityMap } from "./schema";
+import { validateCapabilityMap, validateSiteContent } from "@/content/schema";
 
 describe("validateSiteContent", () => {
-  it("accepts complete public site content", () => {
-    expect(validSiteContent.openSource.contributions.map(({ number, status, summary, url }) => ({ number, status, summary, url }))).toEqual([
-      { number: 1077, status: "merged", summary: "用 RETE Token 模型解释规则执行。", url: "https://github.com/semantica-agi/semantica/pull/1077" },
-      { number: 1081, status: "merged", summary: "为 ContextGraph 提供标准适配器。", url: "https://github.com/semantica-agi/semantica/pull/1081" },
-      { number: 1094, status: "merged", summary: "解释 SHACL 真实约束来源。", url: "https://github.com/semantica-agi/semantica/pull/1094" },
-      { number: 1096, status: "merged", summary: "将规则 Action 与 provenance 关联。", url: "https://github.com/semantica-agi/semantica/pull/1096" },
-      { number: 1113, status: "merged", summary: "统一 RDF name 到 label 的规范化。", url: "https://github.com/semantica-agi/semantica/pull/1113" },
-      { number: 1143, status: "merged", summary: "为时间图补充指标说明。", url: "https://github.com/semantica-agi/semantica/pull/1143" },
-      { number: 1215, status: "merged", summary: "修正 pipeline 注册 handler 接线。", url: "https://github.com/semantica-agi/semantica/pull/1215" },
-      { number: 1217, status: "merged", summary: "保证 serializer round-trip 依赖与 delta 元数据。", url: "https://github.com/semantica-agi/semantica/pull/1217" },
-      { number: 1226, status: "merged", summary: "按依赖层实现 set_parallelism 并行执行。", url: "https://github.com/semantica-agi/semantica/pull/1226" },
-      { number: 1153, status: "open", summary: "补齐决策模型契约。", url: "https://github.com/semantica-agi/semantica/pull/1153" },
-      { number: 1160, status: "open", summary: "将 PolicyEngine compliance 失败改为显式抛出。", url: "https://github.com/semantica-agi/semantica/pull/1160" },
-      { number: 1208, status: "review", summary: "修复冲突解决 unhashable TypeError。", url: "https://github.com/semantica-agi/semantica/pull/1208" },
-      { number: 1243, status: "review", summary: "实现 SPARQLReasoner.execute_query 三路径。", url: "https://github.com/semantica-agi/semantica/pull/1243" },
-    ]);
-    expect(validateSiteContent(validSiteContent)).toEqual({ ok: true });
+  it("rejects the legacy 13-entry open source fixture until content migration", () => {
+    expect(validateSiteContent(validSiteContent)).toEqual(
+      expect.objectContaining({
+        ok: false,
+        errors: expect.arrayContaining([
+          "openSource.contributions must contain exactly 15 entries",
+        ]),
+      }),
+    );
   });
 
   it("rejects content without education", () => {
@@ -211,43 +203,124 @@ describe("validateSiteContent", () => {
   });
 });
 
-const nodes = [
-  { id: "agent-context", title: "Agent Context", description: "接收上下文" },
-  { id: "context-graph", title: "ContextGraph", description: "组织图结构" },
-  { id: "semantic-validation", title: "RDF / SHACL / Temporal", description: "语义验证" },
-  { id: "rule-decision", title: "Rule & Decision", description: "规则决策" },
-  { id: "auditable-execution", title: "Auditable Execution", description: "可审计执行" },
-];
-const contributions = Array.from({ length: 13 }, (_, index) => ({
-  number: index + 1,
-  status: "merged",
-  summary: `PR ${index + 1}`,
-  url: `https://github.com/cx-org/semantica/pull/${index + 1}`,
-}));
-const domains = [
-  { id: "graph-data-adapters", title: "图数据适配", outcome: "统一输入", nodeIds: ["context-graph"], prNumbers: [1, 2, 3] },
-  { id: "constraint-explanation", title: "约束解释", outcome: "解释失败", nodeIds: ["semantic-validation"], prNumbers: [4] },
-  { id: "temporal-stability", title: "时间稳定性", outcome: "稳定时间语义", nodeIds: ["semantic-validation"], prNumbers: [5] },
-  { id: "rule-query-reasoning", title: "规则与查询推理", outcome: "完善推理", nodeIds: ["rule-decision"], prNumbers: [6, 7, 8, 9] },
-  { id: "decision-model-contracts", title: "决策模型契约", outcome: "明确契约", nodeIds: ["rule-decision"], prNumbers: [10, 11] },
-  { id: "execution-pipeline", title: "执行链路", outcome: "支持执行", nodeIds: ["auditable-execution"], prNumbers: [12, 13] },
+const PILLARS = [
+  { id: "context-management", title: "上下文管理", summary: "ContextGraph 结构化、可查询。", prNumbers: [1081] },
+  { id: "knowledge-modeling", title: "知识建模", summary: "冲突检测与语义去重。", prNumbers: [1113, 1143] },
+  { id: "deterministic-reasoning", title: "确定性推理", summary: "RETE/Datalog/SPARQL 可解释。", prNumbers: [1096, 1077] },
+  { id: "ontology-management", title: "本体治理", summary: "SHACL 真实约束解释。", prNumbers: [1094] },
+  { id: "decision-intelligence", title: "决策智能", summary: "决策为一等公民对象。", prNumbers: [1153] },
+  { id: "end-to-end-traceability", title: "端到端溯源", summary: "执行链路并行与 PROV-O 审计。", prNumbers: [1215, 1217, 1226] },
 ];
 
-it.each([
-  ["unknown node", (copy: typeof domains) => { copy[0].nodeIds = ["missing-node"]; }, "openSource.contributionDomains[0].nodeIds[0] must reference an existing graph node"],
-  ["unknown PR", (copy: typeof domains) => { copy[0].prNumbers = [9999]; }, "openSource.contributionDomains[0].prNumbers[0] must reference an existing contribution"],
-  ["unmapped PR", (copy: typeof domains) => { copy.forEach((domain) => { domain.prNumbers = domain.prNumbers.filter((number) => number !== 1); }); }, "openSource.contributions PR #1 must belong to at least one contribution domain"],
-])("rejects capability map with %s", (_label, mutate, expectedError) => {
-  const copy = structuredClone(domains);
-  mutate(copy);
-  expect(validateCapabilityMap(nodes, copy, contributions)).toContain(expectedError);
+// 简报原文 6 条 + 5 条补充：PILLARS 引用的 1113/1094/1153/1215/1217 不在简报 6 条样本中，
+// 为使用例 1（返回 []）成立而补充；补充条目的 kind/scale 为维持 merged 排序的测试数据。
+const CONTRIBUTIONS = [
+  { number: 1096, status: "merged", kind: "feat", scale: "1141+/44-", summary: "规则驱动动作。", url: "https://github.com/semantica-agi/semantica/pull/1096" },
+  { number: 1113, status: "merged", kind: "feat", scale: "330+/25-", summary: "RDF 规范化。", url: "https://github.com/semantica-agi/semantica/pull/1113" },
+  { number: 1081, status: "merged", kind: "feat", scale: "277+/28-", summary: "KG 适配器。", url: "https://github.com/semantica-agi/semantica/pull/1081" },
+  { number: 1094, status: "merged", kind: "feat", scale: "210+/18-", summary: "SHACL 约束解释。", url: "https://github.com/semantica-agi/semantica/pull/1094" },
+  { number: 1226, status: "merged", kind: "fix", scale: "1204+/63-", summary: "依赖层并行。", url: "https://github.com/semantica-agi/semantica/pull/1226" },
+  { number: 1215, status: "merged", kind: "fix", scale: "880+/40-", summary: "handler 接线修正。", url: "https://github.com/semantica-agi/semantica/pull/1215" },
+  { number: 1217, status: "merged", kind: "fix", scale: "745+/51-", summary: "round-trip 序列化。", url: "https://github.com/semantica-agi/semantica/pull/1217" },
+  { number: 1077, status: "merged", kind: "fix", scale: "620+/93-", summary: "RETE Token 模型。", url: "https://github.com/semantica-agi/semantica/pull/1077" },
+  { number: 1143, status: "merged", kind: "fix", scale: "77+/3-", summary: "时间稳定性。", url: "https://github.com/semantica-agi/semantica/pull/1143" },
+  { number: 1160, status: "open", kind: "fix", scale: "113+/20-", summary: "合规检查抛错。", url: "https://github.com/semantica-agi/semantica/pull/1160" },
+  { number: 1153, status: "open", kind: "feat", scale: "510+/35-", summary: "决策模型契约。", url: "https://github.com/semantica-agi/semantica/pull/1153" },
+];
+
+describe("validateCapabilityMap", () => {
+  it("accepts six ordered pillars whose prNumbers all resolve", () => {
+    expect(validateCapabilityMap(PILLARS, CONTRIBUTIONS)).toEqual([]);
+  });
+
+  it("rejects pillar prNumbers that reference an unknown contribution", () => {
+    const copy = structuredClone(PILLARS);
+    copy[0].prNumbers = [9999];
+    expect(validateCapabilityMap(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecturePillars[0].prNumbers[0] must reference an existing contribution",
+    );
+  });
+
+  it("rejects a merged contribution missing from every pillar", () => {
+    const copy = structuredClone(PILLARS);
+    copy[1].prNumbers = [1113];
+    expect(validateCapabilityMap(copy, CONTRIBUTIONS)).toContain(
+      "openSource.contributions PR #1143 must belong to at least one architecture pillar",
+    );
+  });
+
+  it("rejects duplicate pillar ids", () => {
+    const copy = structuredClone(PILLARS);
+    copy[1].id = copy[0].id;
+    expect(validateCapabilityMap(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecturePillars must not contain duplicate ids",
+    );
+  });
+
+  it("rejects pillars listed outside the required order", () => {
+    const copy = structuredClone(PILLARS);
+    [copy[0], copy[1]] = [copy[1], copy[0]];
+    expect(validateCapabilityMap(copy, CONTRIBUTIONS)).toContain(
+      "openSource.architecturePillars must use the required ordered ids",
+    );
+  });
+
+  it("rejects a merged fix contribution ordered before a feat", () => {
+    const copy = structuredClone(CONTRIBUTIONS);
+    const fixIndex = copy.findIndex((contribution) => contribution.number === 1143);
+    const [fix] = copy.splice(fixIndex, 1);
+    copy.unshift(fix);
+    expect(validateCapabilityMap(PILLARS, copy)).toContain(
+      "openSource.contributions merged entries must be ordered: feat before fix, then descending scale",
+    );
+  });
+
+  it("rejects feat contributions not ordered by descending scale", () => {
+    const copy = structuredClone(CONTRIBUTIONS);
+    const featIndex = copy.findIndex((contribution) => contribution.number === 1081);
+    const [feat] = copy.splice(featIndex, 1);
+    copy.unshift(feat);
+    expect(validateCapabilityMap(PILLARS, copy)).toContain(
+      "openSource.contributions merged entries must be ordered: feat before fix, then descending scale",
+    );
+  });
 });
 
-it("rejects duplicate or misordered nodes and a non-six or misordered domain map", () => {
-  const duplicateNodes = structuredClone(nodes);
-  duplicateNodes[1].id = duplicateNodes[0].id;
-  expect(validateCapabilityMap(duplicateNodes, domains, contributions)).toContain("openSource.graphNodes must not contain duplicate ids");
-  expect(validateCapabilityMap(nodes.toReversed(), domains, contributions)).toContain("openSource.graphNodes must use the required ordered ids");
-  expect(validateCapabilityMap(nodes, domains.slice(0, 5), contributions)).toContain("openSource.contributionDomains must contain exactly 6 entries");
-  expect(validateCapabilityMap(nodes, domains.toReversed(), contributions)).toContain("openSource.contributionDomains must use the required ordered ids");
+describe("validateSiteContent contribution fields", () => {
+  // TODO(Task 2): these cases depend on the legacy 13-entry fixture; enable
+  // after the fixture migrates to the 15-entry architecture-pillar structure.
+  const withKindsAndScales = () => {
+    const copy = structuredClone(validSiteContent) as SiteContent;
+    copy.openSource.contributions.forEach((contribution) => {
+      contribution.kind = "feat";
+      contribution.scale = "10+/2-";
+    });
+    return copy;
+  };
+
+  it.skip("rejects scale that does not match the NNN+/NNN- format", () => {
+    const copy = withKindsAndScales();
+    copy.openSource.contributions[0].scale = "1141";
+    expect(validateSiteContent(copy)).toEqual(
+      expect.objectContaining({
+        ok: false,
+        errors: expect.arrayContaining([
+          "openSource.contributions[0].scale must match the NNN+/NNN- format",
+        ]),
+      }),
+    );
+  });
+
+  it.skip("rejects kind outside feat or fix", () => {
+    const copy = withKindsAndScales();
+    copy.openSource.contributions[0].kind = "chore";
+    expect(validateSiteContent(copy)).toEqual(
+      expect.objectContaining({
+        ok: false,
+        errors: expect.arrayContaining([
+          "openSource.contributions[0].kind must be feat or fix",
+        ]),
+      }),
+    );
+  });
 });

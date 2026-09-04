@@ -26,19 +26,14 @@ export type OpenSourceContribution = {
   status: "merged" | "open" | "review";
   summary: string;
   url: string;
+  kind: "feat" | "fix";
+  scale: string;
 };
 
-export type ProjectGraphNode = {
+export type ArchitecturePillar = {
   id: string;
   title: string;
-  description: string;
-};
-
-export type ContributionDomain = {
-  id: string;
-  title: string;
-  outcome: string;
-  nodeIds: string[];
+  summary: string;
   prNumbers: number[];
 };
 
@@ -51,8 +46,8 @@ export type OpenSourceProject = {
   starsSnapshot: number;
   honors: Array<{ platform: string; rank: string; period: string; evidence: string }>;
   contributions: OpenSourceContribution[];
-  graphNodes: [ProjectGraphNode, ProjectGraphNode, ProjectGraphNode, ProjectGraphNode, ProjectGraphNode];
-  contributionDomains: ContributionDomain[];
+  highlights: string[];
+  architecturePillars: ArchitecturePillar[];
   repositoryUrl: string;
   articlePath: `/blog/${string}`;
 };
@@ -138,21 +133,16 @@ const CONTRIBUTION_STATUSES = new Set<OpenSourceContribution["status"]>([
   "review",
 ]);
 const GITHUB_PR_URL_PATTERN = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+$/;
-const CAPABILITY_NODE_ORDER = [
-  "agent-context",
-  "context-graph",
-  "semantic-validation",
-  "rule-decision",
-  "auditable-execution",
+const ARCHITECTURE_PILLAR_ORDER = [
+  "context-management",
+  "knowledge-modeling",
+  "deterministic-reasoning",
+  "ontology-management",
+  "decision-intelligence",
+  "end-to-end-traceability",
 ] as const;
-const CONTRIBUTION_DOMAIN_ORDER = [
-  "graph-data-adapters",
-  "constraint-explanation",
-  "temporal-stability",
-  "rule-query-reasoning",
-  "decision-model-contracts",
-  "execution-pipeline",
-] as const;
+const CONTRIBUTION_KINDS = new Set<OpenSourceContribution["kind"]>(["feat", "fix"]);
+const SCALE_PATTERN = /^\d+\+\/\d+-$/;
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -348,8 +338,9 @@ export function validateSiteContent(input: unknown): ValidationResult {
         ["platform", "rank", "period", "evidence"].forEach((field) => checkText(value[field], `openSource.honors[${index}].${field}`));
       });
     }
-    if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 13) {
-      errors.push("openSource.contributions must contain exactly 13 entries");
+    checkStringArray(openSource.highlights, "openSource.highlights", 1);
+    if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 15) {
+      errors.push("openSource.contributions must contain exactly 15 entries");
     } else {
       const seenPrNumbers = new Set<number>();
       let mergedCount = 0;
@@ -368,17 +359,23 @@ export function validateSiteContent(input: unknown): ValidationResult {
         } else if (value.status === "merged") {
           mergedCount += 1;
         }
+        if (typeof value.kind !== "string" || !CONTRIBUTION_KINDS.has(value.kind as OpenSourceContribution["kind"])) {
+          errors.push(`openSource.contributions[${index}].kind must be feat or fix`);
+        }
+        if (typeof value.scale !== "string" || !SCALE_PATTERN.test(value.scale)) {
+          errors.push(`openSource.contributions[${index}].scale must match the NNN+/NNN- format`);
+        }
         checkText(value.summary, `openSource.contributions[${index}].summary`);
         const url = checkText(value.url, `openSource.contributions[${index}].url`);
         if (url && !GITHUB_PR_URL_PATTERN.test(url)) {
           errors.push(`openSource.contributions[${index}].url must be an HTTPS GitHub PR URL`);
         }
       });
-      if (mergedCount !== 9) {
-        errors.push("openSource.contributions must contain exactly 9 merged entries");
+      if (mergedCount !== 10) {
+        errors.push("openSource.contributions must contain exactly 10 merged entries");
       }
     }
-    errors.push(...validateCapabilityMap(openSource.graphNodes, openSource.contributionDomains, openSource.contributions));
+    errors.push(...validateCapabilityMap(openSource.architecturePillars, openSource.contributions));
     checkHttpsUrl(openSource.repositoryUrl, "openSource.repositoryUrl");
     const articlePath = checkText(openSource.articlePath, "openSource.articlePath");
     if (articlePath && !/^\/blog\/.+/.test(articlePath)) errors.push("openSource.articlePath must be a /blog/ path");
@@ -437,118 +434,115 @@ export function validateSiteContent(input: unknown): ValidationResult {
 }
 
 export function validateCapabilityMap(
-  graphNodes: unknown,
-  contributionDomains: unknown,
+  architecturePillars: unknown,
   contributions: unknown,
 ): string[] {
   const errors: string[] = [];
-  const checkCapabilityRecord = (value: unknown, path: string): UnknownRecord | undefined => {
-    if (!isRecord(value)) {
+  const checkRecord = (value: unknown, path: string): Record<string, unknown> | undefined => {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
       errors.push(`${path} must be an object`);
       return undefined;
     }
-    return value;
+    return value as Record<string, unknown>;
   };
-  const checkCapabilityText = (value: unknown, path: string): string | undefined => {
+  const checkText = (value: unknown, path: string): string | undefined => {
     if (typeof value !== "string" || value.trim() === "") {
       errors.push(`${path} must be a non-empty string`);
       return undefined;
     }
     return value;
   };
+  const scaleValue = (scale: string): number =>
+    scale.split("/").reduce((sum, part) => sum + Number(part.replace(/\D/g, "")), 0);
 
-  const validNodeIds = new Set<string>();
-  if (!Array.isArray(graphNodes)) {
-    errors.push("openSource.graphNodes must be an array");
-  } else {
-    const orderedNodeIds: string[] = [];
-    graphNodes.forEach((node, index) => {
-      const value = checkCapabilityRecord(node, `openSource.graphNodes[${index}]`);
-      if (!value) return;
-      const id = checkCapabilityText(value.id, `openSource.graphNodes[${index}].id`);
-      if (id === undefined) return;
-      if (validNodeIds.has(id)) {
-        errors.push("openSource.graphNodes must not contain duplicate ids");
-      } else {
-        validNodeIds.add(id);
-      }
-      orderedNodeIds.push(id);
-      checkCapabilityText(value.title, `openSource.graphNodes[${index}].title`);
-      checkCapabilityText(value.description, `openSource.graphNodes[${index}].description`);
-    });
-    if (
-      orderedNodeIds.length !== CAPABILITY_NODE_ORDER.length ||
-      orderedNodeIds.some((id, index) => id !== CAPABILITY_NODE_ORDER[index])
-    ) {
-      errors.push("openSource.graphNodes must use the required ordered ids");
-    }
-  }
-
-  const validPrNumbers = new Set<number>();
+  // 1. 收集 PR 编号与 merged 排序合规
+  const mergedOrder: Array<{ number: number; kind: string; scale: number }> = [];
   if (!Array.isArray(contributions)) {
     errors.push("openSource.contributions must be an array");
   } else {
     contributions.forEach((contribution, index) => {
-      const value = checkCapabilityRecord(contribution, `openSource.contributions[${index}]`);
+      const value = checkRecord(contribution, `openSource.contributions[${index}]`);
       if (!value) return;
-      if (typeof value.number === "number" && Number.isInteger(value.number) && value.number > 0) {
-        validPrNumbers.add(value.number);
-      }
-    });
-  }
-
-  const mappedPrNumbers = new Set<number>();
-  if (!Array.isArray(contributionDomains)) {
-    errors.push("openSource.contributionDomains must be an array");
-  } else {
-    if (contributionDomains.length !== CONTRIBUTION_DOMAIN_ORDER.length) {
-      errors.push("openSource.contributionDomains must contain exactly 6 entries");
-    }
-    const orderedDomainIds: string[] = [];
-    contributionDomains.forEach((domain, index) => {
-      const value = checkCapabilityRecord(domain, `openSource.contributionDomains[${index}]`);
-      if (!value) return;
-      const id = checkCapabilityText(value.id, `openSource.contributionDomains[${index}].id`);
-      if (id !== undefined) orderedDomainIds.push(id);
-      checkCapabilityText(value.title, `openSource.contributionDomains[${index}].title`);
-      checkCapabilityText(value.outcome, `openSource.contributionDomains[${index}].outcome`);
-      if (!Array.isArray(value.nodeIds)) {
-        errors.push(`openSource.contributionDomains[${index}].nodeIds must be an array`);
-      } else {
-        value.nodeIds.forEach((nodeId, nodeIndex) => {
-          if (typeof nodeId === "string" && validNodeIds.has(nodeId)) return;
-          errors.push(
-            `openSource.contributionDomains[${index}].nodeIds[${nodeIndex}] must reference an existing graph node`,
-          );
+      if (value.status === "merged") {
+        mergedOrder.push({
+          number: value.number as number,
+          kind: value.kind as string,
+          scale: scaleValue(String(value.scale ?? "0+/0-")),
         });
       }
+    });
+    const rank = (kind: string) => (kind === "feat" ? 0 : 1);
+    for (let i = 1; i < mergedOrder.length; i += 1) {
+      const prev = mergedOrder[i - 1];
+      const curr = mergedOrder[i];
+      const outOfOrder =
+        rank(prev.kind) > rank(curr.kind) ||
+        (rank(prev.kind) === rank(curr.kind) && prev.scale < curr.scale);
+      if (outOfOrder) {
+        errors.push("openSource.contributions merged entries must be ordered: feat before fix, then descending scale");
+        break;
+      }
+    }
+  }
+
+  // 2. 支柱校验
+  const validPrNumbers = new Set<number>(
+    Array.isArray(contributions)
+      ? contributions
+          .map((c) => (typeof (c as Record<string, unknown>).number === "number" ? (c as Record<string, unknown>).number as number : undefined))
+          .filter((n): n is number => n !== undefined)
+      : [],
+  );
+
+  const mappedPrNumbers = new Set<number>();
+  const orderedPillarIds: string[] = [];
+  const seenPillarIds = new Set<string>();
+  if (!Array.isArray(architecturePillars)) {
+    errors.push("openSource.architecturePillars must be an array");
+  } else {
+    if (architecturePillars.length !== ARCHITECTURE_PILLAR_ORDER.length) {
+      errors.push("openSource.architecturePillars must contain exactly 6 entries");
+    }
+    architecturePillars.forEach((pillar, index) => {
+      const value = checkRecord(pillar, `openSource.architecturePillars[${index}]`);
+      if (!value) return;
+      const id = checkText(value.id, `openSource.architecturePillars[${index}].id`);
+      if (id !== undefined) {
+        orderedPillarIds.push(id);
+        if (seenPillarIds.has(id)) errors.push("openSource.architecturePillars must not contain duplicate ids");
+        else seenPillarIds.add(id);
+      }
+      checkText(value.title, `openSource.architecturePillars[${index}].title`);
+      checkText(value.summary, `openSource.architecturePillars[${index}].summary`);
       if (!Array.isArray(value.prNumbers)) {
-        errors.push(`openSource.contributionDomains[${index}].prNumbers must be an array`);
+        errors.push(`openSource.architecturePillars[${index}].prNumbers must be an array`);
       } else {
         value.prNumbers.forEach((prNumber, prIndex) => {
           if (typeof prNumber === "number" && validPrNumbers.has(prNumber)) {
             mappedPrNumbers.add(prNumber);
             return;
           }
-          errors.push(
-            `openSource.contributionDomains[${index}].prNumbers[${prIndex}] must reference an existing contribution`,
-          );
+          errors.push(`openSource.architecturePillars[${index}].prNumbers[${prIndex}] must reference an existing contribution`);
         });
       }
     });
     if (
-      orderedDomainIds.length !== CONTRIBUTION_DOMAIN_ORDER.length ||
-      orderedDomainIds.some((id, index) => id !== CONTRIBUTION_DOMAIN_ORDER[index])
+      orderedPillarIds.length !== ARCHITECTURE_PILLAR_ORDER.length ||
+      orderedPillarIds.some((id, index) => id !== ARCHITECTURE_PILLAR_ORDER[index])
     ) {
-      errors.push("openSource.contributionDomains must use the required ordered ids");
+      errors.push("openSource.architecturePillars must use the required ordered ids");
     }
   }
 
-  validPrNumbers.forEach((prNumber) => {
-    if (!mappedPrNumbers.has(prNumber)) {
-      errors.push(`openSource.contributions PR #${prNumber} must belong to at least one contribution domain`);
-    }
-  });
+  // 3. merged PR 归属覆盖
+  if (Array.isArray(contributions)) {
+    contributions.forEach((contribution) => {
+      const value = contribution as Record<string, unknown>;
+      if (value.status === "merged" && !mappedPrNumbers.has(value.number as number)) {
+        errors.push(`openSource.contributions PR #${value.number} must belong to at least one architecture pillar`);
+      }
+    });
+  }
 
   return errors;
 }
