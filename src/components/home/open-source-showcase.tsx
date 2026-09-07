@@ -26,7 +26,7 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
 
       <p className="open-source-showcase-background">{project.background}</p>
 
-      <section aria-label="Semantica 核心架构" className="arch-map">
+      <section aria-label="Semantica 核心架构" className="arch-diagram">
         <div className="arch-layers">
           {project.architecture.layers.map((layer) => (
             <div className="arch-layer" key={layer.id}>
@@ -54,7 +54,7 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
       <ul aria-label="Semantica 已合并贡献" className="pr-list">
         {merged.map((contribution) => (
           <li key={contribution.number}>
-            <a href={contribution.url} rel="noreferrer" target="_blank">{`PR #${contribution.number} · ${contribution.title}`}</a>
+            <a className="pr-link" href={contribution.url} rel="noreferrer" target="_blank">{`PR #${contribution.number} · ${contribution.title}`}</a>
           </li>
         ))}
       </ul>
