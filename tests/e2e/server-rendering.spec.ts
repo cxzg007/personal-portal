@@ -16,12 +16,9 @@ test("core recruiting content is server rendered", async ({ page }) => {
   await expect(page.getByRole("link", { name: /简历/ })).toHaveCount(0);
 });
 
-test("server HTML keeps the complete Semantica map", async ({ page }) => {
+test("server HTML keeps the complete Semantica architecture diagram", async ({ page }) => {
   await page.goto("/");
-  const map = page.getByRole("region", { name: "Semantica 架构与合并贡献" });
-  await expectSemanticaMapComplete(map);
-  await expect(map.getByRole("button", { name: /^架构支柱/ })).toHaveCount(6);
-  await expect(map.getByTestId("merged-contribution")).toHaveCount(10);
-  await expect(map.getByRole("link", { name: /^PR #/ })).toHaveCount(10);
-  await expect(map.getByRole("link", { name: /PR #1226/ })).toHaveAttribute("href", /\/pull\/1226$/);
+  const showcase = page.locator("main > section#open-source .open-source-showcase");
+  await expectSemanticaMapComplete(showcase);
+  await expect(showcase.getByRole("button")).toHaveCount(0);
 });

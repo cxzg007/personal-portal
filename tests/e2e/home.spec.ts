@@ -78,8 +78,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
-  await expect(openSource.getByText(/截至 2026-09-04：10 个贡献已合并。/)).toBeVisible();
-  await expect(openSource.locator(".open-source-stars").filter({ hasText: /GitHub Stars/ })).toBeVisible();
+  await expect(openSource.getByText(/截至 2026-09-04：10 个贡献已合并/)).toBeVisible();
   await expect(openSource.getByRole("link", { name: "Semantica GitHub repository" })).toHaveAttribute(
     "href",
     "https://github.com/semantica-agi/semantica",
@@ -88,12 +87,6 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
     "href",
     "/blog/first-agent-system",
   );
-  await expect(
-    openSource.getByRole("img", { name: "GitHub Trending #1 Repository of the Day" }),
-  ).toBeVisible();
-  await expect(
-    openSource.getByRole("img", { name: "Trendshift · Python #3 Repository of the Week" }),
-  ).toBeVisible();
 
   const contact = page.locator("main > section#contact");
   const email = contact.getByRole("link", { name: "jiangjunjie_tj@foxmail.com" });
@@ -186,41 +179,33 @@ test("open source showcase exposes ten merged PR links", async ({ page }) => {
   await page.goto("/");
 
   const openSource = page.locator("main > section#open-source");
-  await expect(openSource.getByRole("list", { name: "Semantica 项目亮点" })).toBeVisible();
+  await expect(openSource.getByRole("list", { name: "Semantica 已合并贡献" })).toBeVisible();
   await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(10);
-  await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(10);
+  await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(0);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(0);
-  await expect(openSource.getByLabel("Semantica 架构支柱")).toBeVisible();
+  await expect(openSource.getByRole("button")).toHaveCount(0);
   await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
 });
 
-test("Semantica map preserves click priority and DOM order", async ({ page }) => {
+test("Semantica architecture renders four static layers in DOM order", async ({ page }) => {
   await page.goto("/");
-  const map = page.getByRole("region", { name: "Semantica 架构与合并贡献" });
-  await expectSemanticaMapComplete(map);
-  const reasoning = map.getByRole("button", { name: /^架构支柱：确定性推理/ });
-  const traceability = map.getByRole("button", { name: /^架构支柱：端到端溯源/ });
-  const reasoningItem = map.locator('[data-testid="merged-contribution"][data-pr-number="1096"]');
-  const traceabilityItem = map.locator('[data-testid="merged-contribution"][data-pr-number="1226"]');
-  const links = map.getByRole("link", { name: /^PR #/ });
-  const before = await links.allTextContents();
 
-  await traceability.hover();
-  await expect(traceabilityItem).toHaveAttribute("data-emphasis", "active");
-  await expect(reasoningItem).toHaveAttribute("data-emphasis", "muted");
-  await page.mouse.move(0, 0);
-  await expect(traceabilityItem).toHaveAttribute("data-emphasis", "default");
+  const showcase = page.locator("main > section#open-source .open-source-showcase");
+  await expectSemanticaMapComplete(showcase);
 
-  await reasoning.click();
-  await traceability.hover();
-  await expect(reasoning).toHaveAttribute("aria-pressed", "true");
-  await expect(reasoningItem).toHaveAttribute("data-emphasis", "active");
-  await expect(traceabilityItem).toHaveAttribute("data-emphasis", "muted");
-  await expect(links).toHaveCount(10);
-  expect(await links.allTextContents()).toEqual(before);
+  const map = showcase.getByRole("region", { name: "Semantica 核心架构" });
+  const layerTitles = map.locator(".arch-layer-title");
+  expect(await layerTitles.evaluateAll((titles) => titles.map(({ textContent }) => textContent))).toEqual([
+    "数据与知识层",
+    "推理层",
+    "治理层",
+    "决策层",
+  ]);
 
-  await reasoning.click();
-  await expect(reasoning).toHaveAttribute("aria-pressed", "false");
+  // The showcase stays fully static: no pillars, no toggles, no test hooks.
+  await expect(showcase.getByRole("button")).toHaveCount(0);
+  await expect(showcase.getByTestId("open-source-spotlight")).toHaveCount(0);
+  await expect(showcase.getByTestId("merged-contribution")).toHaveCount(0);
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {

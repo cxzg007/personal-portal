@@ -132,18 +132,17 @@ for (const viewport of viewports) {
     await expectHorizontallyContained(systems.locator("#system-panel-ontology-agent-platform"));
 
     const openSource = page.locator("main > section#open-source");
-    await expectHorizontallyContained(openSource.locator(".open-source-showcase"));
-    const map = openSource.getByRole("region", { name: "Semantica 架构与合并贡献" });
-    const pillars = map.getByRole("button", { name: /^架构支柱/ });
-    await expectSemanticaMapComplete(map);
+    const showcase = openSource.locator(".open-source-showcase");
+    await expectHorizontallyContained(showcase);
+    const map = openSource.getByRole("region", { name: "Semantica 核心架构" });
+    await expectSemanticaMapComplete(showcase);
     await expectHorizontallyContained(map);
-    await expect(pillars).toHaveCount(6);
-    await expect(map.getByTestId("merged-contribution")).toHaveCount(10);
-    await expect(map.getByRole("link", { name: /^PR #/ })).toHaveCount(10);
+    await expectHorizontallyContained(openSource.getByRole("list", { name: "Semantica 已合并贡献" }));
 
     if (viewport.width === 390) {
+      const layers = map.locator(".arch-layer");
       const boxes = await Promise.all(
-        (await pillars.all()).map((node) => node.boundingBox()),
+        (await layers.all()).map((node) => node.boundingBox()),
       );
       expect(boxes.every((box) => box !== null)).toBe(true);
       for (let index = 1; index < boxes.length; index += 1) {

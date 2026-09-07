@@ -66,17 +66,6 @@ test("desktop keyboard order covers skip navigation, seven nav links, hero actio
     hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com", exact: true }),
     hero.getByRole("link", { name: "GitHub", exact: true }),
     page.locator("#system-tab-ontology-agent-platform"),
-    ...[
-      "上下文管理",
-      "知识建模",
-      "确定性推理",
-      "本体治理",
-      "决策智能",
-      "端到端溯源",
-    ].map((name) =>
-      openSource.getByRole("button", { name: `架构支柱：${name}`, exact: false }),
-    ),
-    openSource.getByRole("button", { name: "查看全部贡献", exact: true }),
     ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((index) =>
       openSource.getByRole("link", { name: /^PR #/ }).nth(index),
     ),
@@ -185,35 +174,13 @@ test("reduced motion preserves content, removes Canvas, and sets the static prof
   await expect(page.locator("main > section#internships")).toBeVisible();
 });
 
-test("Semantica architecture map supports focus priority, Space, and Escape", async ({ page }) => {
+test("Semantica architecture showcase stays static and PR links keep visible focus", async ({ page }) => {
   await page.goto("/");
-  const map = page.getByRole("region", { name: "Semantica 架构与合并贡献" });
-  const reasoning = map.getByRole("button", { name: /^架构支柱：确定性推理/ });
-  const context = map.getByRole("button", { name: /^架构支柱：上下文管理/ });
-  const reasoningItem = map.locator('[data-testid="merged-contribution"][data-pr-number="1096"]');
-  const contextItem = map.locator('[data-testid="merged-contribution"][data-pr-number="1081"]');
 
-  await reasoning.focus();
-  await expect(reasoningItem).toHaveAttribute("data-emphasis", "active");
-  await context.hover();
-  await expect(reasoningItem).toHaveAttribute("data-emphasis", "active");
-  await expect(contextItem).toHaveAttribute("data-emphasis", "muted");
+  const openSource = page.locator("main > section#open-source");
+  await expect(openSource.getByRole("button")).toHaveCount(0);
 
-  await reasoning.evaluate((element) => (element as HTMLButtonElement).blur());
-  await expect(contextItem).toHaveAttribute("data-emphasis", "active");
-  await page.mouse.move(0, 0);
-  await expect(contextItem).toHaveAttribute("data-emphasis", "default");
-
-  await reasoning.focus();
-  await page.keyboard.press("Space");
-  await expect(reasoning).toHaveAttribute("aria-pressed", "true");
-  await expectVisibleFocus(reasoning);
-  await context.focus();
-  await expect(reasoningItem).toHaveAttribute("data-emphasis", "active");
-  await expect(contextItem).toHaveAttribute("data-emphasis", "muted");
-
-  await page.keyboard.press("Escape");
-  await expect(reasoning).toHaveAttribute("aria-pressed", "false");
-  await expect(map.getByTestId("open-source-spotlight")).toHaveAttribute("data-selected-pillar", "all");
-  await expect(contextItem).toHaveAttribute("data-emphasis", "active");
+  const firstPrLink = openSource.getByRole("link", { name: /^PR #/ }).first();
+  await firstPrLink.focus();
+  await expectVisibleFocus(firstPrLink);
 });

@@ -129,14 +129,9 @@ test("article detail visual", async ({ page }) => {
 
 test("Semantica architecture map remains stable", async ({ page }) => {
   await prepareStablePage(page, "/");
-  const map = page.getByRole("region", { name: "Semantica 架构与合并贡献" });
+  const map = page.getByRole("region", { name: "Semantica 核心架构" });
   await expect(map).toBeVisible();
   await expect(map).toHaveScreenshot("semantica-architecture-map.png", {
-    animations: "disabled",
-  });
-
-  await map.getByRole("button", { name: /^架构支柱：确定性推理/ }).click();
-  await expect(map).toHaveScreenshot("semantica-deterministic-reasoning.png", {
     animations: "disabled",
   });
 });

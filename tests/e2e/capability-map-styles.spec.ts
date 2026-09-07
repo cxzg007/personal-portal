@@ -1,33 +1,50 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { expectNoRotation } from "./helpers/css";
 
-const columnCount = async (page: import("@playwright/test").Page) => {
-  const value = await page.getByLabel("Semantica 架构支柱").evaluate(
-    (element) => getComputedStyle(element).gridTemplateColumns,
-  );
-  return value.split(" ").filter(Boolean).length;
+const layerColumnCount = async (page: Page) => {
+  const value = await page
+    .getByRole("region", { name: "Semantica 核心架构" })
+    .locator(".arch-layer")
+    .first()
+    .evaluate((element) => getComputedStyle(element).gridTemplateColumns);
+  return value === "none" ? 1 : value.split(" ").filter(Boolean).length;
 };
 
-test("capability map uses six, three, and one column without unreadable muting", async ({ page }) => {
-  for (const [width, expectedColumns] of [[1280, 6], [768, 3], [390, 1]] as const) {
+test("architecture diagram stacks on mobile and forms a two-column desktop layout", async ({ page }) => {
+  const map = page.getByRole("region", { name: "Semantica 核心架构" });
+
+  // Mobile: capabilities stack under their layer title and the spanning
+  // traceability rail stays a horizontal pill.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await expect(map).toBeVisible();
+  expect(await layerColumnCount(page)).toBe(1);
+  expect(
+    await map.locator(".arch-spanning").evaluate((element) => getComputedStyle(element).writingMode),
+  ).toBe("horizontal-tb");
+
+  // Tablet and desktop: two-column layer bands, a vertical spanning rail, and
+  // connectors between consecutive layers only.
+  for (const width of [768, 1280]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/");
-    await expect(page.getByLabel("Semantica 架构支柱")).toBeVisible();
-    expect(await columnCount(page)).toBe(expectedColumns);
-  }
+    await expect(map).toBeVisible();
+    expect(await layerColumnCount(page)).toBe(2);
+    expect(
+      await map.locator(".arch-spanning").evaluate((element) => getComputedStyle(element).writingMode),
+    ).toBe("vertical-rl");
 
-  await page.setViewportSize({ width: 1280, height: 1000 });
-  await page.goto("/");
-  const map = page.getByRole("region", { name: "Semantica 架构与合并贡献" });
-  await map.getByRole("button", { name: /^架构支柱：确定性推理/ }).click();
-  const domainGraph = map.locator('[data-testid="merged-contribution"][data-pr-number="1081"]');
-  const readOpacity = () => domainGraph.evaluate((element) => Number(getComputedStyle(element).opacity));
-  // The 240ms opacity transition may not have rendered its first frame right
-  // after the click, so poll until the muted state settles below 1.
-  await expect.poll(readOpacity, { timeout: 5_000 }).toBeLessThan(1);
-  const opacity = await readOpacity();
-  expect(opacity).toBeGreaterThanOrEqual(0.65);
-  expect(opacity).toBeLessThan(1);
+    const layers = map.locator(".arch-layer");
+    for (let index = 0; index < 3; index += 1) {
+      const connector = await layers
+        .nth(index)
+        .evaluate((element) => getComputedStyle(element, "::after").content);
+      expect(connector).not.toBe("none");
+    }
+    expect(
+      await layers.nth(3).evaluate((element) => getComputedStyle(element, "::after").content),
+    ).toBe("none");
+  }
 });
 
 test("content cards stay horizontal and pointer hover moves at most two pixels", async ({ page }) => {

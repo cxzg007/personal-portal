@@ -1182,6 +1182,13 @@ html[data-profile-motion="static"] .profile-reveal {
     transition-duration: 0s !important;
   }
 
+  .arch-layer,
+  .arch-capability,
+  .pr-link {
+    /* explicit 0s beats the global 0.01ms !important fallback */
+    transition-duration: 0s !important;
+  }
+
   .sticky-internship-card,
   .sticky-internship-card[data-stack-progress="0"],
   .sticky-internship-card[data-stack-progress="1"],
