@@ -31,7 +31,8 @@ describe("WritingStage", () => {
   it("renders a single static article stage without carousel controls", () => {
     render(<WritingStage posts={[post(1)]} />);
 
-    expect(screen.getByRole("heading", { name: "文章 1" })).toBeVisible();
+    expect(screen.getByRole("heading", { level: 3, name: "文章 1" })).toBeVisible();
+    expect(screen.queryByRole("heading", { level: 2 })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "上一篇文章" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "下一篇文章" })).not.toBeInTheDocument();
     expect(screen.getByText("第 1 篇文章描述")).toBeVisible();

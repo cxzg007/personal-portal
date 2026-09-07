@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 import { expectNoRotation } from "./helpers/css";
 
-const NAV_SECTIONS = ["info", "internships", "systems", "open-source", "writing", "contact"];
+// Task 1 of the recruiting-conversion plan removed the `#info` stage and its
+// navigation entry; this list mirrors the remaining in-page sections.
+const NAV_SECTIONS = ["internships", "systems", "open-source", "writing", "contact"];
 
 test("reduced motion preference keeps the layout static without hiding content", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -26,7 +28,7 @@ test("reduced motion preference keeps the layout static without hiding content",
   expect(transitionDurations.every((duration) => duration === "0s")).toBe(true);
 
   const cards = page.locator(
-    ".profile-info-facts, .sticky-internship-card, .system-project-panel, .open-source-showcase, #writing article, #contact > section, .blog-card",
+    ".profile-info-facts, .sticky-internship-card, .system-project-panel, .open-source-showcase, #writing article, #contact > div, .blog-card",
   );
   await expectNoRotation(cards);
   const transformsBeforeHover = await cards.evaluateAll((elements) =>

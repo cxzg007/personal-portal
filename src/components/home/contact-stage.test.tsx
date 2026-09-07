@@ -10,12 +10,10 @@ const { profile } = loadSiteContent();
 afterEach(cleanup);
 
 describe("ContactStage", () => {
-  it("renders the exact recruiting heading and status", () => {
+  it("renders the recruiting status without duplicating the section heading", () => {
     render(<ContactStage profile={profile} />);
 
-    expect(
-      screen.getByRole("heading", { name: "Build reliable agent systems together." }),
-    ).toBeVisible();
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
     expect(screen.getByText(profile.recruitingStatus)).toBeVisible();
   });
 
@@ -30,6 +28,7 @@ describe("ContactStage", () => {
     expect(github).toHaveAttribute("target", "_blank");
     expect(github).toHaveAttribute("rel", "noreferrer");
 
-    expect(screen.queryByRole("link", { name: "下载简历 PDF" })).not.toBeInTheDocument();
+    const pdf = screen.getByRole("link", { name: "下载简历 PDF" });
+    expect(pdf).toHaveAttribute("href", "/resume.pdf");
   });
 });

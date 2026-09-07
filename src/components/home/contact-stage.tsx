@@ -2,8 +2,7 @@ import type { SiteContent } from "@/content/schema";
 
 export function ContactStage({ profile }: { profile: SiteContent["profile"] }) {
   return (
-    <section aria-labelledby="contact-stage-title">
-      <h2 id="contact-stage-title">Build reliable agent systems together.</h2>
+    <div>
       <p>{profile.recruitingStatus}</p>
       <ul>
         <li>
@@ -14,7 +13,10 @@ export function ContactStage({ profile }: { profile: SiteContent["profile"] }) {
             GitHub
           </a>
         </li>
+        <li>
+          <a href="/resume.pdf">下载简历 PDF</a>
+        </li>
       </ul>
-    </section>
+    </div>
   );
 }

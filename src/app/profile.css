@@ -954,7 +954,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   transition: transform 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
-.profile-shell #writing article h2 {
+.profile-shell #writing article h3 {
   margin: 0;
   font-size: clamp(1.3rem, 2vw, 1.65rem);
 }
@@ -989,9 +989,9 @@ html[data-profile-motion="static"] .sticky-internship-card {
   text-underline-offset: 4px;
 }
 
-/* --- contact stage (component renders unclassed section markup) --- */
+/* --- contact stage (component renders an unclassed div container) --- */
 
-.profile-shell #contact > section {
+.profile-shell #contact > div {
   display: grid;
   justify-items: center;
   gap: 1.4rem;
@@ -1003,17 +1003,12 @@ html[data-profile-motion="static"] .sticky-internship-card {
   transition: transform 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
-.profile-shell #contact > section h2 {
-  margin: 0;
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
-}
-
-.profile-shell #contact > section p {
+.profile-shell #contact > div p {
   margin: 0;
   color: var(--profile-muted);
 }
 
-.profile-shell #contact > section ul {
+.profile-shell #contact > div ul {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1023,7 +1018,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   list-style: none;
 }
 
-.profile-shell #contact > section a {
+.profile-shell #contact > div a {
   display: inline-flex;
   padding: 0.7rem 1.5rem;
   border: 1px solid rgb(56 45 34 / 40%);
@@ -1033,7 +1028,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   transition: border-color 480ms ease, transform 480ms ease;
 }
 
-.profile-shell #contact > section a:hover {
+.profile-shell #contact > div a:hover {
   border-color: var(--profile-accent);
   transform: translateY(-2px);
 }
@@ -1044,7 +1039,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   .system-project-panel:hover,
   .open-source-showcase:hover,
   .profile-shell #writing article:hover,
-  .profile-shell #contact > section:hover {
+  .profile-shell #contact > div:hover {
     transform: translateY(-2px);
     box-shadow: 0 22px 56px rgb(56 45 34 / 18%);
   }
@@ -1192,13 +1187,13 @@ html[data-profile-motion="static"] .profile-reveal {
   }
 
   .profile-cta,
-  .profile-shell #contact > section a,
+  .profile-shell #contact > div a,
   .system-project-tab {
     transition: none;
   }
 
   .profile-cta:hover,
-  .profile-shell #contact > section a:hover {
+  .profile-shell #contact > div a:hover {
     transform: none;
   }
 
@@ -1206,7 +1201,7 @@ html[data-profile-motion="static"] .profile-reveal {
   .system-project-panel,
   .open-source-showcase,
   .profile-shell #writing article,
-  .profile-shell #contact > section,
+  .profile-shell #contact > div,
   .sticky-internship-card[data-card-index] {
     transition: none;
   }
@@ -1214,7 +1209,7 @@ html[data-profile-motion="static"] .profile-reveal {
   .system-project-panel:hover,
   .open-source-showcase:hover,
   .profile-shell #writing article:hover,
-  .profile-shell #contact > section:hover {
+  .profile-shell #contact > div:hover {
     transform: none;
   }
 
@@ -1224,5 +1219,8 @@ html[data-profile-motion="static"] .profile-reveal {
 
   .engineering-journey li {
     opacity: 1;
+    /* stagger delays (0.08s/0.16s at >=1440px) would still postpone the
+       0.01ms fallback transition, so clear them explicitly */
+    transition-delay: 0s !important;
   }
 }

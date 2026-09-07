@@ -13,7 +13,7 @@ export function WritingStage({ posts }: { posts: PostMeta[] }) {
     return (
       <section aria-labelledby="writing-stage-title">
         <article>
-          <h2 id="writing-stage-title">{post.title}</h2>
+          <h3 id="writing-stage-title">{post.title}</h3>
           <p>{post.description}</p>
           <ul>
             {post.tags.map((tag) => (
