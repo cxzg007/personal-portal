@@ -2,7 +2,6 @@ import { ContactStage } from "@/components/home/contact-stage";
 import { OpenSourceShowcase } from "@/components/home/open-source-showcase";
 import { PageMotionController } from "@/components/home/page-motion-controller";
 import { ProfileHero } from "@/components/home/profile-hero";
-import { ProfileInfo } from "@/components/home/profile-info";
 import { StickyInternshipStack } from "@/components/home/sticky-internship-stack";
 import { SystemProjectTabs } from "@/components/home/system-project-tabs";
 import { WritingStage } from "@/components/home/writing-stage";
@@ -56,10 +55,6 @@ export default async function HomePage() {
           type="application/ld+json"
         />
         <ProfileHero profile={content.profile} />
-        <section aria-labelledby="info-heading" className="profile-stage profile-stage--cream" id="info">
-          <h2 className="profile-reveal" id="info-heading">个人信息</h2>
-          <ProfileInfo about={content.about} profile={content.profile} />
-        </section>
         <section aria-labelledby="internships-heading" className="profile-stage profile-stage--sage" id="internships">
           <h2 className="profile-reveal" id="internships-heading">实习内容落在真实系统里。</h2>
           <StickyInternshipStack internships={content.internships} />

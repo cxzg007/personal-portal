@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const navigation = [
-  { label: "信息", href: "#info" },
   { label: "实习", href: "#internships" },
   { label: "系统", href: "#systems" },
   { label: "开源", href: "#open-source" },

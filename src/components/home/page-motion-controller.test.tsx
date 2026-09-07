@@ -109,7 +109,6 @@ function mockRect(element: Element, rect: Partial<DOMRect>) {
 const pageFixture = `
   <div class="profile-reveal"></div>
   <section id="profile"></section>
-  <section id="info"></section>
   <section id="internships"></section>
   <article class="sticky-internship-card"></article>
 `;
@@ -125,7 +124,6 @@ function mountEnhancedPage() {
     height: 800,
     width: 1_000,
   });
-  mockRect(document.querySelector("#info")!, { top: 100, bottom: 300, height: 200, width: 1_000 });
   mockRect(document.querySelector("#internships")!, {
     top: 400,
     bottom: 900,
@@ -252,11 +250,7 @@ describe("page motion controller", () => {
     stubMatchMedia({});
     mountEnhancedPage();
 
-    expect(document.documentElement).toHaveAttribute("data-active-section", "info");
-    expect(document.querySelector('a[data-nav-section="info"]')).toHaveAttribute(
-      "aria-current",
-      "location",
-    );
+    expect(document.documentElement).toHaveAttribute("data-active-section", "profile");
     expect(document.querySelector('a[data-nav-section="internships"]')).not.toHaveAttribute(
       "aria-current",
     );
@@ -279,7 +273,6 @@ describe("page motion controller", () => {
       "2",
     );
 
-    mockRect(document.querySelector("#info")!, { top: 400, bottom: 600 });
     mockRect(document.querySelector("#internships")!, { top: 100, bottom: 300 });
     dispatchScroll();
     expect(document.documentElement).toHaveAttribute("data-active-section", "internships");
@@ -287,7 +280,7 @@ describe("page motion controller", () => {
       "aria-current",
       "location",
     );
-    expect(document.querySelector('a[data-nav-section="info"]')).not.toHaveAttribute(
+    expect(document.querySelector('a[data-nav-section="contact"]')).not.toHaveAttribute(
       "aria-current",
     );
   });
@@ -392,9 +385,10 @@ describe("page motion controller", () => {
 
     act(() => media.set("reduced", false));
     expect(document.documentElement).toHaveAttribute("data-profile-motion", "enhanced");
+    mockRect(document.querySelector("#internships")!, { top: 100, bottom: 300 });
     dispatchScroll();
-    expect(document.documentElement).toHaveAttribute("data-active-section", "info");
-    expect(document.querySelector('a[data-nav-section="info"]')).toHaveAttribute(
+    expect(document.documentElement).toHaveAttribute("data-active-section", "internships");
+    expect(document.querySelector('a[data-nav-section="internships"]')).toHaveAttribute(
       "aria-current",
       "location",
     );
@@ -431,7 +425,6 @@ describe("page motion controller", () => {
     render(<Header />);
 
     const expected: Record<string, string> = {
-      "#info": "info",
       "#internships": "internships",
       "#systems": "systems",
       "#open-source": "open-source",
@@ -446,7 +439,7 @@ describe("page motion controller", () => {
       expect(link).not.toHaveAttribute("aria-current");
     }
 
-    expect(document.querySelectorAll("a[data-nav-section]")).toHaveLength(6);
+    expect(document.querySelectorAll("a[data-nav-section]")).toHaveLength(5);
     expect(document.querySelector('a[href="https://github.com/cxzg007"]')).not.toHaveAttribute(
       "data-nav-section",
     );

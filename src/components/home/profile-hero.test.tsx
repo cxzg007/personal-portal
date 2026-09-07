@@ -13,10 +13,12 @@ describe("profile hero", () => {
   it("renders the identity headline, real name, primary actions, and growth path", () => {
     render(<ProfileHero profile={profile} />);
 
-    expect(screen.getByRole("heading", { level: 1, name: "cxzg007 Profile" })).toBeVisible();
-    expect(screen.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
+    expect(screen.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+    expect(screen.queryByText("cxzg007 Profile")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "查看实习" })).toHaveAttribute("href", "#internships");
-    expect(screen.queryByRole("link", { name: "下载简历" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "下载简历 PDF" })).toHaveAttribute("href", "/resume.pdf");
+    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", profile.github);
+    expect(screen.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
     expect(screen.getByText("通信工程 → 后端系统 → Agent / 知识图谱 → 可靠 AI 工程")).toBeVisible();
   });
 

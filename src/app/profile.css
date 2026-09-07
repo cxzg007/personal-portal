@@ -27,7 +27,6 @@
 
 .profile-hero {
   position: relative;
-  min-height: 71.25rem;
   overflow: clip;
   background:
     radial-gradient(circle at 50% 0%, rgb(237 207 130 / 46%), transparent 46%),
@@ -70,7 +69,7 @@
   margin: 0;
   color: transparent;
   font-family: var(--font-display);
-  font-size: clamp(5.5rem, 9vw, 7.5rem);
+  font-size: clamp(3.75rem, 6vw, 5rem);
   font-weight: 440;
   line-height: 1;
   background: linear-gradient(#4a3620, #5c452b 62%, #6e5433);
@@ -200,7 +199,7 @@
   z-index: 1;
   width: min(calc(100% - 3rem), var(--profile-width));
   margin-inline: auto;
-  padding-block: calc(var(--profile-nav-height) + 6rem) 3rem;
+  padding-block: calc(var(--profile-nav-height) + 2.5rem) 2rem;
 }
 
 html[data-profile-motion="enhanced"] .profile-hero-copy {
@@ -212,7 +211,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 }
 
 .profile-hero-kicker {
-  margin: 0 0 1.5rem;
+  margin: 0 0 1rem;
   color: rgb(56 45 34 / 78%);
   font-family: var(--font-mono);
   font-size: 0.8rem;
@@ -222,7 +221,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 
 .profile-hero-copy > p:not(.profile-hero-kicker) {
   width: min(40rem, 100%);
-  margin: 1.75rem 0 0;
+  margin: 1rem 0 0;
   color: rgb(56 45 34 / 82%);
   font-size: clamp(1.05rem, 1.6vw, 1.25rem);
   line-height: 1.75;
@@ -232,7 +231,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   display: flex;
   flex-wrap: wrap;
   gap: 0.9rem;
-  margin-top: 2.25rem;
+  margin-top: 1.25rem;
 }
 
 .profile-cta {
@@ -274,8 +273,8 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   position: relative;
   z-index: 1;
   width: min(calc(100% - 3rem), var(--profile-width));
-  margin: 4rem auto 0;
-  padding: 2rem 2.25rem 2.25rem;
+  margin: 2.25rem auto 0;
+  padding: 1.5rem 1.75rem 1.6rem;
   border: 1px solid var(--profile-line);
   border-radius: 22px;
   background: linear-gradient(180deg, rgb(255 250 240 / 86%), rgb(241 223 191 / 92%));
@@ -303,7 +302,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 .profile-dock-education {
   display: grid;
   gap: 0.55rem;
-  margin: 1.4rem 0 0;
+  margin: 1rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -344,7 +343,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 1.3rem;
+  margin-top: 1rem;
   font-size: 0.92rem;
 }
 
@@ -360,61 +359,11 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 }
 
 .profile-dock-growth {
-  margin: 1.3rem 0 0;
+  margin: 1rem 0 0;
   color: var(--profile-muted);
   font-family: var(--font-mono);
   font-size: 0.82rem;
   letter-spacing: 0.04em;
-}
-
-/* --- profile info stage --- */
-
-.profile-info {
-  display: grid;
-  gap: 2.5rem;
-}
-
-.profile-info-about {
-  display: grid;
-  gap: 1.1rem;
-  max-width: 46rem;
-}
-
-.profile-info-about p {
-  margin: 0;
-  color: var(--profile-muted);
-  font-size: 1.02rem;
-  line-height: 1.8;
-}
-
-.profile-info-facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem 2rem;
-  margin: 0;
-  padding: 1.75rem;
-  border: 1px solid var(--profile-line);
-  border-radius: 20px;
-  background: var(--profile-panel);
-  transition: transform 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
-}
-
-.profile-info-facts > div {
-  display: grid;
-  gap: 0.3rem;
-  padding-block: 0.5rem;
-  border-bottom: 1px solid var(--profile-line);
-}
-
-.profile-info-facts dt {
-  color: var(--muted);
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-}
-
-.profile-info-facts dd {
-  margin: 0;
-  font-weight: 560;
 }
 
 /* --- sticky internship stack --- */
@@ -926,7 +875,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
 /* --- unified warm card hover (desktop pointer only, <=2px lift) --- */
 
 @media (hover: hover) and (pointer: fine) {
-  .profile-info-facts:hover,
   .system-project-panel:hover,
   .open-source-showcase:hover,
   .profile-shell #writing article:hover,
@@ -973,8 +921,7 @@ html[data-profile-motion="static"] .profile-reveal {
     top: auto;
   }
 
-  .architecture-stage,
-  .profile-info-facts {
+  .architecture-stage {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -1018,7 +965,6 @@ html[data-profile-motion="static"] .profile-reveal {
   }
 
   .profile-dock,
-  .profile-info-facts,
   .sticky-internship-card,
   .system-project-panel,
   .open-source-showcase,
@@ -1091,7 +1037,6 @@ html[data-profile-motion="static"] .profile-reveal {
   }
 
   /* pointer-driven lifts are removed entirely */
-  .profile-info-facts,
   .system-project-panel,
   .open-source-showcase,
   .profile-shell #writing article,
@@ -1100,7 +1045,6 @@ html[data-profile-motion="static"] .profile-reveal {
     transition: none;
   }
 
-  .profile-info-facts:hover,
   .system-project-panel:hover,
   .open-source-showcase:hover,
   .profile-shell #writing article:hover,
