@@ -2,8 +2,9 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { loadSiteContent } from "@/content/load-site-content";
+import type { OpenSourceProject } from "@/content/schema";
 
-import { OpenSourceShowcase } from "./open-source-showcase";
+import { OpenSourceShowcase, selectFeaturedContributions } from "./open-source-showcase";
 
 const { openSource } = loadSiteContent();
 const merged = openSource.contributions.filter(({ status }) => status === "merged");
@@ -11,9 +12,30 @@ const openPullRequests = openSource.contributions.filter(({ status }) => status 
 
 afterEach(cleanup);
 
-function renderShowcase() {
-  return render(<OpenSourceShowcase project={openSource} />);
+function renderShowcase(project: OpenSourceProject = openSource) {
+  return render(<OpenSourceShowcase project={project} />);
 }
+
+describe("selectFeaturedContributions", () => {
+  it("prefers PRs 1226, 1081 and 1094 and leaves the other merged PRs as remaining", () => {
+    expect(selectFeaturedContributions(openSource).featured.map(({ number }) => number)).toEqual([
+      1226, 1081, 1094,
+    ]);
+    expect(selectFeaturedContributions(openSource).remaining).toHaveLength(merged.length - 3);
+  });
+
+  it("fills a missing featured slot with another merged PR instead of an open one", () => {
+    const variant: OpenSourceProject = {
+      ...openSource,
+      contributions: openSource.contributions.filter(({ number }) => number !== 1226),
+    };
+    const { featured, remaining } = selectFeaturedContributions(variant);
+
+    expect(featured.map(({ number }) => number)).toEqual([1081, 1094, 1217]);
+    expect(featured.every(({ status }) => status === "merged")).toBe(true);
+    expect(remaining).toHaveLength(merged.length - 4);
+  });
+});
 
 describe("OpenSourceShowcase", () => {
   it("presents the official Semantica logo, identity and background", () => {
@@ -29,56 +51,80 @@ describe("OpenSourceShowcase", () => {
     ).toBeVisible();
   });
 
-  it("renders exactly the ten merged contributions as plain external links", () => {
+  it("surfaces the merged PR statistic and capability labels up front", () => {
     renderShowcase();
-    const list = screen.getByRole("list", { name: "Semantica 已合并贡献" });
-    const links = within(list).getAllByRole("link", { name: /^PR #/ });
-    expect(links).toHaveLength(10);
 
-    for (const contribution of merged) {
-      const link = within(list).getByRole("link", {
-        name: `PR #${contribution.number} · ${contribution.title}`,
-      });
-      expect(link).toHaveAttribute("href", contribution.url);
+    const statistic = screen.getByText("已合并 PR").closest("p");
+    expect(statistic).not.toBeNull();
+    expect(statistic).toHaveTextContent("10");
+    expect(screen.getByText("图数据适配")).toBeVisible();
+    expect(screen.getByText("规则推理")).toBeVisible();
+    expect(screen.getByText("执行链路")).toBeVisible();
+  });
+
+  it("links exactly three featured representative contributions in priority order", () => {
+    renderShowcase();
+
+    const list = screen.getByRole("list", { name: "Semantica 代表性贡献" });
+    const links = within(list).getAllByRole("link", { name: /^PR #/ });
+    expect(links).toHaveLength(3);
+    expect(links.map((link) => link.textContent)).toEqual(
+      [1226, 1081, 1094].map((number) => {
+        const contribution = merged.find((item) => item.number === number);
+        return `PR #${number} · ${contribution?.title}`;
+      }),
+    );
+    for (const link of links) {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noreferrer");
     }
+  });
+
+  it("folds the remaining seven merged PRs into a closed details disclosure", () => {
+    const { container } = renderShowcase();
+
+    const details = container.querySelector("details");
+    expect(details).not.toBeNull();
+    expect(details?.open).toBe(false);
+    expect(within(details as HTMLElement).getByText("查看其余 7 个已合并 PR")).toBeVisible();
+    const remainingLinks = within(details as HTMLElement).getAllByRole("link", { name: /^PR #/ });
+    expect(remainingLinks).toHaveLength(merged.length - 3);
+    for (const link of remainingLinks) {
+      const number = Number(link.textContent?.match(/PR #(\d+)/)?.[1]);
+      expect(merged.some((contribution) => contribution.number === number)).toBe(true);
+    }
+  });
+
+  it("keeps open pull requests and retired wording out of the credibility summary", () => {
+    const { container } = renderShowcase();
 
     for (const pullRequest of openPullRequests) {
       expect(screen.queryByText(new RegExp(`PR #${pullRequest.number}\\b`))).toBeNull();
     }
+    const text = container.textContent ?? "";
+    expect(text).not.toContain("Trending");
+    expect(text).not.toMatch(/stars/i);
+    expect(text).not.toMatch(/FEAT|FIX|MERGED/);
+    expect(text).not.toContain("架构支柱");
+    expect(text).not.toContain("点击");
+    expect(screen.queryByRole("button")).toBeNull();
   });
 
   it("states the dated snapshot boundary computed from merged contributions", () => {
     renderShowcase();
+
     expect(screen.getByText("截至 2026-09-04：10 个贡献已合并")).toBeVisible();
   });
 
   it("links to the external repository and the internal article", () => {
     renderShowcase();
 
-    const repositoryLink = screen.getByRole("link", { name: "Semantica GitHub repository" });
-    expect(repositoryLink).toHaveAttribute("href", "https://github.com/semantica-agi/semantica");
+    const repository = screen.getByRole("link", { name: "Semantica GitHub repository" });
+    expect(repository).toHaveAttribute("href", "https://github.com/semantica-agi/semantica");
+    expect(repository).toHaveAttribute("target", "_blank");
+    expect(repository).toHaveAttribute("rel", "noreferrer");
 
-    const articleLink = screen.getByRole("link", { name: "阅读 Semantica 贡献复盘" });
-    expect(articleLink).toHaveAttribute("href", "/blog/first-agent-system");
-    expect(articleLink).not.toHaveAttribute("target");
-    expect(articleLink).not.toHaveAttribute("rel");
-  });
-
-  it("omits the retired interactive-branch visuals and wording", () => {
-    const { container } = renderShowcase();
-    const text = container.textContent ?? "";
-
-    expect(text).not.toMatch(/stars/i);
-    expect(text).not.toContain("Trending");
-    expect(text).not.toContain("零锁定");
-    expect(text).not.toContain("FEAT");
-    expect(text).not.toContain("FIX");
-    expect(text).not.toContain("MERGED");
-    expect(text).not.toContain("架构支柱");
-    expect(text).not.toContain("点击");
-
-    expect(screen.queryByRole("button")).toBeNull();
+    const article = screen.getByRole("link", { name: "阅读 Semantica 贡献复盘" });
+    expect(article).toHaveAttribute("href", "/blog/first-agent-system");
   });
 });

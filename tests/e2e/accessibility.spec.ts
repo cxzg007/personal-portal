@@ -4,7 +4,7 @@ import type { Locator, Page } from "@playwright/test";
 
 const auditedRoutes = ["/", "/blog", "/blog/first-agent-system"] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
-const primaryNavItems = ["信息", "实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
+const primaryNavItems = ["实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
 
 async function expectNextTab(page: Page, target: Locator) {
   await page.keyboard.press("Tab");
@@ -34,7 +34,7 @@ for (const route of auditedRoutes) {
   });
 }
 
-test("desktop keyboard order covers skip navigation, seven nav links, hero actions, and contact", async (
+test("desktop keyboard order covers skip navigation, six nav links, hero actions, and contact", async (
   { page },
   testInfo,
 ) => {
@@ -53,7 +53,7 @@ test("desktop keyboard order covers skip navigation, seven nav links, hero actio
   const desktopNavigation = page.getByRole("navigation", { name: "主导航" });
   await expect(desktopNavigation).toBeVisible();
 
-  const hero = page.getByRole("region", { name: /cxzg007 Profile/ });
+  const hero = page.getByRole("region", { name: "cxzg007" });
   const postTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
   const openSource = page.locator("main > section#open-source");
   const contact = page.locator("main > section#contact");
@@ -63,12 +63,20 @@ test("desktop keyboard order covers skip navigation, seven nav links, hero actio
     page.getByRole("link", { name: "返回首页" }),
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
     hero.getByRole("link", { name: "查看实习", exact: true }),
+    hero.getByRole("link", { name: "下载简历 PDF", exact: true }),
+    hero.getByRole("link", { name: "GitHub ↗", exact: true }),
     hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com", exact: true }),
     hero.getByRole("link", { name: "GitHub", exact: true }),
+    page.locator("main > section#internships").getByText("查看京东工程细节"),
+    page.locator("main > section#internships").getByText("查看智元机器人工程细节"),
+    page
+      .locator("main > section#internships")
+      .getByText("查看中国船舶集团 722 研究所工程细节"),
     page.locator("#system-tab-ontology-agent-platform"),
-    ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((index) =>
+    ...[0, 1, 2].map((index) =>
       openSource.getByRole("link", { name: /^PR #/ }).nth(index),
     ),
+    openSource.getByText("查看其余 7 个已合并 PR"),
     openSource.getByRole("link", { name: "Semantica GitHub repository", exact: true }),
     openSource.getByRole("link", { name: "阅读 Semantica 贡献复盘", exact: true }),
     page.locator("main > section#writing").getByRole("link", { name: `阅读《${postTitle}》全文` }),
@@ -169,7 +177,7 @@ test("reduced motion preserves content, removes Canvas, and sets the static prof
 
   await expect(page.locator("canvas")).toHaveCount(0);
   await expect(page.locator("html[data-profile-motion='static']")).toHaveCount(1);
-  await expect(page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
   await expect(page.getByRole("link", { name: "查看实习", exact: true })).toBeVisible();
   await expect(page.locator("main > section#internships")).toBeVisible();
 });
@@ -178,9 +186,14 @@ test("Semantica open-source showcase stays static and PR links keep visible focu
   await page.goto("/");
 
   const openSource = page.locator("main > section#open-source");
-  await expect(openSource.getByRole("button")).toHaveCount(0);
+  await expect(openSource.locator("button")).toHaveCount(0);
+  const collapsedDetails = openSource.locator("details.open-source-showcase-details");
+  await expect(collapsedDetails).toBeVisible();
+  await expect(collapsedDetails).not.toHaveAttribute("open");
 
   const firstPrLink = openSource.getByRole("link", { name: /^PR #/ }).first();
   await firstPrLink.focus();
   await expectVisibleFocus(firstPrLink);
+  await collapsedDetails.getByText("查看其余 7 个已合并 PR").focus();
+  await expectVisibleFocus(collapsedDetails.getByText("查看其余 7 个已合并 PR"));
 });

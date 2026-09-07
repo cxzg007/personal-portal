@@ -3,9 +3,9 @@ import { expect, test } from "@playwright/test";
 test("homepage exposes the campus recruiting identity and primary actions", async ({ page }) => {
   await page.goto("/");
 
-  const hero = page.getByRole("region", { name: /cxzg007 Profile/ });
+  const hero = page.getByRole("region", { name: "cxzg007" });
 
-  await expect(page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
   await expect(hero.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
   await expect(hero.getByText("AI Agent / 后端开发", { exact: true })).toBeVisible();
   await expect(hero.getByText("2027 届校招｜AI Agent / 后端开发")).toBeVisible();
@@ -173,16 +173,23 @@ test("internship cards ship brand logos, alternating layouts, and desktop sticky
   await expect(internships.getByRole("button")).toHaveCount(0);
 });
 
-test("open source showcase exposes ten merged PR links", async ({ page }) => {
+test("open source showcase leads with featured PR links and a collapsed remainder", async ({ page }) => {
   await page.goto("/");
 
   const openSource = page.locator("main > section#open-source");
-  await expect(openSource.getByRole("list", { name: "Semantica 已合并贡献" })).toBeVisible();
-  await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(10);
+  await expect(openSource.getByRole("list", { name: "Semantica 代表性贡献" })).toBeVisible();
+  await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(3);
   await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(0);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(0);
-  await expect(openSource.getByRole("button")).toHaveCount(0);
+  await expect(openSource.locator("button")).toHaveCount(0);
   await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
+
+  const details = openSource.locator("details.open-source-showcase-details");
+  await expect(details).toBeVisible();
+  await expect(details).not.toHaveAttribute("open");
+
+  await details.locator("summary").click();
+  await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(10);
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {

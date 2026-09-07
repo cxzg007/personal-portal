@@ -63,7 +63,7 @@ export default async function HomePage() {
           <h2 className="profile-reveal" id="systems-heading">项目按工程问题组织。</h2>
           <SystemProjectTabs projects={content.caseStudies} />
         </section>
-        <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--terracotta" id="open-source">
+        <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--terracotta profile-stage--open-source" id="open-source">
           <h2 className="profile-reveal" id="open-source-heading">开源贡献与公开影响力。</h2>
           <OpenSourceShowcase project={content.openSource} />
         </section>

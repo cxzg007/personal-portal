@@ -817,6 +817,131 @@ html[data-profile-motion="static"] .sticky-internship-card {
   text-underline-offset: 4px;
 }
 
+/* --- open source credibility stage: deep coffee ground, warm orange accents --- */
+
+.profile-stage--open-source {
+  border: 1px solid rgb(240 168 120 / 22%);
+  border-radius: 40px 48px 44px 52px;
+  color: rgb(240 229 210);
+  background: linear-gradient(168deg, #3b281a, #2a1d13 56%, #231710);
+}
+
+.profile-stage--open-source > h2 {
+  color: rgb(248 240 224);
+}
+
+.profile-stage--open-source::before {
+  background: rgb(240 168 120 / 12%);
+}
+
+.profile-stage--open-source::after {
+  border-color: rgb(240 229 210 / 24%);
+  background: rgb(240 168 120 / 6%);
+}
+
+.profile-stage--open-source :focus-visible {
+  outline-color: rgb(240 168 120);
+}
+
+.profile-stage--open-source .open-source-showcase {
+  border-color: rgb(240 168 120 / 30%);
+  background: linear-gradient(180deg, rgb(58 41 27 / 88%), rgb(43 30 19 / 94%));
+}
+
+.profile-stage--open-source .open-source-showcase-identity {
+  color: rgb(226 204 176);
+}
+
+.profile-stage--open-source .open-source-showcase-background {
+  color: rgb(236 222 199);
+}
+
+.profile-stage--open-source .open-source-showcase-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.profile-stage--open-source .open-source-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.profile-stage--open-source .open-source-stat-value {
+  color: rgb(240 168 120);
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.profile-stage--open-source .open-source-stat-label {
+  color: rgb(236 222 199);
+  font-size: 0.9rem;
+}
+
+.profile-stage--open-source .open-source-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.profile-stage--open-source .open-source-capabilities li {
+  padding: 0.2rem 0.7rem;
+  border: 1px solid rgb(240 168 120 / 45%);
+  border-radius: 999px;
+  color: rgb(240 196 156);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.profile-stage--open-source .pr-list li {
+  border-bottom-color: rgb(240 229 210 / 16%);
+}
+
+.profile-stage--open-source .pr-link {
+  color: rgb(243 232 214);
+}
+
+.profile-stage--open-source .pr-link:hover {
+  color: rgb(240 168 120);
+}
+
+.profile-stage--open-source .open-source-showcase-details {
+  color: rgb(214 195 170);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.profile-stage--open-source .open-source-showcase-details summary {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  color: rgb(240 168 120);
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.profile-stage--open-source .open-source-showcase-details summary:hover {
+  color: rgb(247 189 149);
+}
+
+.profile-stage--open-source .open-source-showcase-boundary {
+  color: rgb(219 199 172);
+}
+
+.profile-stage--open-source .open-source-showcase-links a {
+  color: rgb(240 168 120);
+}
+
 /* --- writing stage (components render unclassed article markup) --- */
 
 .profile-shell #writing article {

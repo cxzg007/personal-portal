@@ -101,8 +101,8 @@ test("focused navigation and call-to-action links show a terracotta ring of at l
     await page.getByRole("button", { name: "打开导航菜单" }).click();
   }
   const navLink = isDesktopNavVisible
-    ? desktopNav.getByRole("link", { name: "信息", exact: true })
-    : page.getByRole("navigation", { name: "移动导航" }).getByRole("link", { name: "信息", exact: true });
+    ? desktopNav.getByRole("link", { name: "实习", exact: true })
+    : page.getByRole("navigation", { name: "移动导航" }).getByRole("link", { name: "实习", exact: true });
   const cta = page.getByRole("link", { name: "查看实习", exact: true });
   for (let i = 0; i < 6 && !(await navLink.evaluate((element) => element === document.activeElement)); i += 1) {
     await page.keyboard.press("Tab");

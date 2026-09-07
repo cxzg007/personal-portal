@@ -105,10 +105,10 @@ for (const viewport of viewports) {
 
     await expectNoHorizontalOverflow(page);
     await expect(
-      page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ }),
+      page.getByRole("heading", { level: 1, name: "cxzg007" }),
     ).toBeVisible();
 
-    const hero = page.getByRole("region", { name: /cxzg007 Profile/ });
+    const hero = page.getByRole("region", { name: "cxzg007" });
     await expectHorizontallyContained(hero.locator(".profile-hero-copy"));
     await expectHorizontallyContained(hero.getByRole("link", { name: "查看实习", exact: true }));
     await expectHorizontallyContained(hero.getByLabel("联系方式"));
@@ -135,7 +135,7 @@ for (const viewport of viewports) {
     const showcase = openSource.locator(".open-source-showcase");
     await expectHorizontallyContained(showcase);
     await expectSemanticaMapComplete(showcase);
-    await expectHorizontallyContained(openSource.getByRole("list", { name: "Semantica 已合并贡献" }));
+    await expectHorizontallyContained(openSource.getByRole("list", { name: "Semantica 代表性贡献" }));
 
     await expectHorizontallyContained(openSource.getByLabel("Semantica 公开资料"));
 
@@ -205,7 +205,7 @@ test("homepage reference profile keeps visible geometry at 1920x1080", async ({ 
 
   await expectNoHorizontalOverflow(page);
 
-  const heroHeading = page.getByRole("heading", { level: 1, name: /cxzg007 Profile/ });
+  const heroHeading = page.getByRole("heading", { level: 1, name: "cxzg007" });
   const brandCards = page.locator("main > section#internships").getByRole("article");
   const openSourceCard = page.locator("main > section#open-source .open-source-showcase");
   await expect(brandCards).toHaveCount(3);

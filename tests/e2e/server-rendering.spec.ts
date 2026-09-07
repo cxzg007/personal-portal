@@ -6,7 +6,7 @@ test.use({ javaScriptEnabled: false });
 
 test("core recruiting content is server rendered", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1, name: "cxzg007 Profile" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
   for (const company of ["京东", "智元机器人", "中国船舶集团 722 研究所"]) {
     await expect(page.getByText(company, { exact: true }).first()).toBeVisible();
   }
@@ -16,9 +16,9 @@ test("core recruiting content is server rendered", async ({ page }) => {
   await expect(page.getByRole("link", { name: /简历/ })).toHaveCount(0);
 });
 
-test("server HTML keeps the complete Semantica merged PR list", async ({ page }) => {
+test("server HTML keeps the Semantica credibility summary with collapsed remaining PRs", async ({ page }) => {
   await page.goto("/");
   const showcase = page.locator("main > section#open-source .open-source-showcase");
   await expectSemanticaMapComplete(showcase);
-  await expect(showcase.getByRole("button")).toHaveCount(0);
+  await expect(showcase.locator("button")).toHaveCount(0);
 });
