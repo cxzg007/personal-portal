@@ -16,7 +16,7 @@ test("core recruiting content is server rendered", async ({ page }) => {
   await expect(page.getByRole("link", { name: /简历/ })).toHaveCount(0);
 });
 
-test("server HTML keeps the complete Semantica architecture diagram", async ({ page }) => {
+test("server HTML keeps the complete Semantica merged PR list", async ({ page }) => {
   await page.goto("/");
   const showcase = page.locator("main > section#open-source .open-source-showcase");
   await expectSemanticaMapComplete(showcase);

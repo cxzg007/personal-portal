@@ -134,21 +134,9 @@ for (const viewport of viewports) {
     const openSource = page.locator("main > section#open-source");
     const showcase = openSource.locator(".open-source-showcase");
     await expectHorizontallyContained(showcase);
-    const map = openSource.getByRole("region", { name: "Semantica 核心架构" });
     await expectSemanticaMapComplete(showcase);
-    await expectHorizontallyContained(map);
     await expectHorizontallyContained(openSource.getByRole("list", { name: "Semantica 已合并贡献" }));
 
-    if (viewport.width === 390) {
-      const layers = map.locator(".arch-layer");
-      const boxes = await Promise.all(
-        (await layers.all()).map((node) => node.boundingBox()),
-      );
-      expect(boxes.every((box) => box !== null)).toBe(true);
-      for (let index = 1; index < boxes.length; index += 1) {
-        expect(boxes[index]!.y).toBeGreaterThan(boxes[index - 1]!.y);
-      }
-    }
     await expectHorizontallyContained(openSource.getByLabel("Semantica 公开资料"));
 
     await expectHorizontallyContained(page.locator("main > section#writing").getByRole("article"));

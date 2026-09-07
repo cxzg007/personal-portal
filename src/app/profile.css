@@ -793,75 +793,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
   text-underline-offset: 4px;
 }
 
-/* --- semantica layered architecture diagram (static, no JS) --- */
-
-.arch-diagram {
-  display: grid;
-  gap: 1.6rem;
-}
-
-.arch-layers {
-  position: relative;
-  display: grid;
-  gap: 0.85rem;
-}
-
-.arch-layer {
-  position: relative;
-  display: grid;
-  gap: 0.7rem;
-  padding: 0.95rem 1.15rem;
-  border: 1px solid var(--profile-line);
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgb(255 250 240 / 78%), rgb(241 223 191 / 45%));
-  box-shadow: 0 6px 18px rgb(56 45 34 / 8%);
-}
-
-.arch-layer-title {
-  margin: 0;
-  color: var(--profile-accent);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.arch-capabilities {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.arch-capability {
-  padding: 0.22rem 0.72rem;
-  border: 1px solid var(--profile-line);
-  border-radius: 999px;
-  background: rgb(255 250 240 / 65%);
-  color: var(--profile-ink);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-}
-
-/* Mobile default: spanning capability renders as a simple stacked pill. */
-.arch-spanning {
-  justify-self: start;
-  margin: 0;
-  padding: 0.32rem 0.95rem;
-  border: 1px solid rgb(184 95 63 / 40%);
-  border-radius: 999px;
-  background: rgb(237 207 130 / 32%);
-  color: var(--terracotta-deep);
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
-
 /* --- merged PR list (minimal rows) --- */
 
 .pr-list {
@@ -894,58 +825,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
   color: var(--profile-accent);
   text-decoration: underline;
   text-underline-offset: 4px;
-}
-
-/* Desktop: stacked bands + centered connectors + vertical spanning rail. */
-@media (min-width: 768px) {
-  .arch-layers {
-    gap: 1.1rem;
-    padding-right: 3.4rem;
-  }
-
-  .arch-layer {
-    grid-template-columns: minmax(7.5rem, 0.3fr) minmax(0, 1fr);
-    align-items: center;
-    gap: 1.2rem;
-  }
-
-  /* vertical connector between stacked layer bands */
-  .arch-layer:not(:last-of-type)::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    translate: -50% 0;
-    width: 1px;
-    height: 1.1rem;
-    background: linear-gradient(180deg, var(--profile-accent), rgb(184 95 63 / 30%));
-  }
-
-  /* right vertical spanning rail with upright text */
-  .arch-spanning {
-    position: absolute;
-    inset-block: 0;
-    right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.2rem;
-    padding: 1rem 0;
-    border: 1px solid rgb(184 95 63 / 40%);
-    border-radius: 12px;
-    background: linear-gradient(180deg, rgb(237 207 130 / 38%), rgb(184 95 63 / 12%));
-    writing-mode: vertical-rl;
-    font-size: 0.72rem;
-  }
-
-  /* additional spanning capabilities stack as parallel rails inward */
-  .arch-spanning:nth-of-type(2) {
-    right: 3.4rem;
-  }
-
-  .arch-spanning:nth-of-type(3) {
-    right: 6.8rem;
-  }
 }
 
 /* --- writing stage (components render unclassed article markup) --- */
@@ -1182,8 +1061,6 @@ html[data-profile-motion="static"] .profile-reveal {
     transition-duration: 0s !important;
   }
 
-  .arch-layer,
-  .arch-capability,
   .pr-link {
     /* explicit 0s beats the global 0.01ms !important fallback */
     transition-duration: 0s !important;

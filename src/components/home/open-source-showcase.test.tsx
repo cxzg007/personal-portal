@@ -29,38 +29,6 @@ describe("OpenSourceShowcase", () => {
     ).toBeVisible();
   });
 
-  it("renders the four architecture layers with titles in schema order", () => {
-    const { container } = renderShowcase();
-    expect(screen.getByRole("region", { name: "Semantica 核心架构" })).toBeInTheDocument();
-
-    expect(container.querySelectorAll(".arch-layer")).toHaveLength(4);
-    expect(Array.from(container.querySelectorAll(".arch-layer-title")).map((node) => node.textContent)).toEqual([
-      "数据与知识层",
-      "推理层",
-      "治理层",
-      "决策层",
-    ]);
-  });
-
-  it("renders all six capability labels with the spanning end-to-end traceability bar", () => {
-    const { container } = renderShowcase();
-    const map = screen.getByRole("region", { name: "Semantica 核心架构" });
-
-    for (const label of ["上下文管理", "知识建模", "确定性推理", "本体治理", "决策智能", "端到端溯源"]) {
-      expect(within(map).getByText(label)).toBeVisible();
-    }
-
-    const capabilityTags = container.querySelectorAll(".arch-capability");
-    expect(capabilityTags).toHaveLength(5);
-    expect(
-      Array.from(capabilityTags).map((tag) => tag.textContent),
-    ).toEqual(["上下文管理", "知识建模", "确定性推理", "本体治理", "决策智能"]);
-
-    const spanning = container.querySelectorAll(".arch-spanning");
-    expect(spanning).toHaveLength(1);
-    expect(spanning[0].textContent).toBe("端到端溯源");
-  });
-
   it("renders exactly the ten merged contributions as plain external links", () => {
     renderShowcase();
     const list = screen.getByRole("list", { name: "Semantica 已合并贡献" });

@@ -1,7 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { expectSemanticaMapComplete } from "./helpers/semantica-map";
-
 test("homepage exposes the campus recruiting identity and primary actions", async ({ page }) => {
   await page.goto("/");
 
@@ -185,27 +183,6 @@ test("open source showcase exposes ten merged PR links", async ({ page }) => {
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(0);
   await expect(openSource.getByRole("button")).toHaveCount(0);
   await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
-});
-
-test("Semantica architecture renders four static layers in DOM order", async ({ page }) => {
-  await page.goto("/");
-
-  const showcase = page.locator("main > section#open-source .open-source-showcase");
-  await expectSemanticaMapComplete(showcase);
-
-  const map = showcase.getByRole("region", { name: "Semantica 核心架构" });
-  const layerTitles = map.locator(".arch-layer-title");
-  expect(await layerTitles.evaluateAll((titles) => titles.map(({ textContent }) => textContent))).toEqual([
-    "数据与知识层",
-    "推理层",
-    "治理层",
-    "决策层",
-  ]);
-
-  // The showcase stays fully static: no pillars, no toggles, no test hooks.
-  await expect(showcase.getByRole("button")).toHaveCount(0);
-  await expect(showcase.getByTestId("open-source-spotlight")).toHaveCount(0);
-  await expect(showcase.getByTestId("merged-contribution")).toHaveCount(0);
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {

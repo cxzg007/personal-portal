@@ -174,7 +174,7 @@ test("reduced motion preserves content, removes Canvas, and sets the static prof
   await expect(page.locator("main > section#internships")).toBeVisible();
 });
 
-test("Semantica architecture showcase stays static and PR links keep visible focus", async ({ page }) => {
+test("Semantica open-source showcase stays static and PR links keep visible focus", async ({ page }) => {
   await page.goto("/");
 
   const openSource = page.locator("main > section#open-source");

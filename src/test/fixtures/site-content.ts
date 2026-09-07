@@ -90,43 +90,6 @@ export const validSiteContent = {
     identity: "Open-source Contributor · cxzg007",
     background: "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约与执行链路并行化。",
     snapshotDate: "2026-09-04",
-    architecture: {
-      capabilities: [
-        { id: "graph-data-adapter", label: "图数据适配" },
-        { id: "shacl-explanation", label: "SHACL 解释" },
-        { id: "temporal-stability", label: "时间稳定性" },
-        { id: "rule-reasoning", label: "规则推理" },
-        { id: "decision-contract", label: "决策契约" },
-        { id: "end-to-end-traceability", label: "端到端溯源" },
-      ],
-      layers: [
-        {
-          id: "data-knowledge",
-          title: "数据与知识层",
-          summary: "图数据适配、语义建模与 SHACL 约束解释。",
-          capabilityIds: ["graph-data-adapter", "shacl-explanation", "temporal-stability"],
-        },
-        {
-          id: "reasoning",
-          title: "推理层",
-          summary: "RETE/Datalog/SPARQL 确定性推理路径。",
-          capabilityIds: ["rule-reasoning"],
-        },
-        {
-          id: "governance",
-          title: "治理层",
-          summary: "策略引擎与合规检查。",
-          capabilityIds: ["shacl-explanation"],
-        },
-        {
-          id: "decision",
-          title: "决策层",
-          summary: "决策模型契约、因果追踪与执行链路。",
-          capabilityIds: ["decision-contract"],
-        },
-      ],
-      spanningCapabilityIds: ["end-to-end-traceability"],
-    },
     contributions: [
       {
         number: 1364,

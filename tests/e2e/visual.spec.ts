@@ -126,12 +126,3 @@ test("article detail visual", async ({ page }) => {
 
   await expect(page.locator(".article-layout")).toHaveScreenshot("article-detail.png");
 });
-
-test("Semantica architecture map remains stable", async ({ page }) => {
-  await prepareStablePage(page, "/");
-  const map = page.getByRole("region", { name: "Semantica 核心架构" });
-  await expect(map).toBeVisible();
-  await expect(map).toHaveScreenshot("semantica-architecture-map.png", {
-    animations: "disabled",
-  });
-});

@@ -17,8 +17,8 @@ test("reduced motion preference keeps the layout static without hiding content",
   await expect(page.getByRole("link", { name: "查看实习" })).toBeVisible();
   await expect(page.locator("main > section#internships .sticky-internship-card")).toHaveCount(3);
 
-  const map = page.getByRole("region", { name: "Semantica 核心架构" });
-  const motionTargets = map.locator(".arch-layer, .arch-capability, .pr-link");
+  const openSource = page.locator("main > section#open-source");
+  const motionTargets = openSource.locator(".pr-link");
   const transitionDurations = await motionTargets.evaluateAll((elements) =>
     elements.map((element) => getComputedStyle(element).transitionDuration),
   );
