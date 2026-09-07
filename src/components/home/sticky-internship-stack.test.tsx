@@ -17,7 +17,8 @@ describe("sticky internship stack", () => {
     expect(cards).toHaveLength(3);
     expect(cards[0]).toHaveAttribute("data-card-index", "0");
     expect(within(cards[0]).getByRole("img", { name: internships[0].logo.alt })).toBeVisible();
-    expect(within(cards[0]).getByRole("list", { name: "京东 能力建设记录" })).toBeVisible();
+    expect(within(cards[0]).getByRole("list", { name: "京东 核心成果" })).toBeVisible();
+    expect(within(cards[0]).getByText("查看京东工程细节")).toBeVisible();
     expect(within(cards[0]).queryByRole("button", { name: /技术细节/ })).not.toBeInTheDocument();
 
     expect(cards[1]).toHaveAttribute("data-card-index", "1");

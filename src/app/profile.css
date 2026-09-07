@@ -370,14 +370,14 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 
 .sticky-internship-list {
   display: grid;
-  gap: 2.5rem;
+  gap: 1.25rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .sticky-internship-list > li {
-  min-height: 24rem;
+  min-height: 14rem;
 }
 
 .sticky-internship-card {
@@ -423,24 +423,33 @@ html[data-profile-motion="static"] .sticky-internship-card {
 }
 
 .internship-card-header {
-  margin-bottom: 1rem;
+  margin-bottom: 0.65rem;
 }
 
 .internship-card-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem 0.9rem;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
   margin: 0;
   font-size: 0.85rem;
 }
 
 .internship-company {
+  font-size: 0.95rem;
   font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .internship-team,
 .internship-role {
   color: var(--profile-muted);
+}
+
+.internship-team::after {
+  content: "·";
+  margin-left: 0.75rem;
+  color: var(--profile-line);
 }
 
 .internship-period {
@@ -452,7 +461,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
 .internship-card-columns {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: 1.75rem;
+  gap: 1.25rem;
   align-items: start;
 }
 
@@ -469,17 +478,17 @@ html[data-profile-motion="static"] .sticky-internship-card {
 }
 
 .internship-value-headline {
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.75rem;
   font-size: clamp(1.25rem, 2vw, 1.6rem);
   font-weight: 600;
   line-height: 1.35;
 }
 
 .internship-copy-column > p {
-  margin: 0 0 0.9rem;
+  margin: 0 0 0.6rem;
   color: var(--profile-muted);
-  font-size: 0.98rem;
-  line-height: 1.75;
+  font-size: 0.95rem;
+  line-height: 1.65;
 }
 
 .internship-stack {
@@ -487,10 +496,42 @@ html[data-profile-motion="static"] .sticky-internship-card {
   font-size: 0.85rem;
 }
 
-.internship-result {
-  color: var(--profile-ink);
+.internship-outcomes {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.2rem 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.internship-outcomes li {
   border-left: 2px solid var(--profile-accent);
-  padding-left: 0.9rem;
+  padding-left: 0.75rem;
+  color: var(--profile-ink);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.internship-details {
+  margin-top: 0.25rem;
+  color: var(--profile-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.internship-details summary {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  color: var(--profile-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.internship-details summary:hover {
+  color: var(--profile-accent);
 }
 
 .internship-visual-column {

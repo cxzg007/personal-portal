@@ -9,7 +9,7 @@ type InternshipStoryCardProps = {
 };
 
 export function InternshipStoryCard({ internship, index }: InternshipStoryCardProps) {
-  const capabilityRecords = internship.highlights;
+  const visibleOutcomes = internship.results.slice(0, 3);
 
   return (
     <article
@@ -32,21 +32,24 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
           <p className="internship-context">{internship.context}</p>
           <p className="internship-ownership">{internship.ownership}</p>
           <p className="internship-stack">{internship.stack.join("、")}</p>
-          {internship.results.map((result) => (
-            <p className="internship-result" key={result}>
-              {result}
-            </p>
-          ))}
+          <ul aria-label={`${internship.company} 核心成果`} className="internship-outcomes">
+            {visibleOutcomes.map((result) => (
+              <li key={result}>{result}</li>
+            ))}
+          </ul>
+          <details className="internship-details">
+            <summary>查看{internship.company}工程细节</summary>
+            <ul aria-label={`${internship.company} 能力建设记录`} className="capability-records">
+              {internship.highlights.map((highlight) => (
+                <li key={highlight}>{highlight}</li>
+              ))}
+            </ul>
+          </details>
         </div>
         <div className="internship-visual-column">
           <BrandMark asset={internship.logo} />
           <p className="internship-status">{internship.status}</p>
           <EngineeringJourney label={`${internship.company} 工程旅程`} nodes={internship.journey} />
-          <ul aria-label={`${internship.company} 能力建设记录`} className="capability-records">
-            {capabilityRecords.map((highlight) => (
-              <li key={highlight}>{highlight}</li>
-            ))}
-          </ul>
         </div>
       </div>
     </article>
