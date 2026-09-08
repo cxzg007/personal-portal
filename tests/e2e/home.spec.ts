@@ -251,6 +251,74 @@ test("internship cards ship brand logos, alternating layouts, and desktop sticky
   await expect(internships.getByRole("button")).toHaveCount(0);
 });
 
+test("expanding any internship disclosure un-sticks the stack and keeps detail items unobstructed", async (
+  { page },
+  testInfo,
+) => {
+  test.skip(testInfo.project.name !== "chromium", "sticky stacking is a desktop-only layout");
+  await page.goto("/");
+
+  const internships = page.locator("main > section#internships");
+  const internshipCards = internships.getByRole("article");
+  const disclosureLabels = [
+    "查看京东工程细节",
+    "查看智元机器人工程细节",
+    "查看中国船舶集团 722 研究所工程细节",
+  ];
+  const recordLabels = ["京东 能力建设记录", "智元机器人 能力建设记录", "中国船舶集团 722 研究所 能力建设记录"];
+
+  // 未展开时堆叠保持 sticky。
+  const firstCard = internshipCards.nth(0);
+  expect(await firstCard.evaluate((element) => window.getComputedStyle(element).position)).toBe(
+    "sticky",
+  );
+
+  // 三张卡片各自渲染对应的品牌工程示意图（jd→ontology、agibot→streaming、cssc→communication）。
+  const engineeringKinds = ["ontology", "streaming", "communication"];
+  for (let index = 0; index < 3; index += 1) {
+    const figure = internshipCards.nth(index).locator(`figure[data-engineering-kind="${engineeringKinds[index]}"]`);
+    await expect(figure).toBeVisible();
+    await expect(figure.locator("svg")).toHaveAttribute("aria-hidden", "true");
+  }
+
+  for (let index = 0; index < 3; index += 1) {
+    const card = internshipCards.nth(index);
+    const details = card.locator("details.internship-details");
+
+    await card.getByText(disclosureLabels[index]).click();
+    await expect(details).toHaveAttribute("open", "");
+    for (let check = 0; check < 3; check += 1) {
+      const position = await internshipCards
+        .nth(check)
+        .evaluate((element) => window.getComputedStyle(element).position);
+      expect(position).toBe("static");
+    }
+
+    // 滚动至该卡最后一条能力建设记录，几何级验证中心点不被页头/相邻卡遮挡。
+    const recordItems = card.getByLabel(recordLabels[index]).getByRole("listitem");
+    const lastItem = recordItems.last();
+    await lastItem.scrollIntoViewIfNeeded();
+    await expect(lastItem).toBeVisible();
+
+    const hit = await lastItem.evaluate((node) => {
+      const rect = node.getBoundingClientRect();
+      const point = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      const target = document.elementFromPoint(point.x, point.y);
+      if (!target) return { point, inside: false };
+      return { point, inside: node.contains(target) };
+    });
+    expect(hit.inside).toBe(true);
+    expect(hit.point.y).toBeGreaterThan(0);
+    expect(hit.point.y).toBeLessThan(page.viewportSize()!.height);
+
+    // 关闭 details 后恢复 sticky 堆叠。
+    await card.getByText(disclosureLabels[index]).click();
+    await expect(details).not.toHaveAttribute("open");
+    const restored = await firstCard.evaluate((element) => window.getComputedStyle(element).position);
+    expect(restored).toBe("sticky");
+  }
+});
+
 test("open source showcase leads with featured PR links and a collapsed remainder", async ({ page }) => {
   await page.goto("/");
 

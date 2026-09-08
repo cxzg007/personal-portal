@@ -1,0 +1,298 @@
+/*
+ * 工程示意图一次性入场动画。
+ * 基础态 = 动画结束态：无 data-in-view（无 JS / static / reduced-motion）
+ * 时图形完整可读；仅当元素进入视口（复用 .profile-reveal observer
+ * 写入 data-in-view="true"）时播放一次装饰性动画，反复滚动不重播内容遮挡。
+ * 所有颜色取自 .profile-shell 作用域 token，不依赖未定义的 --brand-accent。
+ */
+
+.figure {
+  margin: 0;
+  width: 100%;
+}
+
+.diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.caption {
+  margin: 0.45rem 0 0;
+  color: var(--profile-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* --- 共享图形基色 --- */
+
+.entityNode,
+.streamTrack,
+.mainNode {
+  fill: var(--profile-panel);
+  stroke: var(--profile-line);
+  stroke-width: 1.5;
+}
+
+.entityLabel,
+.trackLabel,
+.boundaryLabel,
+.pathLabel,
+.exitLabel {
+  fill: var(--profile-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-anchor: middle;
+}
+
+.timeline,
+.timelineTick {
+  stroke: var(--profile-line);
+  stroke-width: 1.5;
+}
+
+/* --- ontology：查询路径依次亮起（约 1.4s） --- */
+
+.queryPath {
+  fill: none;
+  stroke: rgb(182 83 53 / 45%);
+  stroke-width: 2;
+}
+
+.controlledExit {
+  fill: none;
+  stroke: var(--profile-accent);
+  stroke-dasharray: 5 4;
+  stroke-width: 1.5;
+}
+
+.exitLabel {
+  fill: var(--profile-accent);
+}
+
+.figure[data-in-view="true"] .entityNode {
+  animation: nodeWake 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.figure[data-in-view="true"] .entityNode[data-step="2"] {
+  animation-delay: 350ms;
+}
+
+.figure[data-in-view="true"] .entityNode[data-step="3"] {
+  animation-delay: 700ms;
+}
+
+.figure[data-in-view="true"] .queryPath {
+  stroke: var(--profile-accent);
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: drawPath 350ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.figure[data-in-view="true"] .queryPath[data-step="2"] {
+  animation-delay: 350ms;
+}
+
+.figure[data-in-view="true"] .queryPath[data-step="3"] {
+  animation-delay: 700ms;
+}
+
+.figure[data-in-view="true"] .queryPath[data-step="4"] {
+  animation-delay: 1050ms;
+}
+
+.figure[data-in-view="true"] .controlledExit {
+  animation: nodeWake 350ms cubic-bezier(0.22, 1, 0.36, 1) 1050ms both;
+}
+
+/* --- streaming：播放头移动一次、数据帧依次显现（约 1.6s） --- */
+
+.dataFrame {
+  fill: var(--profile-sage);
+  opacity: 0.9;
+}
+
+.sessionBoundary {
+  stroke: var(--profile-muted);
+  stroke-dasharray: 4 5;
+  stroke-width: 1.5;
+}
+
+.playhead {
+  stroke: var(--profile-accent);
+  stroke-width: 2;
+  /* 静态基线即播放终点，播放头只前进一次 */
+  transform: translateX(348px);
+}
+
+.figure[data-in-view="true"] .dataFrame {
+  animation: frameIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.figure[data-in-view="true"] .dataFrame[data-step="2"] {
+  animation-delay: 150ms;
+}
+
+.figure[data-in-view="true"] .dataFrame[data-step="3"] {
+  animation-delay: 300ms;
+}
+
+.figure[data-in-view="true"] .dataFrame[data-step="4"] {
+  animation-delay: 450ms;
+}
+
+.figure[data-in-view="true"] .dataFrame[data-step="5"] {
+  animation-delay: 600ms;
+}
+
+.figure[data-in-view="true"] .dataFrame[data-step="6"] {
+  animation-delay: 750ms;
+}
+
+.figure[data-in-view="true"] .dataFrame[data-step="7"] {
+  animation-delay: 900ms;
+}
+
+.figure[data-in-view="true"] .dataFrame[data-step="8"] {
+  animation-delay: 1050ms;
+}
+
+.figure[data-in-view="true"] .dataFrame[data-step="9"] {
+  animation-delay: 1200ms;
+}
+
+.figure[data-in-view="true"] .playhead {
+  animation: playheadMove 1600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* --- communication：主链路变淡、替代链路亮起（约 1.6s） --- */
+
+.mainEdge {
+  stroke: var(--profile-line);
+  stroke-width: 2;
+}
+
+/* 静态基线即“已降级”的主链路段（动画结束后同态） */
+.degradingEdge {
+  stroke: var(--profile-line);
+  stroke-width: 2;
+  opacity: 0.28;
+}
+
+.altEdge {
+  stroke: var(--profile-sage);
+  stroke-width: 2;
+}
+
+.altNode {
+  fill: var(--profile-panel);
+  stroke: var(--profile-sage);
+  stroke-width: 2;
+}
+
+.figure[data-in-view="true"] .mainEdge {
+  animation: edgeWake 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.figure[data-in-view="true"] .mainEdge[data-step="2"] {
+  animation-delay: 200ms;
+}
+
+.figure[data-in-view="true"] .mainEdge[data-step="3"] {
+  animation-delay: 400ms;
+}
+
+.figure[data-in-view="true"] .degradingEdge {
+  animation: edgeDegrade 1600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.figure[data-in-view="true"] .altEdge {
+  animation: edgeWake 280ms cubic-bezier(0.22, 1, 0.36, 1) 800ms both;
+}
+
+.figure[data-in-view="true"] .altEdge[data-step="2"] {
+  animation-delay: 1080ms;
+}
+
+.figure[data-in-view="true"] .altEdge[data-step="3"] {
+  animation-delay: 1360ms;
+}
+
+.figure[data-in-view="true"] .altNode {
+  animation: nodeWake 280ms cubic-bezier(0.22, 1, 0.36, 1) 800ms both;
+}
+
+.figure[data-in-view="true"] .altNode[data-step="3"] {
+  animation-delay: 1360ms;
+}
+
+/* --- keyframes：仅微透明度/位移，不移动文本 --- */
+
+@keyframes nodeWake {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawPath {
+  from {
+    stroke-dashoffset: 220;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes frameIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+@keyframes playheadMove {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(348px);
+  }
+}
+
+@keyframes edgeWake {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes edgeDegrade {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.28;
+  }
+}
+
+/* reduced-motion / static：全局 profile.css 已将动画压至 0.01ms，
+   此处仅兜底声明禁用 transform，确保播放头等变换不残留。 */
+@media (prefers-reduced-motion: reduce) {
+  .figure .playhead {
+    transform: translateX(348px);
+  }
+}

@@ -18,6 +18,8 @@
   --amber: var(--terracotta);
   --coral: var(--terracotta-deep);
   --amber-rgb: 184 95 63;
+  /* 修复 .brand-mark 边框/内阴影长期引用的未定义变量（缺失时边框整体失效） */
+  --brand-accent: 184 95 63;
   --color-bg: var(--page);
   --color-bg-deep: var(--surface-strong);
   --color-panel: rgba(255, 250, 240, 0.82);

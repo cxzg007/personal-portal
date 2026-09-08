@@ -97,4 +97,26 @@ describe("internship story card", () => {
     expect(details!.textContent).toContain("三级读取链路");
     expect(details!.textContent).toContain("三级实体去重");
   });
+
+  it("maps each internship brand theme to its explicit engineering visual kind", () => {
+    const expectedKindsByTheme: Record<string, string> = {
+      jd: "ontology",
+      agibot: "streaming",
+      cssc: "communication",
+    };
+
+    internships.forEach((internship, index) => {
+      const expectedKind = expectedKindsByTheme[internship.logo.theme];
+      expect(expectedKind).toBeDefined();
+
+      const view = render(<InternshipStoryCard internship={internship} index={index} />);
+      const figure = view.container.querySelector(`figure[data-engineering-kind="${expectedKind}"]`);
+      expect(figure).not.toBeNull();
+      expect(figure!.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
+
+      const caption = within(figure as HTMLElement).getByText(`${internship.company} 工程示意`);
+      expect(caption).toBeVisible();
+      view.unmount();
+    });
+  });
 });

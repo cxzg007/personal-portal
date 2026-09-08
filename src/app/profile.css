@@ -458,6 +458,15 @@ html[data-profile-motion="static"] .sticky-internship-card {
   transition: none;
 }
 
+/* 任一卡片的工程细节展开后，整个 sticky 堆叠退化为普通文档流：
+   取消 sticky/缩放/透明度与过渡，长内容完整展开阅读；关闭后恢复。 */
+.sticky-internship-list:has(details[open]) .sticky-internship-card {
+  position: static;
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
 .internship-card-header {
   margin-bottom: 0.65rem;
 }
