@@ -10,12 +10,11 @@ const { profile } = loadSiteContent();
 afterEach(cleanup);
 
 describe("profile dock", () => {
-  it("renders the real name, target role, and recruiting status", () => {
+  it("renders the real name and the merged recruiting identity line", () => {
     render(<ProfileDock profile={profile} />);
 
     expect(screen.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
-    expect(screen.getByText(profile.targetRole)).toBeVisible();
-    expect(screen.getByText(profile.recruitingStatus)).toBeVisible();
+    expect(screen.getByText(`2027 届校招 · ${profile.targetRole}`)).toBeVisible();
   });
 
   it("renders exactly two education rows with the badge block layout", () => {
@@ -69,9 +68,11 @@ describe("profile dock", () => {
     );
   });
 
-  it("shows the exact growth path copy", () => {
+  it("no longer renders the growth path copy", () => {
     render(<ProfileDock profile={profile} />);
 
-    expect(screen.getByText("通信工程 → 后端系统 → Agent / 知识图谱 → 可靠 AI 工程")).toBeVisible();
+    expect(
+      screen.queryByText("通信工程 → 后端系统 → Agent / 知识图谱 → 可靠 AI 工程"),
+    ).not.toBeInTheDocument();
   });
 });

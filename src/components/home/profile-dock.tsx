@@ -6,14 +6,11 @@ type ProfileDockProps = {
   profile: SiteContent["profile"];
 };
 
-const GROWTH_PATH = "通信工程 → 后端系统 → Agent / 知识图谱 → 可靠 AI 工程";
-
 export function ProfileDock({ profile }: ProfileDockProps) {
   return (
     <aside className="profile-dock">
       <p className="profile-dock-name">{profile.name} / Jiang Junjie</p>
-      <p className="profile-dock-role">{profile.targetRole}</p>
-      <p className="profile-dock-status">{profile.recruitingStatus}</p>
+      <p className="profile-dock-role">{`2027 届校招 · ${profile.targetRole}`}</p>
 
       <ul aria-label="教育经历" className="profile-dock-education">
         {profile.education.map((education) => (
@@ -49,7 +46,6 @@ export function ProfileDock({ profile }: ProfileDockProps) {
         </a>
       </div>
 
-      <p className="profile-dock-growth">{GROWTH_PATH}</p>
     </aside>
   );
 }

@@ -12,9 +12,9 @@ test("homepage uses the light warm paper tokens", async ({ page }) => {
       muted: styles.getPropertyValue("--profile-muted").trim(),
     };
   });
-  expect(tokens.ink).toBe("#382d22");
-  expect(tokens.bg).toBe("#f8efdc");
-  expect(tokens.muted).toBe("#382d229e");
+  expect(tokens.ink).toBe("#30261f");
+  expect(tokens.bg).toBe("#faf7ef");
+  expect(tokens.muted).toBe("#6f6257");
 });
 
 test("homepage keeps readable contrast on the light theme", async ({ page }) => {
@@ -124,7 +124,7 @@ test("focused navigation and call-to-action links show a terracotta ring of at l
   for (const ring of [navRing, ctaRing]) {
     expect(ring.style).not.toBe("none");
     expect(Number.parseFloat(ring.width)).toBeGreaterThanOrEqual(2);
-    expect(ring.color).toBe("rgb(184, 95, 63)");
+    expect(ring.color).toBe("rgb(182, 83, 53)");
   }
 });
 

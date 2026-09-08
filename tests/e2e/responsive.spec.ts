@@ -66,7 +66,9 @@ async function expectHorizontallyContained(
 async function expectNoHiddenOffscreenContent(page: Page) {
   const offenders = await page.evaluate(() => {
     const tolerance = 1;
-    const allowedOverflow = ".table-scroll, .table-scroll *";
+    // SVG <text> 的 clientWidth 固定为约一个字符宽（浏览器度量怪癖），
+    // 与视口/字号无关，并不代表真实溢出，故一并豁免。
+    const allowedOverflow = ".table-scroll, .table-scroll *, svg text";
     const labels = (element: Element) => {
       const className = typeof element.className === "string" ? `.${element.className.trim().replaceAll(" ", ".")}` : "";
       return `${element.tagName.toLowerCase()}${className}`;

@@ -56,23 +56,23 @@ export default async function HomePage() {
         />
         <ProfileHero profile={content.profile} />
         <section aria-labelledby="internships-heading" className="profile-stage profile-stage--sage" id="internships">
-          <h2 className="profile-reveal" id="internships-heading">实习内容落在真实系统里。</h2>
+          <h2 className="profile-reveal" id="internships-heading">实习经历</h2>
           <StickyInternshipStack internships={content.internships} />
         </section>
         <section aria-labelledby="systems-heading" className="profile-stage profile-stage--cream" id="systems">
-          <h2 className="profile-reveal" id="systems-heading">项目按工程问题组织。</h2>
+          <h2 className="profile-reveal" id="systems-heading">系统设计</h2>
           <SystemProjectTabs projects={content.caseStudies} />
         </section>
         <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--terracotta profile-stage--open-source" id="open-source">
-          <h2 className="profile-reveal" id="open-source-heading">开源贡献与公开影响力。</h2>
+          <h2 className="profile-reveal" id="open-source-heading">开源贡献</h2>
           <OpenSourceShowcase project={content.openSource} />
         </section>
         <section aria-labelledby="writing-heading" className="profile-stage profile-stage--sage" id="writing">
-          <h2 className="profile-reveal" id="writing-heading">技术写作与工程复盘。</h2>
+          <h2 className="profile-reveal" id="writing-heading">工程复盘</h2>
           <WritingStage posts={featuredPosts} />
         </section>
         <section aria-labelledby="contact-heading" className="profile-stage profile-stage--terracotta" id="contact">
-          <h2 className="profile-reveal" id="contact-heading">Build reliable agent systems together.</h2>
+          <h2 className="profile-reveal" id="contact-heading">一起构建可靠的 AI 系统。</h2>
           <ContactStage profile={content.profile} />
         </section>
       </main>

@@ -4,12 +4,11 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto("/");
 
-  const hero = page.getByRole("region", { name: "cxzg007" });
+  const hero = page.locator("#profile");
 
-  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+  await expect(hero.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
   await expect(hero.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
-  await expect(hero.getByText("AI Agent / 后端开发", { exact: true })).toBeVisible();
-  await expect(hero.getByText("2027 届校招｜AI Agent / 后端开发")).toBeVisible();
+  await expect(hero.getByText("2027 届校招 · AI Agent / 后端开发", { exact: true })).toBeVisible();
   await expect(hero.getByText("电子信息", { exact: true })).toBeVisible();
   await expect(hero.getByText("通信工程", { exact: true })).toBeVisible();
   await expect(hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com" })).toHaveAttribute(
@@ -31,6 +30,34 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
 
   const resume = await page.request.get("/resume.pdf");
   expect(resume.status()).toBe(200);
+
+  for (const target of [
+    hero.locator(".profile-dock-name"),
+    hero.getByRole("list", { name: "教育经历" }),
+    hero.getByRole("link", { name: "查看实习", exact: true }),
+    hero.getByRole("link", { name: "下载简历 PDF", exact: true }),
+  ]) {
+    await expect(target).toBeInViewport({ ratio: 1 });
+    const box = await target.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.y + box!.height).toBeLessThanOrEqual(720);
+  }
+
+  const headerBox = await page.locator("#top").boundingBox();
+  expect(headerBox).not.toBeNull();
+  const headerBottom = headerBox!.y + headerBox!.height;
+  const educationEntries = hero.getByRole("list", { name: "教育经历" }).getByRole("listitem");
+  await expect(educationEntries).toHaveCount(2);
+  for (const entry of await educationEntries.all()) {
+    const box = await entry.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.y).toBeGreaterThanOrEqual(headerBottom);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(720);
+  }
+  const githubCtaBox = await githubCta.boundingBox();
+  expect(githubCtaBox).not.toBeNull();
+  expect(githubCtaBox!.y).toBeGreaterThanOrEqual(headerBottom);
+  expect(githubCtaBox!.y + githubCtaBox!.height).toBeLessThanOrEqual(720);
 
   await expect(page.locator("section#info")).toHaveCount(0);
   await expect(page.locator('header a[href="#info"]')).toHaveCount(0);

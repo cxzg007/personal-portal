@@ -1,0 +1,68 @@
+.figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  width: 100%;
+}
+
+.network {
+  display: block;
+  width: 100%;
+  max-width: 34rem;
+  height: auto;
+  overflow: visible;
+}
+
+.coreEdge {
+  stroke: var(--profile-accent);
+  stroke-width: 2;
+  opacity: 0.55;
+}
+
+.auxEdge {
+  stroke: var(--profile-muted);
+  stroke-width: 1.25;
+  opacity: 0.28;
+}
+
+.coreNode {
+  fill: var(--profile-panel);
+  stroke: var(--profile-accent);
+  stroke-width: 2;
+}
+
+.auxNode {
+  fill: var(--profile-sage);
+  opacity: 0.75;
+}
+
+.coreLabel {
+  fill: var(--profile-ink);
+  font-size: 17px;
+  font-weight: 600;
+  dominant-baseline: central;
+}
+
+.caption {
+  color: var(--profile-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.14em;
+  margin: 0;
+  text-align: center;
+}
+
+/* 761–1023px：缩小图形，避免挤压左侧文字。 */
+@media (max-width: 1023px) {
+  .network {
+    max-width: 24rem;
+  }
+}
+
+/* ≤760px：网络默认收拢链路，保持小巧居中。 */
+@media (max-width: 760px) {
+  .network {
+    max-width: 19rem;
+  }
+}
