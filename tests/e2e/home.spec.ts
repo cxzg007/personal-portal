@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("homepage exposes the campus recruiting identity and primary actions", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto("/");
 
   const hero = page.getByRole("region", { name: "cxzg007" });
@@ -15,12 +16,37 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
     "href",
     "mailto:jiangjunjie_tj@foxmail.com",
   );
-  await expect(hero.getByRole("link", { name: /GitHub/ })).toHaveAttribute(
+  await expect(hero.getByRole("link", { name: "GitHub", exact: true })).toHaveAttribute(
     "href",
     "https://github.com/cxzg007",
   );
-  await expect(page.getByRole("link", { name: "查看实习" })).toHaveAttribute("href", "#internships");
+
+  const viewInternships = hero.getByRole("link", { name: "查看实习" });
+  const downloadResume = hero.getByRole("link", { name: "下载简历 PDF" });
+  const githubCta = hero.getByRole("link", { name: "GitHub ↗" });
+  await expect(viewInternships).toHaveAttribute("href", "#internships");
+  await expect(downloadResume).toHaveAttribute("href", "/resume.pdf");
+  await expect(githubCta).toHaveAttribute("href", "https://github.com/cxzg007");
+  await expect(githubCta).toHaveAttribute("target", "_blank");
+
+  const resume = await page.request.get("/resume.pdf");
+  expect(resume.status()).toBe(200);
+
+  await expect(page.locator("section#info")).toHaveCount(0);
+  await expect(page.locator('header a[href="#info"]')).toHaveCount(0);
   await expect(page.getByRole("link", { name: "教育" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "信息" })).toHaveCount(0);
+
+  const duplicateIds = await page.evaluate(() => {
+    const seen = new Set<string>();
+    const duplicates = new Set<string>();
+    document.querySelectorAll("[id]").forEach((element) => {
+      if (seen.has(element.id)) duplicates.add(element.id);
+      seen.add(element.id);
+    });
+    return [...duplicates];
+  });
+  expect(duplicateIds).toEqual([]);
 });
 
 test("internships, system cases, and contact form a keyboard-accessible recruiting narrative", async ({
@@ -34,19 +60,44 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(internships.getByText("京东", { exact: true })).toBeVisible();
   await expect(internships.getByText("智元机器人", { exact: true })).toBeVisible();
   await expect(internships.getByText("中国船舶集团 722 研究所", { exact: true })).toBeVisible();
-  await expect(internships.getByLabel("京东 能力建设记录")).toBeVisible();
-  await expect(internships.getByLabel("智元机器人 能力建设记录")).toBeVisible();
-  await expect(internships.getByLabel("中国船舶集团 722 研究所 能力建设记录")).toBeVisible();
+  await expect(internships.getByLabel("京东 核心成果")).toBeVisible();
+  await expect(internships.getByLabel("智元机器人 核心成果")).toBeVisible();
+  await expect(internships.getByLabel("中国船舶集团 722 研究所 核心成果")).toBeVisible();
 
   const internshipCards = internships.getByRole("article");
+  await expect(
+    internshipCards.nth(0).getByLabel("京东 核心成果").getByRole("listitem"),
+  ).toHaveCount(3);
+  await expect(
+    internshipCards.nth(1).getByLabel("智元机器人 核心成果").getByRole("listitem"),
+  ).toHaveCount(3);
+  await expect(
+    internshipCards.nth(2).getByLabel("中国船舶集团 722 研究所 核心成果").getByRole("listitem"),
+  ).toHaveCount(2);
+
+  const jdDetails = internshipCards.nth(0).locator("details.internship-details");
+  await expect(jdDetails).not.toHaveAttribute("open");
+  await expect(internshipCards.nth(0).getByLabel("京东 能力建设记录")).toBeHidden();
+
+  for (let step = 0; step < 60; step += 1) {
+    if (
+      await jdDetails.locator("summary").evaluate((node) => document.activeElement === node)
+    )
+      break;
+    await page.keyboard.press("Tab");
+  }
+  await expect(jdDetails.locator("summary")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(jdDetails).toHaveAttribute("open", "");
+  await expect(internshipCards.nth(0).getByLabel("京东 能力建设记录")).toBeVisible();
   await expect(
     internshipCards.nth(0).getByLabel("京东 能力建设记录").getByRole("listitem"),
   ).toHaveCount(5);
   await expect(
-    internshipCards.nth(1).getByLabel("智元机器人 能力建设记录").getByRole("listitem"),
+    internshipCards.nth(1).getByLabel("智元机器人 能力建设记录").locator("li"),
   ).toHaveCount(6);
   await expect(
-    internshipCards.nth(2).getByLabel("中国船舶集团 722 研究所 能力建设记录").getByRole("listitem"),
+    internshipCards.nth(2).getByLabel("中国船舶集团 722 研究所 能力建设记录").locator("li"),
   ).toHaveCount(3);
 
   const systems = page.locator("main > section#systems");
@@ -144,9 +195,9 @@ test("mobile navigation resets cleanly across the desktop breakpoint", async ({ 
 test("homepage exposes the reference-style section order", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator("main > section")).toHaveCount(7);
+  await expect(page.locator("main > section")).toHaveCount(6);
   expect(await page.locator("main > section").evaluateAll((sections) => sections.map(({ id }) => id))).toEqual([
-    "profile", "info", "internships", "systems", "open-source", "writing", "contact",
+    "profile", "internships", "systems", "open-source", "writing", "contact",
   ]);
 });
 

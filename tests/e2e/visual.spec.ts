@@ -45,13 +45,6 @@ test("profile hero visual at 1440", async ({ page }, testInfo) => {
   await expect(page.locator("section.profile-hero")).toHaveScreenshot("profile-hero-1440.png");
 });
 
-test("profile information visual at 1440", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
-
-  await prepareStablePage(page, "/");
-  await expect(page.locator("main > section#info")).toHaveScreenshot("profile-information-1440.png");
-});
-
 test("internship story stack visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 

@@ -8,11 +8,18 @@ export function getStackProgress(top: number, stickyTop: number): 0 | 1 | 2 {
   return 2;
 }
 
+// 激活线取页头下方 240px：页面在窄视口（如 768×1024 tablet）缩短后，
+// 靠底部的 writing 分区顶部最多只能进入页头下方约 216px 处（更小的窗口
+// 会先触发页底兜底），160px 的旧阈值会使其永远无法被高亮。
+const ACTIVE_SECTION_OFFSET = 240;
+
 export function selectActiveSection(
   entries: Array<{ id: string; top: number }>,
   headerHeight: number,
 ): string {
-  return entries.filter(({ top }) => top <= headerHeight + 160).at(-1)?.id ?? "profile";
+  return (
+    entries.filter(({ top }) => top <= headerHeight + ACTIVE_SECTION_OFFSET).at(-1)?.id ?? "profile"
+  );
 }
 
 const DEFAULT_HEADER_HEIGHT = 72;

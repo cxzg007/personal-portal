@@ -193,8 +193,8 @@ describe("page motion controller pure helpers", () => {
     expect(
       selectActiveSection(
         [
-          { id: "a", top: 160 },
-          { id: "b", top: 161 },
+          { id: "a", top: 240 },
+          { id: "b", top: 241 },
         ],
         0,
       ),

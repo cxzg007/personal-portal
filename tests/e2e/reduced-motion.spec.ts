@@ -28,7 +28,7 @@ test("reduced motion preference keeps the layout static without hiding content",
   expect(transitionDurations.every((duration) => duration === "0s")).toBe(true);
 
   const cards = page.locator(
-    ".profile-info-facts, .sticky-internship-card, .system-project-panel, .open-source-showcase, #writing article, #contact > div, .blog-card",
+    ".sticky-internship-card, .system-project-panel, .open-source-showcase, #writing article, #contact > div, .blog-card",
   );
   await expectNoRotation(cards);
   const transformsBeforeHover = await cards.evaluateAll((elements) =>

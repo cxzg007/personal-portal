@@ -13,7 +13,11 @@ test("core recruiting content is server rendered", async ({ page }) => {
   await expect(page.getByText(/面向 AI Agent 的图原生上下文与可审计基础设施/)).toBeVisible();
   await expect(page.getByRole("link", { name: /发送邮件/ })).toHaveAttribute("href", "mailto:jiangjunjie_tj@foxmail.com");
   await expect(page.getByRole("link", { name: /GitHub/ }).last()).toHaveAttribute("href", "https://github.com/cxzg007");
-  await expect(page.getByRole("link", { name: /简历/ })).toHaveCount(0);
+  const resumeLinks = page.getByRole("link", { name: "下载简历 PDF" });
+  await expect(resumeLinks).toHaveCount(2);
+  for (const link of await resumeLinks.all()) {
+    await expect(link).toHaveAttribute("href", "/resume.pdf");
+  }
 });
 
 test("server HTML keeps the Semantica credibility summary with collapsed remaining PRs", async ({ page }) => {

@@ -124,8 +124,17 @@ for (const viewport of viewports) {
     const firstInternship = internships.locator('article[data-card-index="0"]');
     await expectHorizontallyContained(firstInternship);
     await expectHorizontallyContained(firstInternship.getByRole("img", { name: "京东品牌标志" }));
-    await expectHorizontallyContained(firstInternship.getByLabel("京东 能力建设记录"));
-    await expectHorizontallyContained(internships.getByLabel("中国船舶集团 722 研究所 能力建设记录"));
+    // 能力建设记录位于默认闭合的 details 内：断言可见的 summary 不横向溢出、记录列表保持隐藏。
+    const jdDetails = firstInternship.locator("details.internship-details");
+    await expectHorizontallyContained(jdDetails.getByText("查看京东工程细节"));
+    await expect(firstInternship.getByLabel("京东 能力建设记录")).toBeHidden();
+    const csscDetails = internships
+      .locator('article[data-card-index="2"]')
+      .locator("details.internship-details");
+    await expectHorizontallyContained(csscDetails.getByText("查看中国船舶集团 722 研究所工程细节"));
+    await expect(
+      internships.getByLabel("中国船舶集团 722 研究所 能力建设记录"),
+    ).toBeHidden();
 
     const systems = page.locator("main > section#systems");
     await expectHorizontallyContained(systems.getByRole("tablist"));

@@ -82,6 +82,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     page.locator("main > section#writing").getByRole("link", { name: `阅读《${postTitle}》全文` }),
     contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }),
     contact.getByRole("link", { name: "GitHub", exact: true }),
+    contact.getByRole("link", { name: "下载简历 PDF", exact: true }),
   ];
 
   for (const target of keyboardOrder) {
