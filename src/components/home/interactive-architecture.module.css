@@ -1,0 +1,194 @@
+/*
+ * 交互式架构工作台（interactive-architecture）。
+ * 布局：55:45 左图右解释；画布按 640×260 参考坐标系定位节点按钮，
+ * SVG 连线铺底（aria-hidden），节点为绝对定位的 HTML button。
+ * 颜色全部取自全局 profile.css 定义的 token。
+ */
+
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.canvasFigure {
+  margin: 0;
+}
+
+.canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 640 / 260;
+  /* 换行文案较多时按内容自然增高，避免截断 */
+  min-height: 15rem;
+}
+
+.canvasSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.edge {
+  stroke: var(--profile-line);
+  stroke-width: 2;
+}
+
+.node {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.5rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--profile-line);
+  border-radius: 10px;
+  background: var(--profile-panel);
+  color: var(--profile-ink);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.node:hover {
+  border-color: var(--profile-accent);
+}
+
+.node:focus-visible {
+  outline: 2px solid var(--profile-accent);
+  outline-offset: 2px;
+}
+
+.node[aria-pressed="true"] {
+  border-color: var(--profile-accent);
+  background: var(--profile-field-cream);
+  box-shadow: 0 0 0 1px var(--profile-accent);
+}
+
+.caption {
+  margin: 0.5rem 0 0;
+  color: var(--profile-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.explanation {
+  border: 1px solid var(--profile-line);
+  border-radius: 10px;
+  background: var(--profile-panel);
+  padding: 1rem 1.1rem;
+  /* 解释区随长文案自然增长，不做高度截断 */
+  min-height: 15rem;
+}
+
+.liveStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.explanationHeading {
+  margin: 0 0 0.65rem;
+  color: var(--profile-accent);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.detailList {
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.detailItem {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.detailLabel {
+  color: var(--profile-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+}
+
+.detailText {
+  margin: 0;
+  color: var(--profile-ink);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.prLink {
+  color: var(--profile-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.prLink:hover,
+.prLink:focus-visible {
+  color: var(--profile-accent-hover);
+}
+
+.statusBadge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--profile-sage);
+  border-radius: 999px;
+  color: var(--profile-sage);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* 761–1023px：图与解释区纵排，节点按钮保持可读尺寸 */
+@media (max-width: 1023px) {
+  .workbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .canvas {
+    min-height: 12rem;
+  }
+
+  .node {
+    min-height: 3rem;
+    font-size: 0.72rem;
+  }
+
+  .explanation {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node {
+    transition: none;
+  }
+}

@@ -8,6 +8,7 @@ import { WritingStage } from "@/components/home/writing-stage";
 import { Header } from "@/components/shell/header";
 import { loadSiteContent } from "@/content/load-site-content";
 import { getAllPosts } from "@/content/posts";
+import { loadSystemArchitectures } from "@/content/system-architectures";
 import { serializeJsonLd } from "@/lib/discovery";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -61,7 +62,7 @@ export default async function HomePage() {
         </section>
         <section aria-labelledby="systems-heading" className="profile-stage profile-stage--cream" id="systems">
           <h2 className="profile-reveal" id="systems-heading">系统设计</h2>
-          <SystemProjectTabs projects={content.caseStudies} />
+          <SystemProjectTabs architectures={loadSystemArchitectures(content)} projects={content.caseStudies} />
         </section>
         <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--terracotta profile-stage--open-source" id="open-source">
           <h2 className="profile-reveal" id="open-source-heading">开源贡献</h2>

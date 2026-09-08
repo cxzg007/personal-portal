@@ -3,11 +3,13 @@
 import { useRef, useState } from "react";
 
 import type { CaseStudy } from "@/content/schema";
+import type { ResolvedSystemArchitecture } from "@/content/system-architectures";
 
-import { ArchitectureStage } from "./architecture-stage";
+import { InteractiveArchitecture } from "./interactive-architecture";
 
 type SystemProjectTabsProps = {
   projects: CaseStudy[];
+  architectures: ResolvedSystemArchitecture[];
 };
 
 function nextIndex(key: string, current: number, count: number) {
@@ -18,9 +20,10 @@ function nextIndex(key: string, current: number, count: number) {
   return current;
 }
 
-export function SystemProjectTabs({ projects }: SystemProjectTabsProps) {
+export function SystemProjectTabs({ projects, architectures }: SystemProjectTabsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const architectureByProjectId = new Map(architectures.map((architecture) => [architecture.projectId, architecture]));
 
   function activate(next: number) {
     setActiveIndex(next);
@@ -38,6 +41,7 @@ export function SystemProjectTabs({ projects }: SystemProjectTabsProps) {
   }
 
   const activeProject = projects[activeIndex];
+  const activeArchitecture = architectureByProjectId.get(activeProject.id);
 
   return (
     <div className="system-project-tabs">
@@ -73,7 +77,9 @@ export function SystemProjectTabs({ projects }: SystemProjectTabsProps) {
       >
         <h3 className="system-project-title">{activeProject.title}</h3>
         <p className="system-project-problem">{activeProject.problem}</p>
-        <ArchitectureStage project={activeProject} />
+        {activeArchitecture ? (
+          <InteractiveArchitecture architecture={activeArchitecture} key={activeProject.id} />
+        ) : null}
         <ul className="system-project-tradeoffs">
           {activeProject.tradeoffs.map((tradeoff) => (
             <li key={tradeoff}>{tradeoff}</li>

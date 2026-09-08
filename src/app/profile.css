@@ -707,49 +707,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
   text-underline-offset: 4px;
 }
 
-/* --- architecture stage --- */
-
-.architecture-stage {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.architecture-stage-node {
-  display: grid;
-  gap: 0.55rem;
-  padding: 1.25rem;
-  border: 1px solid var(--profile-line);
-  border-radius: 20px;
-  background: rgb(241 223 191 / 55%);
-}
-
-.architecture-stage-connector {
-  display: block;
-  width: 2.25rem;
-  height: 1px;
-  background: linear-gradient(90deg, var(--profile-accent), transparent);
-}
-
-.architecture-stage-label {
-  color: var(--profile-accent);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.architecture-stage-node p {
-  margin: 0;
-  color: var(--profile-muted);
-  font-size: 0.92rem;
-  line-height: 1.7;
-}
-
 /* --- open source showcase --- */
 
 .open-source-showcase {
@@ -1175,10 +1132,6 @@ html[data-profile-motion="enhanced"] .reveal[data-reveal-status="visible"] {
     position: static;
   }
 
-  .architecture-stage {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .open-source-showcase-header {
     flex-direction: column;
     align-items: flex-start;
@@ -1237,10 +1190,6 @@ html[data-profile-motion="enhanced"] .reveal[data-reveal-status="visible"] {
   .writing-stage .writing-body,
   .writing-stage .writing-meta {
     padding: 1.25rem 1.35rem;
-  }
-
-  .architecture-stage {
-    grid-template-columns: minmax(0, 1fr);
   }
 
   html[data-profile-motion="enhanced"] .reveal {
