@@ -1,0 +1,210 @@
+[
+  {
+    "projectId": "ontology-agent-platform",
+    "kind": "concept-flow",
+    "caption": "工程示意 · 按技术关注点简化",
+    "defaultNodeId": "semantic",
+    "nodes": [
+      {
+        "id": "semantic",
+        "label": "本体语义",
+        "column": 0,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 0 },
+          { "kind": "case", "field": "decisions", "index": 0 }
+        ]
+      },
+      {
+        "id": "relations",
+        "label": "关联推导",
+        "column": 1,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 1 },
+          { "kind": "case", "field": "decisions", "index": 1 }
+        ]
+      },
+      {
+        "id": "query",
+        "label": "语义查询",
+        "column": 2,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "decisions", "index": 2 }
+        ]
+      },
+      {
+        "id": "execution",
+        "label": "执行约束",
+        "column": 3,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 2 },
+          { "kind": "case", "field": "constraints", "index": 3 },
+          { "kind": "case", "field": "decisions", "index": 3 }
+        ]
+      }
+    ],
+    "edges": [
+      { "from": "semantic", "to": "relations" },
+      { "from": "relations", "to": "query" },
+      { "from": "query", "to": "execution" }
+    ]
+  },
+  {
+    "projectId": "streaming-backend",
+    "kind": "concept-flow",
+    "caption": "工程示意 · 按技术关注点简化",
+    "defaultNodeId": "reading",
+    "nodes": [
+      {
+        "id": "reading",
+        "label": "三级读取",
+        "column": 0,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 0 },
+          { "kind": "case", "field": "decisions", "index": 1 }
+        ]
+      },
+      {
+        "id": "transport",
+        "label": "双通道回放",
+        "column": 1,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 1 },
+          { "kind": "case", "field": "decisions", "index": 0 }
+        ]
+      },
+      {
+        "id": "session",
+        "label": "会话控制",
+        "column": 2,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 2 },
+          { "kind": "case", "field": "decisions", "index": 2 }
+        ]
+      },
+      {
+        "id": "isolation",
+        "label": "并发隔离",
+        "column": 3,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 3 },
+          { "kind": "case", "field": "decisions", "index": 3 }
+        ]
+      }
+    ],
+    "edges": [
+      { "from": "reading", "to": "transport" },
+      { "from": "transport", "to": "session" },
+      { "from": "session", "to": "isolation" }
+    ]
+  },
+  {
+    "projectId": "knowledge-memory",
+    "kind": "concept-flow",
+    "caption": "工程示意 · 按技术关注点简化",
+    "defaultNodeId": "dedup",
+    "nodes": [
+      {
+        "id": "dedup",
+        "label": "实体去重",
+        "column": 0,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 0 },
+          { "kind": "case", "field": "decisions", "index": 0 }
+        ]
+      },
+      {
+        "id": "idempotency",
+        "label": "幂等任务",
+        "column": 1,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 1 },
+          { "kind": "case", "field": "decisions", "index": 1 }
+        ]
+      },
+      {
+        "id": "recovery",
+        "label": "故障恢复",
+        "column": 2,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 2 },
+          { "kind": "case", "field": "decisions", "index": 2 }
+        ]
+      },
+      {
+        "id": "relations",
+        "label": "关系约束",
+        "column": 3,
+        "row": 0,
+        "details": [
+          { "kind": "case", "field": "constraints", "index": 3 },
+          { "kind": "case", "field": "decisions", "index": 3 }
+        ]
+      }
+    ],
+    "edges": [
+      { "from": "dedup", "to": "idempotency" },
+      { "from": "idempotency", "to": "recovery" },
+      { "from": "recovery", "to": "relations" }
+    ]
+  },
+  {
+    "projectId": "semantica-contributions",
+    "kind": "contribution-map",
+    "caption": "贡献领域 · 非完整项目架构",
+    "defaultNodeId": "data",
+    "nodes": [
+      {
+        "id": "data",
+        "label": "图数据适配",
+        "column": 0,
+        "row": 0,
+        "details": [
+          { "kind": "pr", "number": 1081 },
+          { "kind": "pr", "number": 1113 }
+        ]
+      },
+      {
+        "id": "constraints",
+        "label": "约束解释",
+        "column": 1,
+        "row": 0,
+        "details": [
+          { "kind": "pr", "number": 1094 }
+        ]
+      },
+      {
+        "id": "rules",
+        "label": "规则推理",
+        "column": 0,
+        "row": 1,
+        "details": [
+          { "kind": "pr", "number": 1077 },
+          { "kind": "pr", "number": 1096 }
+        ]
+      },
+      {
+        "id": "execution",
+        "label": "执行链路",
+        "column": 1,
+        "row": 1,
+        "details": [
+          { "kind": "pr", "number": 1226 },
+          { "kind": "pr", "number": 1217 },
+          { "kind": "pr", "number": 1215 }
+        ]
+      }
+    ],
+    "edges": []
+  }
+]
