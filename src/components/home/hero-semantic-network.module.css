@@ -45,6 +45,22 @@
   dominant-baseline: central;
 }
 
+/* 指针临近核心节点：driver 写入 data-network-highlight，联动邻接边高亮。 */
+.network [data-network-highlight] {
+  fill: var(--profile-accent);
+  stroke-width: 3;
+}
+
+.network [data-network-edge-active] {
+  opacity: 0.95;
+  stroke-width: 2.5;
+}
+
+/* 不可见或后台标签页：暂停渲染时整体淡出，恢复后回到正常强度。 */
+.network[data-network-running="false"] {
+  opacity: 0.45;
+}
+
 .caption {
   color: var(--profile-muted);
   font-size: 0.8125rem;

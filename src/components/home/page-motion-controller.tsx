@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 
+import { getHeroProgress } from "@/lib/hero-network";
+import { createHeroNetworkDriver, type HeroNetworkDriver } from "@/lib/hero-network-driver";
+
 export function getStackProgress(top: number, stickyTop: number): 0 | 1 | 2 {
   if (top > stickyTop + 120) return 0;
   if (top > stickyTop) return 1;
@@ -24,6 +27,10 @@ export function selectActiveSection(
 
 const DEFAULT_HEADER_HEIGHT = 72;
 const STICKY_TOP = 0;
+
+// 入场动画：约 360ms 展开静态链路，随后一次性微动收敛，总计不超过 4 秒。
+const INTRO_EXPAND_MS = 360;
+const INTRO_SETTLE_MS = 3_640;
 
 function getHeaderHeight(): number {
   const header = document.querySelector<HTMLElement>(".site-header");
@@ -77,9 +84,16 @@ export function PageMotionController() {
     const viewportPreference = window.matchMedia("(max-width: 760px)");
     let frameId: number | null = null;
     let observer: IntersectionObserver | null = null;
+    let heroObserver: IntersectionObserver | null = null;
     let listening = false;
     let hero: HTMLElement | null = null;
     let pointer: { x: number; y: number } | null = null;
+    let driver: HeroNetworkDriver | null = null;
+    let heroVisible = true;
+    let introPlayed = false;
+    let introPhase: "expand" | "settle" | "off" = "off";
+    let introStart = 0;
+    let introLastFrame = -1;
 
     const update = () => {
       frameId = null;
@@ -114,6 +128,37 @@ export function PageMotionController() {
           );
         }
       }
+
+      if (driver && hero && heroVisible && !document.hidden) {
+        const now = performance.now();
+        let networkProgress: number;
+        if (introPhase === "expand") {
+          networkProgress = Math.min(1, (now - introStart) / INTRO_EXPAND_MS);
+          if (networkProgress >= 1) {
+            introPhase = "settle";
+            introStart = now;
+          }
+        } else if (introPhase === "settle") {
+          const settleT = (now - introStart) / INTRO_SETTLE_MS;
+          if (settleT >= 1) {
+            introPhase = "off";
+            networkProgress = 1;
+          } else {
+            const decay = 1 - settleT;
+            networkProgress = 1 - 0.04 * Math.sin(settleT * Math.PI * 2) * decay;
+          }
+        } else {
+          const bounds = hero.getBoundingClientRect();
+          networkProgress = getHeroProgress(bounds.top, bounds.height);
+        }
+        driver.update(networkProgress, pointer);
+        // 入场阶段共用同一个 RAF 队列逐帧推进；结束后不再自行续帧。
+        // 同步 RAF stub（jsdom 测试）中时间戳不推进，用该守卫避免无限递归。
+        if (introPhase !== "off" && now !== introLastFrame) {
+          introLastFrame = now;
+          scheduleUpdate();
+        }
+      }
     };
 
     const scheduleUpdate = () => {
@@ -128,22 +173,55 @@ export function PageMotionController() {
       scheduleUpdate();
     };
 
+    const handlePointerLeave = () => {
+      pointer = null;
+      scheduleUpdate();
+    };
+
+    // 用户一旦滚动立即结束入场动画，直接衔接滚动目标进度。
+    const handleScroll = () => {
+      if (introPhase !== "off") {
+        introPhase = "off";
+      }
+      scheduleUpdate();
+    };
+
+    const handleVisibilityChange = () => {
+      const running = !document.hidden;
+      driver?.setRunning(running);
+      if (running) {
+        scheduleUpdate();
+      }
+    };
+
     const stopEnhanced = () => {
       if (observer) {
         observer.disconnect();
         observer = null;
       }
+      if (heroObserver) {
+        heroObserver.disconnect();
+        heroObserver = null;
+      }
+      if (driver) {
+        driver.destroy();
+        driver = null;
+      }
+      heroVisible = true;
+      introPhase = "off";
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (frameId !== null) {
         window.cancelAnimationFrame(frameId);
         frameId = null;
       }
       if (listening) {
-        window.removeEventListener("scroll", scheduleUpdate);
+        window.removeEventListener("scroll", handleScroll);
         window.removeEventListener("resize", scheduleUpdate);
         listening = false;
       }
       if (hero) {
         hero.removeEventListener("pointermove", handlePointerMove);
+        hero.removeEventListener("pointerleave", handlePointerLeave);
         hero = null;
       }
       pointer = null;
@@ -175,12 +253,41 @@ export function PageMotionController() {
         observer = revealObserver;
       }
       if (!listening) {
-        window.addEventListener("scroll", scheduleUpdate, { passive: true });
+        window.addEventListener("scroll", handleScroll, { passive: true });
         window.addEventListener("resize", scheduleUpdate, { passive: true });
         listening = true;
       }
       hero = document.getElementById("profile");
       hero?.addEventListener("pointermove", handlePointerMove, { passive: true });
+      hero?.addEventListener("pointerleave", handlePointerLeave, { passive: true });
+      if (!driver) {
+        const networkSvg = document.querySelector<SVGSVGElement>("[data-hero-network]");
+        if (networkSvg) {
+          driver = createHeroNetworkDriver(networkSvg);
+          driver.setRunning(!document.hidden);
+          heroVisible = !document.hidden;
+          document.addEventListener("visibilitychange", handleVisibilityChange);
+          const networkVisibilityObserver = new IntersectionObserver((entries) => {
+            const visible =
+              entries.some((entry) => entry.isIntersecting) && !document.hidden;
+            heroVisible = visible;
+            driver?.setRunning(visible);
+            if (visible) {
+              scheduleUpdate();
+            }
+          });
+          networkVisibilityObserver.observe(networkSvg);
+          heroObserver = networkVisibilityObserver;
+          // 仅首次挂载且当前在页面顶部时播放入场动画；
+          // preference 往返切换或恢复到中间滚动位置时直接使用当前进度，不闪回。
+          if (!introPlayed && window.scrollY <= 4) {
+            introPlayed = true;
+            introPhase = "expand";
+            introStart = performance.now();
+            introLastFrame = -1;
+          }
+        }
+      }
       update();
     };
 

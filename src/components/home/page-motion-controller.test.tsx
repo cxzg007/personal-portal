@@ -2,6 +2,12 @@ import { act, cleanup, render } from "@testing-library/react";
 import type React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  getHeroNetworkFrame,
+  getHeroProgress,
+  HERO_NETWORK_EDGES,
+  HERO_NETWORK_NODES,
+} from "@/lib/hero-network";
 import { Header } from "../shell/header";
 import {
   getStackProgress,
@@ -138,6 +144,81 @@ function mountEnhancedPage() {
   });
   vi.spyOn(document.documentElement, "scrollHeight", "get").mockReturnValue(5_000);
   render(<PageMotionController />);
+}
+
+function networkSvg() {
+  return document.querySelector<SVGSVGElement>("[data-hero-network]")!;
+}
+
+function nodeElement(id: string) {
+  return document.querySelector(`[data-network-node="${id}"]`)!;
+}
+
+function expectedNodeTransform(id: string, progress: number) {
+  const entry = getHeroNetworkFrame(progress).find((frame) => frame.id === id);
+  if (!entry) throw new Error(`unknown network node: ${id}`);
+  return `translate(${entry.point.x} ${entry.point.y})`;
+}
+
+function networkFixture() {
+  const edges = HERO_NETWORK_EDGES.map(
+    (edge) =>
+      `    <line data-network-from="${edge.from}" data-network-to="${edge.to}"></line>`,
+  ).join("\n");
+  const nodes = HERO_NETWORK_NODES.map((node) => {
+    const collapsed = getHeroNetworkFrame(0).find((frame) => frame.id === node.id)!.point;
+    return `    <g data-network-node="${node.id}" transform="translate(${collapsed.x} ${collapsed.y})"></g>`;
+  }).join("\n");
+  return `
+  <div class="profile-reveal"></div>
+  <section id="profile">
+    <svg data-hero-network viewBox="0 0 560 360">
+${edges}
+${nodes}
+    </svg>
+  </section>
+  <section id="internships"></section>
+  <article class="sticky-internship-card"></article>
+`;
+}
+
+function mountNetworkPage({
+  heroTop = 0,
+  heroHeight = 800,
+}: {
+  heroTop?: number;
+  heroHeight?: number;
+} = {}) {
+  const media = stubMatchMedia({});
+  // 同步 RAF stub 中时间不推进：固定 performance.now 让 introLastFrame 守卫生效，
+  // 各用例需要推进入场时间时再自行覆盖 mockReturnValue。
+  vi.spyOn(performance, "now").mockReturnValue(1_000);
+  document.body.innerHTML = networkFixture();
+  render(<Header />);
+  const header = document.querySelector<HTMLElement>(".site-header")!;
+  mockRect(header, { top: 0, bottom: 72, height: 72, width: 1_200 });
+  mockRect(document.querySelector("#profile")!, {
+    top: heroTop,
+    bottom: heroTop + heroHeight,
+    height: heroHeight,
+    width: 1_000,
+  });
+  mockRect(networkSvg(), { top: 0, left: 0, bottom: 360, right: 560, height: 360, width: 560 });
+  mockRect(document.querySelector("#internships")!, {
+    top: 400,
+    bottom: 900,
+    height: 500,
+    width: 1_000,
+  });
+  mockRect(document.querySelector(".sticky-internship-card")!, {
+    top: 200,
+    bottom: 600,
+    height: 400,
+    width: 1_000,
+  });
+  vi.spyOn(document.documentElement, "scrollHeight", "get").mockReturnValue(5_000);
+  render(<PageMotionController />);
+  return media;
 }
 
 function dispatchScroll() {
@@ -442,6 +523,134 @@ describe("page motion controller", () => {
     expect(document.querySelectorAll("a[data-nav-section]")).toHaveLength(5);
     expect(document.querySelector('a[href="https://github.com/cxzg007"]')).not.toHaveAttribute(
       "data-nav-section",
+    );
+  });
+
+  it("plays the network intro from the top and interrupts it on the first scroll", () => {
+    const nowSpy = vi.spyOn(performance, "now").mockReturnValue(1_000);
+    mountNetworkPage({ heroTop: 0, heroHeight: 800 });
+
+    expect(networkSvg()).toHaveAttribute("data-network-running", "true");
+    // 同步 RAF stub 下时间戳不推进：入场停留在第 0 帧（收拢链路）。
+    expect(nodeElement("understand").getAttribute("transform")).toBe(
+      expectedNodeTransform("understand", 0),
+    );
+
+    // 推进入场时间到展开一半，pointermove 帧继续入场动画。
+    nowSpy.mockReturnValue(1_180);
+    dispatchPointer(520, 320);
+    expect(nodeElement("understand").getAttribute("transform")).toBe(
+      expectedNodeTransform("understand", 0.5),
+    );
+
+    // 用户滚动立即中断入场，直接衔接滚动目标进度（-110 / (800*0.55) = 0.25）。
+    mockRect(document.querySelector("#profile")!, { top: -110, bottom: 690, height: 800 });
+    dispatchScroll();
+    expect(nodeElement("understand").getAttribute("transform")).toBe(
+      expectedNodeTransform("understand", 0.25),
+    );
+  });
+
+  it("restores the mid-scroll network progress without replaying the intro", () => {
+    vi.spyOn(window, "scrollY", "get").mockReturnValue(1_200);
+    mountNetworkPage({ heroTop: -300, heroHeight: 800 });
+
+    const progress = getHeroProgress(-300, 800);
+    expect(progress).toBeGreaterThan(0.5);
+    expect(nodeElement("execute").getAttribute("transform")).toBe(
+      expectedNodeTransform("execute", progress),
+    );
+    // 静态收拢帧与入场起点都不等于当前进度帧，证明未闪回。
+    expect(nodeElement("execute").getAttribute("transform")).not.toBe(
+      expectedNodeTransform("execute", 0),
+    );
+  });
+
+  it("suspends and resumes the network on page visibility change", () => {
+    mountNetworkPage();
+
+    expect(networkSvg()).toHaveAttribute("data-network-running", "true");
+    act(() => {
+      Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    expect(networkSvg()).toHaveAttribute("data-network-running", "false");
+
+    act(() => {
+      Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    expect(networkSvg()).toHaveAttribute("data-network-running", "true");
+    delete (document as { hidden?: boolean }).hidden;
+  });
+
+  it("highlights the nearest core node and its edges while the pointer is near", () => {
+    mountNetworkPage();
+
+    // progress = 0 时 understand 核心位于 (72, 180)，指针距离约 13 单位。
+    dispatchPointer(80, 190);
+    expect(nodeElement("understand")).toHaveAttribute("data-network-highlight");
+    expect(
+      document.querySelector('[data-network-from="understand"][data-network-to="retrieve"]'),
+    ).toHaveAttribute("data-network-edge-active");
+    expect(
+      document.querySelector('[data-network-from="understand-aux-1"][data-network-to="understand"]'),
+    ).toHaveAttribute("data-network-edge-active");
+    expect(nodeElement("retrieve")).not.toHaveAttribute("data-network-highlight");
+
+    act(() => {
+      document.getElementById("profile")!.dispatchEvent(new Event("pointerleave"));
+    });
+    expect(nodeElement("understand")).not.toHaveAttribute("data-network-highlight");
+    expect(
+      document.querySelector('[data-network-from="understand"][data-network-to="retrieve"]'),
+    ).not.toHaveAttribute("data-network-edge-active");
+  });
+
+  it("toggles the network running state from the hero intersection observer", () => {
+    mountNetworkPage();
+    expect(FakeIntersectionObserver.instances).toHaveLength(2);
+    const networkObserver = FakeIntersectionObserver.instances[1]!;
+    expect(networkObserver.observed.has(networkSvg())).toBe(true);
+    // 打断入场，进入随滚动阶段。
+    dispatchScroll();
+
+    act(() => networkObserver.trigger(networkSvg(), false));
+    expect(networkSvg()).toHaveAttribute("data-network-running", "false");
+    // 网络不可见时滚动不更新几何。
+    mockRect(document.querySelector("#profile")!, { top: -300, bottom: 500, height: 800 });
+    dispatchScroll();
+    expect(nodeElement("understand").getAttribute("transform")).toBe(
+      expectedNodeTransform("understand", 0),
+    );
+
+    act(() => networkObserver.trigger(networkSvg(), true));
+    expect(networkSvg()).toHaveAttribute("data-network-running", "true");
+    expect(nodeElement("understand").getAttribute("transform")).toBe(
+      expectedNodeTransform("understand", getHeroProgress(-300, 800)),
+    );
+  });
+
+  it("destroys the driver and restores the static frame when motion goes static", () => {
+    const media = mountNetworkPage({ heroTop: -300, heroHeight: 800 });
+    dispatchPointer(80, 190);
+    expect(nodeElement("understand")).toHaveAttribute("data-network-highlight");
+
+    act(() => media.set("reduced", true));
+    expect(networkSvg()).not.toHaveAttribute("data-network-running");
+    expect(nodeElement("understand").getAttribute("transform")).toBe(
+      expectedNodeTransform("understand", 0),
+    );
+    expect(nodeElement("understand")).not.toHaveAttribute("data-network-highlight");
+    FakeIntersectionObserver.instances.forEach((instance) => {
+      expect(instance.disconnected).toBe(true);
+    });
+
+    // 切回 enhanced：重建 driver 但不重播入场，直接衔接当前滚动进度。
+    act(() => media.set("reduced", false));
+    expect(networkSvg()).toHaveAttribute("data-network-running", "true");
+    expect(nodeElement("execute").getAttribute("transform")).toBe(
+      expectedNodeTransform("execute", getHeroProgress(-300, 800)),
     );
   });
 });
