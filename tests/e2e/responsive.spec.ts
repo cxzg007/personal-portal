@@ -84,6 +84,11 @@ async function expectNoHiddenOffscreenContent(page: Page) {
         }
 
         const issues: string[] = [];
+        // sr-only 的 aria-live 播报区（宽高约 1px + 裁剪）是为屏幕阅读器
+        // 有意保留文本，不代表布局溢出，故按几何特征豁免。
+        if (element.hasAttribute("aria-live") && rect.width <= 2 && rect.height <= 2) {
+          return [];
+        }
         if (rect.left < -tolerance || rect.right > window.innerWidth + tolerance) {
           issues.push(`${labels(element)} is offscreen at ${rect.left.toFixed(2)}..${rect.right.toFixed(2)}`);
         }

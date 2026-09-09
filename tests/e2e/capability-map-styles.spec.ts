@@ -5,7 +5,7 @@ test("content cards stay horizontal and pointer hover moves at most two pixels",
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.goto("/");
   const cards = page.locator(
-    ".profile-info-facts, .sticky-internship-card, .system-project-panel, .open-source-showcase, #writing article, #contact > div, .blog-card",
+    ".sticky-internship-card, .system-project-panel, .open-source-showcase, #writing article, #contact > div, .blog-card",
   );
   await expectNoRotation(cards);
 

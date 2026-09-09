@@ -281,3 +281,57 @@ test("route round-trip keeps a single network driver without residual listeners"
   // 无残留的 pointer 高亮样式。
   await expect(page.locator("[data-network-highlight]")).toHaveCount(0);
 });
+
+test("scrolling out and back to the top restores the same network geometry without jumps", async ({ page }, testInfo) => {
+  test.skip(
+    testInfo.project.name === "mobile",
+    "enhanced network motion requires a viewport wider than 760px",
+  );
+  await page.goto("/");
+
+  const svg = page.locator("[data-hero-network]");
+  await expect(svg).toHaveAttribute("data-network-running", "true");
+  // 触发一次 scroll 结束入场动画，锁定滚动驱动路径。
+  await page.evaluate(() => window.scrollTo(0, 1));
+
+  // 开始滚动前的顶部基线：progress 0 的几何。
+  const topGeometry = await readHeroGeometry(page);
+  const topProgress = heroProgress(topGeometry);
+  const topUnderstand = expectedCorePoint("understand", topProgress);
+  const topRetrieve = expectedCorePoint("retrieve", topProgress);
+  await expectNodeNear(page, "understand", topUnderstand);
+  await expectEdgeNear(page, "understand", "retrieve", topUnderstand, topRetrieve);
+  const topTransform = await readNodeTransform(page, "understand");
+
+  // 滚出 hero（progress 收敛到 1），网络进入完整展开状态。
+  const heroAbsTop = topGeometry.top + topGeometry.scrollY;
+  const deepScroll = heroAbsTop + topGeometry.height * 0.55 * 1.05;
+  await page.evaluate((y) => window.scrollTo(0, y), deepScroll);
+  const deepGeometry = await readHeroGeometry(page);
+  expect(heroProgress(deepGeometry)).toBeGreaterThanOrEqual(0.99);
+  await expectNodeNear(page, "understand", CORE_POINTS.understand.initial);
+
+  // 返回顶部：几何必须回到与起始顶部一致的位置（无突跳、无残留状态）。
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const restoredGeometry = await readHeroGeometry(page);
+  await expectNodeNear(
+    page,
+    "understand",
+    expectedCorePoint("understand", heroProgress(restoredGeometry)),
+  );
+  await expectNodeNear(page, "understand", topUnderstand);
+  const restoredTransform = await readNodeTransform(page, "understand");
+  // 返回顶部后的几何必须与起始顶部一致。transform 属性解析存在亚像素抖动
+  // （实测 <0.01px），属于噪声；真正的突跳会是整段插值距离（数十像素）。
+  expect(restoredTransform).not.toBeNull();
+  expect(topTransform).not.toBeNull();
+  expect(Math.abs(restoredTransform!.x - topTransform!.x)).toBeLessThanOrEqual(0.1);
+  expect(Math.abs(restoredTransform!.y - topTransform!.y)).toBeLessThanOrEqual(0.1);
+
+  // driver 在整个往返过程中保持单实例运行。
+  await expect(svg).toHaveAttribute("data-network-running", "true");
+  const runningCount = await page.evaluate(
+    () => document.querySelectorAll("[data-network-running]").length,
+  );
+  expect(runningCount).toBe(1);
+});

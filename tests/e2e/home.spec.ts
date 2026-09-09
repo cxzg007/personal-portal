@@ -324,7 +324,7 @@ test("open source showcase leads with featured PR links and a collapsed remainde
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("list", { name: "Semantica 代表性贡献" })).toBeVisible();
-  await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(3);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(3);
   await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(0);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(0);
   await expect(openSource.locator("button")).toHaveCount(0);
@@ -335,7 +335,7 @@ test("open source showcase leads with featured PR links and a collapsed remainde
   await expect(details).not.toHaveAttribute("open");
 
   await details.locator("summary").click();
-  await expect(openSource.getByRole("link", { name: /^PR #/ })).toHaveCount(10);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(10);
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {
@@ -356,7 +356,7 @@ test("writing stage renders the single article with a full-read destination", as
     writing.getByRole("heading", { name: "从 Semantica 开源贡献看 Agent 项目的工程协作" }),
   ).toBeVisible();
   await expect(
-    writing.getByRole("link", { name: "阅读《从 Semantica 开源贡献看 Agent 项目的工程协作》全文" }),
+    writing.getByRole("link", { name: "阅读文章：从 Semantica 开源贡献看 Agent 项目的工程协作" }),
   ).toHaveAttribute("href", "/blog/first-agent-system");
 });
 

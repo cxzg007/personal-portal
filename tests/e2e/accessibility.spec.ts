@@ -73,16 +73,23 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
       .locator("main > section#internships")
       .getByText("查看中国船舶集团 722 研究所工程细节"),
     page.locator("#system-tab-ontology-agent-platform"),
+    // Tab 键顺序包含选中架构的节点按钮（DOM 阅读顺序：semantic→relations→query→execution）。
+    ...["semantic", "relations", "query", "execution"].map((nodeId) =>
+      page.locator(`#architecture-node-ontology-agent-platform-${nodeId}`),
+    ),
     ...[0, 1, 2].map((index) =>
-      openSource.getByRole("link", { name: /^PR #/ }).nth(index),
+      openSource.getByRole("link", { name: /^已合并 · PR #/ }).nth(index),
     ),
     openSource.getByText("查看其余 7 个已合并 PR"),
     openSource.getByRole("link", { name: "Semantica GitHub repository", exact: true }),
     openSource.getByRole("link", { name: "阅读 Semantica 贡献复盘", exact: true }),
-    page.locator("main > section#writing").getByRole("link", { name: `阅读《${postTitle}》全文` }),
+    // 写作区每条目含两个链接（h3 标题链接在前，aria-label 的阅读全文在后），条目后为列表页入口。
+    page.locator("main > section#writing").getByRole("link", { name: postTitle, exact: true }),
+    page.locator("main > section#writing").getByRole("link", { name: `阅读文章：${postTitle}` }),
+    page.locator("main > section#writing").getByRole("link", { name: "全部文章", exact: true }),
     contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }),
-    contact.getByRole("link", { name: "GitHub", exact: true }),
     contact.getByRole("link", { name: "下载简历 PDF", exact: true }),
+    contact.getByRole("link", { name: "GitHub", exact: true }),
   ];
 
   for (const target of keyboardOrder) {
@@ -192,7 +199,7 @@ test("Semantica open-source showcase stays static and PR links keep visible focu
   await expect(collapsedDetails).toBeVisible();
   await expect(collapsedDetails).not.toHaveAttribute("open");
 
-  const firstPrLink = openSource.getByRole("link", { name: /^PR #/ }).first();
+  const firstPrLink = openSource.getByRole("link", { name: /^已合并 · PR #/ }).first();
   await firstPrLink.focus();
   await expectVisibleFocus(firstPrLink);
   await collapsedDetails.getByText("查看其余 7 个已合并 PR").focus();

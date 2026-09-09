@@ -9,16 +9,16 @@ import { expect, type Locator } from "@playwright/test";
 export async function expectSemanticaMapComplete(showcase: Locator): Promise<void> {
   const featuredLinks = showcase
     .getByRole("list", { name: "Semantica 代表性贡献" })
-    .getByRole("link", { name: /^PR #/ });
+    .getByRole("link", { name: /^已合并 · PR #/ });
   await expect(featuredLinks).toHaveCount(3);
-  await expect(showcase.getByRole("link", { name: /PR #1226/ })).toHaveAttribute(
+  await expect(showcase.getByRole("link", { name: /已合并 · PR #1226/ })).toHaveAttribute(
     "href",
     /\/pull\/1226$/,
   );
 
   const remainingLinks = showcase
     .getByRole("list", { name: "Semantica 其余已合并贡献", includeHidden: true })
-    .getByRole("link", { name: /^PR #/, includeHidden: true });
+    .getByRole("link", { name: /^已合并 · PR #/, includeHidden: true });
   await expect(remainingLinks).toHaveCount(7);
 
   const details = showcase.locator("details.open-source-showcase-details");
