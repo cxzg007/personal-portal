@@ -43,9 +43,15 @@ const postLoaders = {
   "first-agent-system": () => import("../../content/posts/first-agent-system.mdx"),
 } satisfies PostLoaderMap;
 
-const postFiles = {
-  "first-agent-system": "first-agent-system.mdx",
-} as const;
+// 文件名约定：content/posts/<slug>.mdx。从加载器派生文件名映射，
+// 新增文章只需要在 postLoaders 登记一处，避免 slug 与文件名双表漂移。
+const postFiles = Object.fromEntries(
+  Object.keys(postLoaders).map((slug) => [slug, `${slug}.mdx`]),
+) as Record<string, string>;
+
+export function getRegisteredPostSlugs(): string[] {
+  return Object.keys(postLoaders);
+}
 
 const requiredStringFields = ["title", "description", "seoDescription"] as const;
 

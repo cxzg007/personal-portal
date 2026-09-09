@@ -7,6 +7,7 @@ import {
   createPostReader,
   getAllPosts,
   getPost,
+  getRegisteredPostSlugs,
   type PostSource,
 } from "./posts";
 
@@ -155,6 +156,18 @@ describe("post loading", () => {
 
   it("indexes the repository's first public article", () => {
     expect(getAllPosts().map((post) => post.slug)).toContain("first-agent-system");
+  });
+
+  it("keeps the posts directory and the loader registry in sync", () => {
+    const postsDir = path.join(process.cwd(), "content", "posts");
+    const onDisk = fs
+      .readdirSync(postsDir)
+      .filter((file) => file.endsWith(".mdx"))
+      .map((file) => file.replace(/\.mdx$/, ""))
+      .sort();
+    const registered = [...getRegisteredPostSlugs()].sort();
+
+    expect(onDisk).toEqual(registered);
   });
 
   it("binds each Semantica PR number to its public link, topic, and snapshot status", () => {

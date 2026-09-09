@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { BlogFilter } from "@/components/blog/blog-filter";
 import { Header } from "@/components/shell/header";
 import { loadSiteContent } from "@/content/load-site-content";
@@ -36,6 +37,9 @@ export default function BlogPage() {
       <Header />
       <main id="main-content" tabIndex={-1}>
         <header className="blog-hero">
+          <Link className="blog-back-link" href="/#top">
+            <span aria-hidden="true">←</span> 返回首页
+          </Link>
           <p className="eyebrow">ENGINEERING NOTES / {posts.length.toString().padStart(2, "0")}</p>
           <h1>技术博客</h1>
           <p>

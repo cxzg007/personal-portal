@@ -148,14 +148,17 @@ test("blog filters and article actions remain keyboard operable", async ({ page 
 
   const articleTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
   const skipLink = page.getByRole("link", { name: "跳到主要内容" });
-  const siteMark = page.getByRole("link", { name: "返回首页" });
+  // 用类选择器精确定位站点标识，避免与博客 hero 的“返回首页”链接产生可访问名冲突。
+  const siteMark = page.locator(".site-mark");
   const desktopNavigation = page.getByRole("navigation", { name: "主导航" });
+  const heroBackLink = page.locator(".blog-back-link");
   const search = page.getByRole("searchbox", { name: "搜索文章" });
 
   for (const target of [
     skipLink,
     siteMark,
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
+    heroBackLink,
     search,
   ]) {
     await expectNextTab(page, target);

@@ -26,6 +26,10 @@ vi.mock("next/link", () => ({
   },
 }));
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+}));
+
 type MediaKey = "reduced" | "narrow";
 
 function stubMatchMedia(initial: { narrow?: boolean; reduced?: boolean }) {
@@ -506,11 +510,11 @@ describe("page motion controller", () => {
     render(<Header />);
 
     const expected: Record<string, string> = {
-      "#internships": "internships",
-      "#systems": "systems",
-      "#open-source": "open-source",
-      "#writing": "writing",
-      "#contact": "contact",
+      "/#internships": "internships",
+      "/#systems": "systems",
+      "/#open-source": "open-source",
+      "/#writing": "writing",
+      "/#contact": "contact",
     };
 
     for (const [href, section] of Object.entries(expected)) {

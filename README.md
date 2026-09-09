@@ -84,7 +84,13 @@ NEXT_PUBLIC_SITE_URL=https://portfolio.example.test pnpm build
 
 ## 发布 MDX 文章
 
-在 `content/posts/` 新建小写英文、数字和连字符组成的文件名，例如 `agent-memory-design.mdx`。Frontmatter 中以下字段是必需的：
+推荐用脚手架创建新文章（生成合法 frontmatter 模板并给出登记提示）：
+
+```bash
+pnpm new:post agent-memory-design
+```
+
+也可以在 `content/posts/` 手工新建小写英文、数字和连字符组成的文件名，例如 `agent-memory-design.mdx`。Frontmatter 中以下字段是必需的：
 
 ```yaml
 ---
@@ -102,12 +108,13 @@ draft: false
 
 `title`、`description`、`publishedAt`、`updatedAt`、`tags`、`featured` 和 `seoDescription` 由加载器强制校验；`draft` 可省略并默认 `false`。日期必须是存在的 `YYYY-MM-DD`，`updatedAt` 不得早于 `publishedAt`，标签至少一个。生产构建会排除 `draft: true` 的文章。
 
-新增文件后还必须在 `src/content/posts.ts` 中同步登记两处显式映射：
+新增文件后还必须在 `src/content/posts.ts` 的 `postLoaders` 中登记 slug 到动态 `import()` 的映射（文件名映射已由 slug 自动派生，无需单独登记）：
 
-1. 在 `postLoaders` 中添加 slug 到动态 `import()` 的映射；
-2. 在 `postFiles` 中添加同一 slug 到 MDX 文件名的映射。
+```ts
+"agent-memory-design": () => import("../../content/posts/agent-memory-design.mdx"),
+```
 
-这是有意采用的显式发布清单：仅创建 MDX 文件不会让文章进入列表或详情路由。完成后运行：
+这是有意采用的显式发布清单：仅创建 MDX 文件不会让文章进入列表或详情路由。测试会校验 `content/posts/` 目录与注册表完全一致——漏登记或多登记都会失败。完成后运行：
 
 ```bash
 pnpm test -- src/content/posts.test.ts

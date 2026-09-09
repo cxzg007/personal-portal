@@ -146,6 +146,42 @@ test("article keeps a readable warm editorial measure", async ({ page }) => {
   expect(reading.metaFont).toMatch(/Mono|monospace/);
 });
 
+test("navigates back to home sections from the blog index", async ({ page }, testInfo) => {
+  await page.goto("/blog");
+
+  // 小屏下桌面导航不可达，需先展开汉堡菜单，断言/点击均走“移动导航”。
+  const isMobile = testInfo.project.name === "mobile";
+  const openMobileMenu = async () => {
+    await page.getByRole("button", { name: "打开导航菜单" }).click();
+  };
+  const nav = page.getByRole("navigation", { name: isMobile ? "移动导航" : "主导航" });
+
+  if (isMobile) {
+    await openMobileMenu();
+  }
+  const blogLink = nav.getByRole("link", { name: "博客", exact: true });
+  await expect(blogLink).toHaveAttribute("href", "/blog");
+  await expect(blogLink).toHaveAttribute("aria-current", "page");
+
+  if (isMobile) {
+    await page.getByRole("button", { name: "关闭导航菜单" }).click();
+  }
+
+  const heroBackLink = page.locator(".blog-back-link");
+  await expect(heroBackLink).toHaveAttribute("href", "/#top");
+  await heroBackLink.click();
+  await expect(page).toHaveURL(/\/#top$/);
+  await expect(page.locator("main > section#writing")).toBeVisible();
+
+  await page.goto("/blog");
+  if (isMobile) {
+    await openMobileMenu();
+  }
+  await nav.getByRole("link", { name: "实习", exact: true }).click();
+  await expect(page).toHaveURL(/\/#internships$/);
+  await expect(page.locator("main > section#internships")).toBeVisible();
+});
+
 test("opens the article with a table of contents and returns to the blog index", async ({ page }) => {
   await page.goto("/blog");
   await page.getByRole("link", { exact: true, name: articleTitle }).click();

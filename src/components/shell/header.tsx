@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// 锚点统一带 "/" 前缀：首页上仍为页内滚动，博客页/文章页上则跳回首页对应分区。
 const navigation = [
-  { label: "实习", href: "#internships" },
-  { label: "系统", href: "#systems" },
-  { label: "开源", href: "#open-source" },
-  { label: "博客", href: "#writing" },
-  { label: "联系", href: "#contact" },
+  { label: "实习", href: "/#internships" },
+  { label: "系统", href: "/#systems" },
+  { label: "开源", href: "/#open-source" },
+  { label: "博客", href: "/#writing", blogHref: "/blog" },
+  { label: "联系", href: "/#contact" },
   { label: "GitHub", href: "https://github.com/cxzg007" },
 ] as const;
 
@@ -19,23 +21,32 @@ function NavigationLinks({
   onNavigate?: () => void;
   showWriting?: boolean;
 }) {
+  const pathname = usePathname();
+  const onBlogPage = pathname?.startsWith("/blog") ?? false;
+
   return (
     <ul className="navigation-list">
       {navigation
-        .filter((item) => showWriting || item.href !== "#writing")
-        .map((item) => (
-        <li key={item.label}>
-          <Link
-            href={item.href}
-            onClick={onNavigate}
-            data-nav-section={item.href.startsWith("#") ? item.href.slice(1) : undefined}
-            rel={item.href.startsWith("http") ? "noreferrer" : undefined}
-            target={item.href.startsWith("http") ? "_blank" : undefined}
-          >
-            {item.label}
-          </Link>
-        </li>
-      ))}
+        .filter((item) => showWriting || item.href !== "/#writing")
+        .map((item) => {
+          const isBlogItem = "blogHref" in item;
+          const href = isBlogItem && onBlogPage ? item.blogHref : item.href;
+
+          return (
+            <li key={item.label}>
+              <Link
+                aria-current={isBlogItem && onBlogPage ? "page" : undefined}
+                href={href}
+                onClick={onNavigate}
+                data-nav-section={item.href.split("#")[1]}
+                rel={item.href.startsWith("http") ? "noreferrer" : undefined}
+                target={item.href.startsWith("http") ? "_blank" : undefined}
+              >
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
     </ul>
   );
 }

@@ -185,6 +185,15 @@ button {
   transition: transform 160ms ease;
 }
 
+.navigation-list a[aria-current="page"] {
+  color: var(--color-text);
+}
+
+.navigation-list a[aria-current="page"]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
 .navigation-list a:hover {
   color: var(--color-text);
 }
@@ -520,6 +529,21 @@ main {
     repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--terracotta) 16%, transparent) 0deg 3deg, transparent 3deg 12deg);
   content: "";
   pointer-events: none;
+}
+
+.blog-hero .blog-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.4rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.blog-hero .blog-back-link:hover {
+  color: var(--color-primary);
+  transform: translateY(-2px);
 }
 
 .blog-hero .eyebrow,
