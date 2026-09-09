@@ -219,8 +219,26 @@
     "name": "Semantica",
     "logo": { "src": "/brands/semantica.png", "alt": "Semantica 项目标志", "theme": "semantica" },
     "identity": "Open-source Contributor · cxzg007",
-    "background": "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施；贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约与执行链路并行化。",
+    "background": "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施，将分散的数据组织为知识图谱，为推理、检索与决策提供可追溯的上下文。",
     "snapshotDate": "2026-09-04",
+    "recognition": {
+      "stars": 12455,
+      "checkedAt": "2026-09-09",
+      "honors": [
+        {
+          "rank": 1,
+          "platform": "GitHub Trending",
+          "title": "日榜",
+          "sourceUrl": "https://trendshift.io/api/badge/repositories/18986"
+        },
+        {
+          "rank": 3,
+          "platform": "Trendshift · Python",
+          "title": "周榜",
+          "sourceUrl": "https://trendshift.io/api/badge/trendshift/repositories/18986/weekly?language=Python"
+        }
+      ]
+    },
     "contributions": [
       {
         "number": 1364,

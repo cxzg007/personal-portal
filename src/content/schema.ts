@@ -34,6 +34,11 @@ export type OpenSourceProject = {
   identity: string;
   background: string;
   snapshotDate: string;
+  recognition: {
+    stars: number;
+    checkedAt: string;
+    honors: Array<{ rank: number; platform: string; title: string; sourceUrl: string }>;
+  };
   contributions: OpenSourceContribution[];
   repositoryUrl: string;
   articlePath: `/blog/${string}`;
@@ -122,6 +127,7 @@ const OPEN_SOURCE_FIELDS = new Set([
   "identity",
   "background",
   "snapshotDate",
+  "recognition",
   "contributions",
   "repositoryUrl",
   "articlePath",
@@ -315,6 +321,32 @@ export function validateSiteContent(input: unknown): ValidationResult {
     }
     const snapshotDate = checkText(openSource.snapshotDate, "openSource.snapshotDate");
     if (snapshotDate && !/^\d{4}-\d{2}-\d{2}$/.test(snapshotDate)) errors.push("openSource.snapshotDate must use YYYY-MM-DD");
+    const recognition = checkRecord(openSource.recognition, "openSource.recognition");
+    if (recognition) {
+      if (!Number.isSafeInteger(recognition.stars) || (recognition.stars as number) < 0) {
+        errors.push("openSource.recognition.stars must be a non-negative safe integer");
+      }
+      const checkedAt = checkText(recognition.checkedAt, "openSource.recognition.checkedAt");
+      if (checkedAt && (!/^\d{4}-\d{2}-\d{2}$/.test(checkedAt) ||
+        !Number.isFinite(Date.parse(checkedAt)) || new Date(checkedAt).toISOString().slice(0, 10) !== checkedAt)) {
+        errors.push("openSource.recognition.checkedAt must be a valid YYYY-MM-DD date");
+      }
+      if (!Array.isArray(recognition.honors)) {
+        errors.push("openSource.recognition.honors must be an array");
+      } else {
+        recognition.honors.forEach((honor, index) => {
+          const path = `openSource.recognition.honors[${index}]`;
+          const value = checkRecord(honor, path);
+          if (!value) return;
+          if (!Number.isSafeInteger(value.rank) || (value.rank as number) <= 0) {
+            errors.push(`${path}.rank must be a positive safe integer`);
+          }
+          checkText(value.platform, `${path}.platform`);
+          checkText(value.title, `${path}.title`);
+          checkHttpsUrl(value.sourceUrl, `${path}.sourceUrl`);
+        });
+      }
+    }
     if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 15) {
       errors.push("openSource.contributions must contain exactly 15 entries");
     } else {
@@ -414,5 +446,4 @@ export function validateSiteContent(input: unknown): ValidationResult {
 
   return errors.length === 0 ? { ok: true } : { ok: false, errors };
 }
-
 

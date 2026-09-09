@@ -215,4 +215,29 @@ describe("openSource strict schema closure", () => {
       );
     },
   );
+
+  it("accepts dated project recognition with verifiable badge sources", () => {
+    const input = structuredClone(validSiteContent);
+    Object.assign(input.openSource, {
+      recognition: {
+        stars: 12455,
+        checkedAt: "2026-09-09",
+        honors: [{ rank: 1, platform: "GitHub Trending", title: "日榜", sourceUrl: "https://trendshift.io/api/badge/repositories/18986" }],
+      },
+    });
+    expect(validateSiteContent(input)).toEqual({ ok: true });
+  });
+
+  it.each([
+    { stars: -1, checkedAt: "2026-09-09", honors: [], error: "openSource.recognition.stars" },
+    { stars: 12455, checkedAt: "today", honors: [], error: "openSource.recognition.checkedAt" },
+    { stars: 12455, checkedAt: "2026-09-09", honors: [{ rank: 0, platform: "GitHub", title: "日榜", sourceUrl: "https://trendshift.io" }], error: "openSource.recognition.honors[0].rank" },
+    { stars: 12455, checkedAt: "2026-09-09", honors: [{ rank: 1, platform: "GitHub", title: "日榜", sourceUrl: "javascript:alert(1)" }], error: "openSource.recognition.honors[0].sourceUrl" },
+  ])("rejects invalid recognition data: $error", ({ error, ...recognition }) => {
+    const input = structuredClone(validSiteContent);
+    Object.assign(input.openSource, { recognition });
+    const result = validateSiteContent(input);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.some((message) => message.startsWith(error))).toBe(true);
+  });
 });

@@ -324,6 +324,12 @@ test("open source showcase leads with featured PR links and a collapsed remainde
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("list", { name: "Semantica 代表性贡献" })).toBeVisible();
+  const recognition = openSource.getByRole("region", { name: "项目影响力与荣誉" });
+  await expect(recognition.getByRole("link", { name: "12,455 GitHub Stars" })).toHaveAttribute(
+    "href", "https://github.com/semantica-agi/semantica",
+  );
+  await expect(recognition.getByRole("link", { name: /#1 GitHub Trending 日榜/ })).toBeVisible();
+  await expect(recognition.getByRole("link", { name: /#3 Trendshift · Python 周榜/ })).toBeVisible();
   await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(3);
   await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(0);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(0);
@@ -336,6 +342,10 @@ test("open source showcase leads with featured PR links and a collapsed remainde
 
   await details.locator("summary").click();
   await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(10);
+  await details.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(details).not.toHaveAttribute("open");
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(3);
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {
