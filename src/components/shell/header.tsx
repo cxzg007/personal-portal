@@ -12,10 +12,18 @@ const navigation = [
   { label: "GitHub", href: "https://github.com/cxzg007" },
 ] as const;
 
-function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavigationLinks({
+  onNavigate,
+  showWriting = true,
+}: {
+  onNavigate?: () => void;
+  showWriting?: boolean;
+}) {
   return (
     <ul className="navigation-list">
-      {navigation.map((item) => (
+      {navigation
+        .filter((item) => showWriting || item.href !== "#writing")
+        .map((item) => (
         <li key={item.label}>
           <Link
             href={item.href}
@@ -32,7 +40,11 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function Header() {
+type HeaderProps = {
+  showWriting?: boolean;
+};
+
+export function Header({ showWriting = true }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuToggleRef = useRef<HTMLButtonElement>(null);
 
@@ -79,7 +91,7 @@ export function Header() {
         </Link>
 
         <nav className="desktop-navigation" aria-label="主导航">
-          <NavigationLinks />
+          <NavigationLinks showWriting={showWriting} />
         </nav>
 
         <button
@@ -110,7 +122,7 @@ export function Header() {
             </button>
           </div>
           <nav aria-label="移动导航" id="mobile-navigation">
-            <NavigationLinks onNavigate={closeMenu} />
+            <NavigationLinks onNavigate={closeMenu} showWriting={showWriting} />
           </nav>
         </div>
       ) : null}

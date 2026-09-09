@@ -2,21 +2,20 @@ import type { SiteContent } from "@/content/schema";
 
 export function ContactStage({ profile }: { profile: SiteContent["profile"] }) {
   return (
-    <div>
+    <div className="profile-contact-stage">
       <p>{profile.recruitingStatus}</p>
-      <ul>
-        <li>
-          <a href={`mailto:${profile.email}`} aria-label={`发送邮件至 ${profile.email}`}>{profile.email}</a>
-        </li>
-        <li>
-          <a href={profile.github} target="_blank" rel="noreferrer">
-            GitHub
-          </a>
-        </li>
-        <li>
-          <a href="/resume.pdf">下载简历 PDF</a>
-        </li>
-      </ul>
+      <nav aria-label="联系方式" className="profile-contact-links">
+        <a
+          aria-label={`发送邮件至 ${profile.email}`}
+          href={`mailto:${profile.email}`}
+        >
+          发送邮件
+        </a>
+        <a href="/resume.pdf">下载简历 PDF</a>
+        <a href={profile.github} rel="noreferrer" target="_blank">
+          GitHub
+        </a>
+      </nav>
     </div>
   );
 }

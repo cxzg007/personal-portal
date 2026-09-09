@@ -10,6 +10,12 @@ type Contribution = OpenSourceProject["contributions"][number];
 const PREFERRED_FEATURED_PR_NUMBERS = [1226, 1081, 1094] as const;
 const CAPABILITY_LABELS = ["图数据适配", "规则推理", "执行链路"] as const;
 
+const FEATURED_TITLE_ALIASES: Record<number, string> = {
+  1226: "按依赖分层并行执行",
+  1081: "统一 ContextGraph 数据适配",
+  1094: "回溯真实 SHACL 约束",
+};
+
 export function selectFeaturedContributions(project: OpenSourceProject): {
   featured: Contribution[];
   remaining: Contribution[];
@@ -42,6 +48,10 @@ export function selectFeaturedContributions(project: OpenSourceProject): {
   return { featured, remaining };
 }
 
+function prLinkLabel(contribution: Contribution) {
+  return `已合并 · PR #${contribution.number} · ${contribution.title}`;
+}
+
 export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
   const merged = project.contributions.filter(({ status }) => status === "merged");
   const { featured, remaining } = selectFeaturedContributions(project);
@@ -70,17 +80,26 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
         </ul>
       </div>
 
-      <ul aria-label="Semantica 代表性贡献" className="pr-list">
-        {featured.map((contribution) => (
-          <li key={contribution.number}>
-            <a
-              className="pr-link"
-              href={contribution.url}
-              rel="noreferrer"
-              target="_blank"
-            >{`PR #${contribution.number} · ${contribution.title}`}</a>
-          </li>
-        ))}
+      <ul aria-label="Semantica 代表性贡献" className="open-source-feature-grid">
+        {featured.map((contribution) => {
+          const alias = FEATURED_TITLE_ALIASES[contribution.number];
+          return (
+            <li key={contribution.number}>
+              <a
+                className="open-source-feature-card"
+                href={contribution.url}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <span className="open-source-feature-status">{`已合并 · PR #${contribution.number}`}</span>
+                <span className="open-source-feature-title">{alias ?? contribution.title}</span>
+                {alias ? (
+                  <span className="open-source-feature-original">{contribution.title}</span>
+                ) : null}
+              </a>
+            </li>
+          );
+        })}
       </ul>
 
       {remaining.length > 0 ? (
@@ -94,7 +113,7 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
                   href={contribution.url}
                   rel="noreferrer"
                   target="_blank"
-                >{`PR #${contribution.number} · ${contribution.title}`}</a>
+                >{prLinkLabel(contribution)}</a>
               </li>
             ))}
           </ul>

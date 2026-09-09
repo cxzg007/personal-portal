@@ -712,11 +712,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
 .open-source-showcase {
   display: grid;
   gap: 1.8rem;
-  padding: 2rem 2.25rem;
-  border: 1px solid var(--profile-line);
-  border-radius: 22px;
-  background: linear-gradient(180deg, var(--profile-panel), var(--profile-panel-deep));
-  transition: transform 480ms ease, box-shadow 480ms ease, border-color 480ms ease;
 }
 
 .open-source-showcase-header {
@@ -789,6 +784,58 @@ html[data-profile-motion="static"] .sticky-internship-card {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.08em;
+}
+
+/* --- featured contribution cards (low border, no nesting) --- */
+
+.open-source-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.open-source-feature-grid li {
+  min-width: 0;
+}
+
+.open-source-feature-card {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  padding: 1.15rem 1.35rem;
+  border: 1px solid var(--profile-line);
+  border-radius: 14px;
+  text-decoration: none;
+  transition: border-color 320ms ease, transform 320ms ease;
+}
+
+.open-source-feature-card:hover {
+  border-color: var(--profile-accent);
+  transform: translateY(-2px);
+}
+
+.open-source-feature-status {
+  color: var(--profile-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+.open-source-feature-title {
+  color: var(--profile-ink);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.open-source-feature-original {
+  color: var(--profile-muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .open-source-showcase-boundary {
@@ -875,10 +922,22 @@ html[data-profile-motion="static"] .sticky-internship-card {
   outline-offset: 2px;
 }
 
-.profile-stage--open-source .open-source-showcase {
-  border-color: rgb(242 181 141 / 30%);
-  background: linear-gradient(180deg, rgb(56 45 38 / 88%), rgb(36 28 24 / 94%));
-  box-shadow: 0 22px 56px rgb(20 15 12 / 55%);
+.profile-stage--open-source .open-source-feature-card {
+  border-color: rgb(242 181 141 / 26%);
+  background: linear-gradient(180deg, rgb(56 45 38 / 60%), rgb(36 28 24 / 74%));
+}
+
+.profile-stage--open-source .open-source-feature-card:hover {
+  border-color: rgb(242 181 141 / 55%);
+}
+
+.profile-stage--open-source .open-source-feature-title {
+  color: var(--profile-on-dark);
+}
+
+.profile-stage--open-source .open-source-feature-status,
+.profile-stage--open-source .open-source-feature-original {
+  color: var(--profile-on-dark-muted);
 }
 
 .profile-stage--open-source .open-source-showcase-identity {
@@ -944,25 +1003,51 @@ html[data-profile-motion="static"] .sticky-internship-card {
 
 /* --- writing --- */
 
-.writing-stage article {
+.writing-list {
   display: grid;
-  grid-template-columns: 1.4fr 0.6fr;
-  border: 1px solid var(--profile-line);
-  border-radius: 18px;
-  background: linear-gradient(180deg, var(--profile-panel), var(--profile-panel-deep));
-  box-shadow: 0 14px 36px rgb(48 38 31 / 14%);
-  transition: transform 480ms ease, box-shadow 480ms ease;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.writing-stage article:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 22px 56px rgb(48 38 31 / 16%);
+.writing-entry {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 0.26fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem 0.25rem;
+  border-bottom: 1px solid var(--profile-line);
 }
 
-.writing-stage .writing-body {
+.writing-entry:first-child {
+  padding-top: 0.5rem;
+}
+
+.writing-entry:last-child {
+  padding-bottom: 0.5rem;
+  border-bottom: none;
+}
+
+.writing-entry-meta {
   display: grid;
-  gap: 0.7rem;
-  padding: 1.5rem 1.75rem;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.writing-entry-meta time {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--profile-ink);
+}
+
+.writing-entry-minutes {
+  color: var(--profile-muted);
+  font-size: 0.8rem;
+}
+
+.writing-entry-body {
+  display: grid;
+  gap: 0.65rem;
+  align-content: start;
   min-width: 0;
 }
 
@@ -992,38 +1077,42 @@ html[data-profile-motion="static"] .sticky-internship-card {
   line-height: 1.65;
 }
 
-.writing-stage .writing-meta {
-  display: grid;
-  gap: 0.35rem;
-  padding: 1.5rem 1.75rem;
-  border-inline-start: 1px solid var(--profile-line);
-  background: rgb(241 229 210 / 32%);
-  border-radius: 0 16px 16px 0;
-  font-size: 0.85rem;
-  color: var(--profile-muted);
-}
-
-.writing-stage .writing-meta time {
-  font-weight: 600;
-  color: var(--profile-ink);
-}
-
-.writing-stage .writing-meta .tag-list {
+.writing-stage .tag-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin: 0.35rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.writing-stage .writing-meta .tag-list li {
+.writing-stage .tag-list li {
   border: 1px solid var(--profile-line);
   border-radius: 999px;
   padding: 0.15rem 0.6rem;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   letter-spacing: 0.03em;
+}
+
+.writing-entry-link {
+  color: var(--profile-accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  justify-self: start;
+}
+
+.writing-stage-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.4rem;
+}
+
+.writing-stage-footer a {
+  color: var(--profile-accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 /* --- contact --- */
@@ -1113,7 +1202,8 @@ html[data-profile-motion="enhanced"] .reveal[data-reveal-status="visible"] {
 
   .internship-card-columns,
   .sticky-internship-card[data-layout="visual-copy"] .internship-card-columns,
-  .writing-stage article {
+  .writing-entry,
+  .open-source-feature-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -1122,10 +1212,8 @@ html[data-profile-motion="enhanced"] .reveal[data-reveal-status="visible"] {
     order: 0;
   }
 
-  .writing-stage .writing-meta {
-    border-inline-start: 0;
-    border-block-start: 1px solid var(--profile-line);
-    border-radius: 0 0 16px 16px;
+  .writing-entry {
+    gap: 0.9rem;
   }
 
   .sticky-internship-card {
@@ -1183,13 +1271,12 @@ html[data-profile-motion="enhanced"] .reveal[data-reveal-status="visible"] {
   .profile-dock,
   .sticky-internship-card,
   .system-project-panel,
-  .open-source-showcase {
+  .open-source-feature-card {
     padding: 1.4rem;
   }
 
-  .writing-stage .writing-body,
-  .writing-stage .writing-meta {
-    padding: 1.25rem 1.35rem;
+  .writing-entry {
+    padding-block: 1.25rem;
   }
 
   html[data-profile-motion="enhanced"] .reveal {
@@ -1232,7 +1319,7 @@ html[data-profile-motion="enhanced"] .reveal[data-reveal-status="visible"] {
   #contact a,
   .system-project-tab,
   .system-project-panel,
-  .open-source-showcase,
+  .open-source-feature-card,
   #writing article,
   #contact > div {
     transition: none !important;
@@ -1241,6 +1328,7 @@ html[data-profile-motion="enhanced"] .reveal[data-reveal-status="visible"] {
   .sticky-internship-card,
   .profile-cta,
   .writing-stage article,
+  .open-source-feature-card,
   .profile-contact-links a {
     transform: none !important;
   }

@@ -66,18 +66,24 @@ describe("OpenSourceShowcase", () => {
     renderShowcase();
 
     const list = screen.getByRole("list", { name: "Semantica 代表性贡献" });
-    const links = within(list).getAllByRole("link", { name: /^PR #/ });
-    expect(links).toHaveLength(3);
-    expect(links.map((link) => link.textContent)).toEqual(
-      [1226, 1081, 1094].map((number) => {
-        const contribution = merged.find((item) => item.number === number);
-        return `PR #${number} · ${contribution?.title}`;
-      }),
-    );
-    for (const link of links) {
+    const items = within(list).getAllByRole("listitem");
+    expect(items).toHaveLength(3);
+
+    const expected = [
+      { number: 1226, alias: "按依赖分层并行执行" },
+      { number: 1081, alias: "统一 ContextGraph 数据适配" },
+      { number: 1094, alias: "回溯真实 SHACL 约束" },
+    ];
+    expected.forEach(({ number, alias }, index) => {
+      const contribution = merged.find((item) => item.number === number);
+      const link = within(items[index]).getByRole("link");
+      expect(link).toHaveAttribute("href", contribution?.url);
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noreferrer");
-    }
+      expect(within(link).getByText(`已合并 · PR #${number}`)).toBeVisible();
+      expect(within(link).getByText(alias)).toBeVisible();
+      expect(within(link).getByText(contribution?.title ?? "")).toBeVisible();
+    });
   });
 
   it("folds the remaining seven merged PRs into a closed details disclosure", () => {
@@ -87,7 +93,9 @@ describe("OpenSourceShowcase", () => {
     expect(details).not.toBeNull();
     expect(details?.open).toBe(false);
     expect(within(details as HTMLElement).getByText("查看其余 7 个已合并 PR")).toBeVisible();
-    const remainingLinks = within(details as HTMLElement).getAllByRole("link", { name: /^PR #/ });
+    const remainingLinks = within(details as HTMLElement).getAllByRole("link", {
+      name: /^已合并 · PR #/,
+    });
     expect(remainingLinks).toHaveLength(merged.length - 3);
     for (const link of remainingLinks) {
       const number = Number(link.textContent?.match(/PR #(\d+)/)?.[1]);

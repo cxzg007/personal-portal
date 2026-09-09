@@ -48,7 +48,7 @@ export default async function HomePage() {
 
   return (
     <div className="profile-shell">
-      <Header />
+      <Header showWriting={featuredPosts.length > 0} />
       <PageMotionController />
       <main id="main-content" tabIndex={-1}>
         <script
@@ -68,10 +68,12 @@ export default async function HomePage() {
           <h2 className="profile-reveal" id="open-source-heading">开源贡献</h2>
           <OpenSourceShowcase project={content.openSource} />
         </section>
-        <section aria-labelledby="writing-heading" className="profile-stage profile-stage--sage" id="writing">
-          <h2 className="profile-reveal" id="writing-heading">工程复盘</h2>
-          <WritingStage posts={featuredPosts} />
-        </section>
+        {featuredPosts.length > 0 ? (
+          <section aria-labelledby="writing-heading" className="profile-stage profile-stage--sage" id="writing">
+            <h2 className="profile-reveal" id="writing-heading">工程复盘</h2>
+            <WritingStage posts={featuredPosts} />
+          </section>
+        ) : null}
         <section aria-labelledby="contact-heading" className="profile-stage profile-stage--terracotta" id="contact">
           <h2 className="profile-reveal" id="contact-heading">一起构建可靠的 AI 系统。</h2>
           <ContactStage profile={content.profile} />
