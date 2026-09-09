@@ -342,6 +342,14 @@ test("open source showcase leads with featured PR links and a collapsed remainde
 
   await details.locator("summary").click();
   await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(10);
+  const otherLinks = details.getByRole("link", { name: /^已合并 · PR #/ });
+  await expect(otherLinks).toHaveCount(7);
+  for (const [index, number] of [1217, 1215, 1153, 1143, 1113, 1094, 1081].entries()) {
+    await expect(otherLinks.nth(index)).toHaveAttribute(
+      "href",
+      `https://github.com/semantica-agi/semantica/pull/${number}`,
+    );
+  }
   await details.locator("summary").focus();
   await page.keyboard.press("Enter");
   await expect(details).not.toHaveAttribute("open");

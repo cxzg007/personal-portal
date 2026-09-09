@@ -17,21 +17,23 @@ function renderShowcase(project: OpenSourceProject = openSource) {
 }
 
 describe("selectFeaturedContributions", () => {
-  it("prefers PRs 1226, 1081 and 1094 and leaves the other merged PRs as remaining", () => {
+  it("prefers PRs 1077, 1226 and 1096 and leaves the other merged PRs as remaining", () => {
     expect(selectFeaturedContributions(openSource).featured.map(({ number }) => number)).toEqual([
-      1226, 1081, 1094,
+      1077, 1226, 1096,
     ]);
-    expect(selectFeaturedContributions(openSource).remaining).toHaveLength(merged.length - 3);
+    expect(selectFeaturedContributions(openSource).remaining.map(({ number }) => number)).toEqual([
+      1217, 1215, 1153, 1143, 1113, 1094, 1081,
+    ]);
   });
 
   it("fills a missing featured slot with another merged PR instead of an open one", () => {
-    const variant: OpenSourceProject = {
+    const missingLead = {
       ...openSource,
-      contributions: openSource.contributions.filter(({ number }) => number !== 1226),
+      contributions: openSource.contributions.filter(({ number }) => number !== 1077),
     };
-    const { featured, remaining } = selectFeaturedContributions(variant);
+    const { featured, remaining } = selectFeaturedContributions(missingLead);
 
-    expect(featured.map(({ number }) => number)).toEqual([1081, 1094, 1217]);
+    expect(featured.map(({ number }) => number)).toEqual([1226, 1096, 1217]);
     expect(featured.every(({ status }) => status === "merged")).toBe(true);
     expect(remaining).toHaveLength(merged.length - 4);
   });
@@ -64,9 +66,9 @@ describe("OpenSourceShowcase", () => {
     expect(items).toHaveLength(3);
 
     const expected = [
+      { number: 1077, alias: "RETE 规则匹配与链式一致性" },
       { number: 1226, alias: "按依赖分层并行执行" },
-      { number: 1081, alias: "统一 ContextGraph 数据适配" },
-      { number: 1094, alias: "回溯真实 SHACL 约束" },
+      { number: 1096, alias: "规则驱动动作与执行溯源" },
     ];
     expected.forEach(({ number, alias }, index) => {
       const contribution = merged.find((item) => item.number === number);
@@ -130,12 +132,13 @@ describe("OpenSourceShowcase", () => {
     expect(within(recognition).queryByText("已合并 PR")).toBeNull();
   });
 
-  it("gives the lead PR a meaningful summary and a dependency-layer illustration", () => {
+  it("gives the lead PR a meaningful summary and a RETE matching illustration", () => {
     renderShowcase();
-    const lead = screen.getByRole("link", { name: /已合并 · PR #1226/ });
+    const lead = screen.getByRole("link", { name: /已合并 · PR #1077/ });
     expect(within(lead).getByText("核心贡献")).toBeVisible();
-    expect(within(lead).getByText(/让并行配置真正贯通构建、序列化与执行引擎/)).toBeVisible();
-    expect(within(lead).getByRole("img", { name: /独立步骤在同一依赖层并行/ })).toBeVisible();
+    expect(within(lead).getByRole("img", { name: /RETE 多条件匹配/ })).toBeVisible();
+    const parallel = screen.getByRole("link", { name: /已合并 · PR #1226/ });
+    expect(within(parallel).queryByRole("img")).toBeNull();
   });
 
   it("links to the external repository and the internal article", () => {

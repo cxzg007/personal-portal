@@ -1003,12 +1003,11 @@ html[data-profile-motion="static"] .sticky-internship-card {
   font-size: 0.95rem;
 }
 
-.open-source-pipeline { display: block; width: 100%; margin: auto 0; }
-.open-source-pipeline-paths { color: #b57a58; }
-.open-source-pipeline-nodes rect { fill: #fffcf6; stroke: #c0a389; stroke-width: 1; }
-.open-source-pipeline-nodes .open-source-pipeline-parallel { fill: #f5dfca; stroke: #b77e52; }
-.open-source-pipeline-labels { fill: #61432e; font-family: var(--font-mono); font-size: 13px; }
-.open-source-pipeline-labels .open-source-pipeline-caption { fill: #875936; font-size: 11px; }
+.open-source-rete { display: block; width: 100%; margin: auto 0; }
+.open-source-rete-paths { color: #b57a58; }
+.open-source-rete-nodes rect { fill: #fffcf6; stroke: #c0a389; stroke-width: 1; }
+.open-source-rete-nodes .open-source-rete-join { fill: #f5dfca; stroke: #b77e52; }
+.open-source-rete-labels { fill: #61432e; font-family: var(--font-mono); font-size: 13px; }
 
 .open-source-showcase-details { border-block: 1px solid var(--profile-line); }
 
@@ -1064,7 +1063,7 @@ html[data-profile-motion="static"] .sticky-internship-card {
   .open-source-project-overview { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .open-source-recognition { padding: 1.25rem 0 0; border-left: none; border-top: 1px solid var(--profile-line); }
   .open-source-feature-lead { grid-row: auto; }
-  .open-source-pipeline { max-width: 30rem; margin: 1rem auto; }
+  .open-source-rete { max-width: 30rem; margin: 1rem auto; }
 }
 
 @media (max-width: 480px) {

@@ -11,10 +11,12 @@ export async function expectSemanticaMapComplete(showcase: Locator): Promise<voi
     .getByRole("list", { name: "Semantica 代表性贡献" })
     .getByRole("link", { name: /^已合并 · PR #/ });
   await expect(featuredLinks).toHaveCount(3);
-  await expect(showcase.getByRole("link", { name: /已合并 · PR #1226/ })).toHaveAttribute(
-    "href",
-    /\/pull\/1226$/,
-  );
+  for (const [index, number] of [1077, 1226, 1096].entries()) {
+    await expect(featuredLinks.nth(index)).toHaveAttribute(
+      "href",
+      `https://github.com/semantica-agi/semantica/pull/${number}`,
+    );
+  }
 
   const remainingLinks = showcase
     .getByRole("list", { name: "Semantica 其余已合并贡献", includeHidden: true })
