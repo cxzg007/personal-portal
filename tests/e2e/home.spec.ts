@@ -365,11 +365,17 @@ test("honors section and its navigation entry are fully removed", async ({ page 
   await expect(page.locator('header a[href="#honors"]')).toHaveCount(0);
 });
 
-test("writing stage renders the single article with a full-read destination", async ({ page }) => {
+test("writing stage renders the public articles with full-read destinations", async ({ page }) => {
   await page.goto("/");
 
   const writing = page.locator("main > section#writing");
-  await expect(writing.getByRole("article")).toHaveCount(1);
+  await expect(writing.getByRole("article")).toHaveCount(2);
+  await expect(
+    writing.getByRole("heading", { name: "从本体建模到 Agent 执行：我对语义层工程的理解" }),
+  ).toBeVisible();
+  await expect(
+    writing.getByRole("link", { name: "阅读文章：从本体建模到 Agent 执行：我对语义层工程的理解" }),
+  ).toHaveAttribute("href", "/blog/ontology-to-agent-execution");
   await expect(
     writing.getByRole("heading", { name: "从 Semantica 开源贡献看 Agent 项目的工程协作" }),
   ).toBeVisible();
