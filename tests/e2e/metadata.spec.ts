@@ -34,7 +34,7 @@ test("homepage publishes canonical, share metadata, and validated ProfilePage JS
     sameAs: ["https://github.com/cxzg007"],
   });
   expect(profile).toMatchObject({ url: siteOrigin, name: "江俊杰｜AI Agent / 后端开发" });
-  await expect(page.locator("#writing").getByRole("article")).toHaveCount(1);
+  await expect(page.locator("#writing").getByRole("article")).toHaveCount(2);
 });
 
 test("public resume and share card are stable, sanitized assets", async ({ request }) => {

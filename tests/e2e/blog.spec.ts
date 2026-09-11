@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 const articleTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
+const ontologyTitle = "从本体建模到 Agent 执行：我对语义层工程的理解";
 
 async function expectNoThreeScene(page: import("@playwright/test").Page) {
   await expect(page.locator("canvas")).toHaveCount(0);
@@ -110,11 +111,30 @@ test("blog index keeps the warm portfolio visual language with intact card conte
   expect(values.cardBackground).toBe("rgb(255, 250, 240)");
   expect(values.cardMetaFont).toMatch(/Mono|monospace/);
 
-  await expect(page.locator(".blog-card h2")).toHaveCount(1);
-  await expect(page.locator(".blog-card h2")).toHaveText(articleTitle);
-  await expect(page.locator('.blog-card [aria-label="文章标签"] li')).toHaveCount(3);
+  await expect(page.locator(".blog-card h2")).toHaveText([ontologyTitle, articleTitle]);
+  const originalCard = page.locator(".blog-card").filter({ hasText: articleTitle });
+  await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(3);
   await expect(page.getByRole("link", { exact: true, name: articleTitle })).toBeVisible();
   await expect(page.getByRole("link", { name: `阅读文章：${articleTitle}` })).toBeVisible();
+});
+
+test("publishes the ontology article with working contents and adjacent navigation", async ({ page, request }) => {
+  await page.goto("/blog");
+  await page.getByRole("searchbox", { name: "搜索文章" }).fill("本体");
+  await page.getByRole("link", { name: ontologyTitle, exact: true }).click();
+  await expect(page).toHaveURL(/\/blog\/ontology-to-agent-execution$/);
+  await expect(page.getByRole("heading", { level: 1, name: ontologyTitle })).toBeVisible();
+  const tocLink = page.getByRole("navigation", { name: "文章目录" })
+    .getByRole("link", { name: "五、Action：把模型输出变成受控的状态变更" });
+  await tocLink.click();
+  await expect(page.getByRole("heading", { name: "五、Action：把模型输出变成受控的状态变更" })).toBeInViewport();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  await page.getByRole("link", { name: new RegExp(articleTitle) }).click();
+  await expect(page).toHaveURL(/\/blog\/first-agent-system$/);
+  await page.getByRole("link", { name: new RegExp(ontologyTitle) }).click();
+  await expect(page).toHaveURL(/\/blog\/ontology-to-agent-execution$/);
+  const rss = await request.get("/rss.xml");
+  expect(await rss.text()).toContain("/blog/ontology-to-agent-execution</link>");
 });
 
 test("article keeps a readable warm editorial measure", async ({ page }) => {
