@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 const articleTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
-const ontologyTitle = "从本体建模到 Agent 执行：我对语义层工程的理解";
+const ontologyTitle = "【AI学习笔记】深入研究 Palantir 本体论（精简版）";
 
 async function expectNoThreeScene(page: import("@playwright/test").Page) {
   await expect(page.locator("canvas")).toHaveCount(0);
@@ -122,19 +122,24 @@ test("publishes the ontology article with working contents and adjacent navigati
   await page.goto("/blog");
   await page.getByRole("searchbox", { name: "搜索文章" }).fill("本体");
   await page.getByRole("link", { name: ontologyTitle, exact: true }).click();
-  await expect(page).toHaveURL(/\/blog\/ontology-to-agent-execution$/);
+  await expect(page).toHaveURL(/\/blog\/palantir-ontology-notes$/);
   await expect(page.getByRole("heading", { level: 1, name: ontologyTitle })).toBeVisible();
+  await expect(page.locator(".article-prose blockquote")).toContainText("周默");
+  await expect(page.locator(".article-prose blockquote")).toContainText("经授权转载改编");
   const tocLink = page.getByRole("navigation", { name: "文章目录" })
-    .getByRole("link", { name: "五、Action：把模型输出变成受控的状态变更" });
+    .getByRole("link", { name: "行动：让分析结果进入业务流程" });
   await tocLink.click();
-  await expect(page.getByRole("heading", { name: "五、Action：把模型输出变成受控的状态变更" })).toBeInViewport();
+  await expect(page.getByRole("heading", { name: "行动：让分析结果进入业务流程" })).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.getByRole("link", { name: new RegExp(articleTitle) }).click();
   await expect(page).toHaveURL(/\/blog\/first-agent-system$/);
-  await page.getByRole("link", { name: new RegExp(ontologyTitle) }).click();
-  await expect(page).toHaveURL(/\/blog\/ontology-to-agent-execution$/);
+  await page.getByRole("navigation", { name: "相邻文章" }).getByRole("link").filter({ hasText: ontologyTitle }).click();
+  await expect(page).toHaveURL(/\/blog\/palantir-ontology-notes$/);
   const rss = await request.get("/rss.xml");
-  expect(await rss.text()).toContain("/blog/ontology-to-agent-execution</link>");
+  const rssText = await rss.text();
+  expect(rssText).toContain("/blog/palantir-ontology-notes</link>");
+  expect(rssText).not.toContain("ontology-to-agent-execution");
+  expect((await request.get("/blog/ontology-to-agent-execution")).status()).toBe(404);
 });
 
 test("article keeps a readable warm editorial measure", async ({ page }) => {

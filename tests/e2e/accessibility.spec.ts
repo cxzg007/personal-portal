@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 
-const auditedRoutes = ["/", "/blog", "/blog/first-agent-system"] as const;
+const auditedRoutes = ["/", "/blog", "/blog/first-agent-system", "/blog/palantir-ontology-notes"] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
 const primaryNavItems = ["实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
 
@@ -54,7 +54,10 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
   await expect(desktopNavigation).toBeVisible();
 
   const hero = page.getByRole("region", { name: "cxzg007" });
-  const postTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
+  const postTitles = [
+    "【AI学习笔记】深入研究 Palantir 本体论（精简版）",
+    "从 Semantica 开源贡献看 Agent 项目的工程协作",
+  ];
   const openSource = page.locator("main > section#open-source");
   const contact = page.locator("main > section#contact");
 
@@ -87,8 +90,10 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     openSource.getByRole("link", { name: "Semantica GitHub repository", exact: true }),
     openSource.getByRole("link", { name: "阅读 Semantica 贡献复盘", exact: true }),
     // 写作区每条目含两个链接（h3 标题链接在前，aria-label 的阅读全文在后），条目后为列表页入口。
-    page.locator("main > section#writing").getByRole("link", { name: postTitle, exact: true }),
-    page.locator("main > section#writing").getByRole("link", { name: `阅读文章：${postTitle}` }),
+    ...postTitles.flatMap((postTitle) => [
+      page.locator("main > section#writing").getByRole("link", { name: postTitle, exact: true }),
+      page.locator("main > section#writing").getByRole("link", { name: `阅读文章：${postTitle}` }),
+    ]),
     page.locator("main > section#writing").getByRole("link", { name: "全部文章", exact: true }),
     contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }),
     contact.getByRole("link", { name: "下载简历 PDF", exact: true }),
@@ -168,7 +173,7 @@ test("blog filters and article actions remain keyboard operable", async ({ page 
   await search.fill("Semantica");
 
   const filterGroup = page.getByRole("group", { name: "按标签筛选" });
-  for (const name of ["全部", "Agent 工程", "知识图谱", "开源协作"]) {
+  for (const name of ["全部", "Palantir", "本体论", "AI工程", "Agent 工程", "知识图谱", "开源协作"]) {
     const filter = filterGroup.getByRole("button", { exact: true, name });
     await expectNextTab(page, filter);
     await expectVisibleFocus(filter);

@@ -40,7 +40,7 @@ type PostModule = { default: ComponentType };
 type PostLoaderMap = Record<string, () => Promise<PostModule>>;
 
 const postLoaders = {
-  "ontology-to-agent-execution": () => import("../../content/posts/ontology-to-agent-execution.mdx"),
+  "palantir-ontology-notes": () => import("../../content/posts/palantir-ontology-notes.mdx"),
   "first-agent-system": () => import("../../content/posts/first-agent-system.mdx"),
 } satisfies PostLoaderMap;
 

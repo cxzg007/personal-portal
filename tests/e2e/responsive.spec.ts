@@ -155,7 +155,9 @@ for (const viewport of viewports) {
 
     await expectHorizontallyContained(openSource.getByLabel("Semantica 公开资料"));
 
-    await expectHorizontallyContained(page.locator("main > section#writing").getByRole("article"));
+    for (const article of await page.locator("main > section#writing").getByRole("article").all()) {
+      await expectHorizontallyContained(article);
+    }
 
     const contact = page.locator("main > section#contact");
     await expectHorizontallyContained(contact);
