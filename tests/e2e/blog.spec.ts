@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 const articleTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
-const ontologyTitle = "【AI学习笔记】深入研究 Palantir 本体论（精简版）";
+const ontologyTitle = "【AI学习笔记】深入研究Palantir本体论";
 
 async function expectNoThreeScene(page: import("@playwright/test").Page) {
   await expect(page.locator("canvas")).toHaveCount(0);
@@ -111,7 +111,7 @@ test("blog index keeps the warm portfolio visual language with intact card conte
   expect(values.cardBackground).toBe("rgb(255, 250, 240)");
   expect(values.cardMetaFont).toMatch(/Mono|monospace/);
 
-  await expect(page.locator(".blog-card h2")).toHaveText([ontologyTitle, articleTitle]);
+  await expect(page.locator(".blog-card h2")).toHaveText([articleTitle, ontologyTitle]);
   const originalCard = page.locator(".blog-card").filter({ hasText: articleTitle });
   await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(3);
   await expect(page.getByRole("link", { exact: true, name: articleTitle })).toBeVisible();
@@ -125,11 +125,11 @@ test("publishes the ontology article with working contents and adjacent navigati
   await expect(page).toHaveURL(/\/blog\/palantir-ontology-notes$/);
   await expect(page.getByRole("heading", { level: 1, name: ontologyTitle })).toBeVisible();
   await expect(page.locator(".article-prose blockquote")).toContainText("周默");
-  await expect(page.locator(".article-prose blockquote")).toContainText("经授权转载改编");
+  await expect(page.locator(".article-prose blockquote")).toContainText("经授权转载自");
   const tocLink = page.getByRole("navigation", { name: "文章目录" })
-    .getByRole("link", { name: "行动：让分析结果进入业务流程" });
+    .getByRole("link", { name: "第三维：全场景可执行业务行动统一编码" });
   await tocLink.click();
-  await expect(page.getByRole("heading", { name: "行动：让分析结果进入业务流程" })).toBeInViewport();
+  await expect(page.getByRole("heading", { name: "第三维：全场景可执行业务行动统一编码" })).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.getByRole("link", { name: new RegExp(articleTitle) }).click();
   await expect(page).toHaveURL(/\/blog\/first-agent-system$/);

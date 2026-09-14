@@ -55,7 +55,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
 
   const hero = page.getByRole("region", { name: "cxzg007" });
   const postTitles = [
-    "【AI学习笔记】深入研究 Palantir 本体论（精简版）",
+    "【AI学习笔记】深入研究Palantir本体论",
     "从 Semantica 开源贡献看 Agent 项目的工程协作",
   ];
   const openSource = page.locator("main > section#open-source");
