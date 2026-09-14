@@ -41,6 +41,7 @@ type PostLoaderMap = Record<string, () => Promise<PostModule>>;
 
 const postLoaders = {
   "palantir-ontology-notes": () => import("../../content/posts/palantir-ontology-notes.mdx"),
+  "graph-engineering-ontology": () => import("../../content/posts/graph-engineering-ontology.mdx"),
   "first-agent-system": () => import("../../content/posts/first-agent-system.mdx"),
 } satisfies PostLoaderMap;
 

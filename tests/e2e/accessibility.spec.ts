@@ -2,7 +2,13 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 
-const auditedRoutes = ["/", "/blog", "/blog/first-agent-system", "/blog/palantir-ontology-notes"] as const;
+const auditedRoutes = [
+  "/",
+  "/blog",
+  "/blog/first-agent-system",
+  "/blog/palantir-ontology-notes",
+  "/blog/graph-engineering-ontology",
+] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
 const primaryNavItems = ["实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
 
@@ -55,7 +61,8 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
 
   const hero = page.getByRole("region", { name: "cxzg007" });
   const postTitles = [
-    "【AI学习笔记】深入研究Palantir本体论",
+    "【AI学习笔记】Graph Engineering 的尽头：Ontology Engineering",
+    "深入研究Palantir本体论",
     "从 Semantica 开源贡献看 Agent 项目的工程协作",
   ];
   const openSource = page.locator("main > section#open-source");

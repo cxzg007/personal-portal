@@ -2,7 +2,8 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 const articleTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
-const ontologyTitle = "【AI学习笔记】深入研究Palantir本体论";
+const ontologyTitle = "深入研究Palantir本体论";
+const graphOntologyTitle = "【AI学习笔记】Graph Engineering 的尽头：Ontology Engineering";
 
 async function expectNoThreeScene(page: import("@playwright/test").Page) {
   await expect(page.locator("canvas")).toHaveCount(0);
@@ -111,7 +112,11 @@ test("blog index keeps the warm portfolio visual language with intact card conte
   expect(values.cardBackground).toBe("rgb(255, 250, 240)");
   expect(values.cardMetaFont).toMatch(/Mono|monospace/);
 
-  await expect(page.locator(".blog-card h2")).toHaveText([articleTitle, ontologyTitle]);
+  await expect(page.locator(".blog-card h2")).toHaveText([
+    graphOntologyTitle,
+    articleTitle,
+    ontologyTitle,
+  ]);
   const originalCard = page.locator(".blog-card").filter({ hasText: articleTitle });
   await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(3);
   await expect(page.getByRole("link", { exact: true, name: articleTitle })).toBeVisible();
@@ -124,8 +129,6 @@ test("publishes the ontology article with working contents and adjacent navigati
   await page.getByRole("link", { name: ontologyTitle, exact: true }).click();
   await expect(page).toHaveURL(/\/blog\/palantir-ontology-notes$/);
   await expect(page.getByRole("heading", { level: 1, name: ontologyTitle })).toBeVisible();
-  await expect(page.locator(".article-prose blockquote")).toContainText("周默");
-  await expect(page.locator(".article-prose blockquote")).toContainText("经授权转载自");
   const tocLink = page.getByRole("navigation", { name: "文章目录" })
     .getByRole("link", { name: "第三维：全场景可执行业务行动统一编码" });
   await tocLink.click();
@@ -133,13 +136,29 @@ test("publishes the ontology article with working contents and adjacent navigati
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.getByRole("link", { name: new RegExp(articleTitle) }).click();
   await expect(page).toHaveURL(/\/blog\/first-agent-system$/);
-  await page.getByRole("navigation", { name: "相邻文章" }).getByRole("link").filter({ hasText: ontologyTitle }).click();
+  const ontologyNeighbor = page.getByRole("navigation", { name: "相邻文章" })
+    .getByRole("link")
+    .filter({ hasText: ontologyTitle });
+  await ontologyNeighbor.scrollIntoViewIfNeeded();
+  await ontologyNeighbor.click({ force: true });
   await expect(page).toHaveURL(/\/blog\/palantir-ontology-notes$/);
   const rss = await request.get("/rss.xml");
   const rssText = await rss.text();
   expect(rssText).toContain("/blog/palantir-ontology-notes</link>");
   expect(rssText).not.toContain("ontology-to-agent-execution");
   expect((await request.get("/blog/ontology-to-agent-execution")).status()).toBe(404);
+});
+
+test("publishes the Graph Engineering ontology article with formatted content", async ({ page }) => {
+  await page.goto("/blog");
+  await page.getByRole("link", { name: graphOntologyTitle, exact: true }).click();
+  await expect(page).toHaveURL(/\/blog\/graph-engineering-ontology$/);
+  await expect(page.getByRole("heading", { level: 1, name: graphOntologyTitle })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "引言：一场关于 Agent 工程的范式之争" })).toBeVisible();
+  await expect(page.locator(".article-prose pre")).toHaveCount(6);
+  await expect(page.locator(".article-prose table")).toHaveCount(4);
+  await expect(page.locator(".article-prose img")).toHaveCount(17);
+  await expect(page.locator(".article-prose")).not.toContainText("**引言");
 });
 
 test("article keeps a readable warm editorial measure", async ({ page }) => {

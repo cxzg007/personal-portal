@@ -369,12 +369,18 @@ test("writing stage renders the public articles with full-read destinations", as
   await page.goto("/");
 
   const writing = page.locator("main > section#writing");
-  await expect(writing.getByRole("article")).toHaveCount(2);
+  await expect(writing.getByRole("article")).toHaveCount(3);
   await expect(
-    writing.getByRole("heading", { name: "【AI学习笔记】深入研究Palantir本体论" }),
+    writing.getByRole("heading", { name: "【AI学习笔记】Graph Engineering 的尽头：Ontology Engineering" }),
   ).toBeVisible();
   await expect(
-    writing.getByRole("link", { name: "阅读文章：【AI学习笔记】深入研究Palantir本体论" }),
+    writing.getByRole("link", { name: "阅读文章：【AI学习笔记】Graph Engineering 的尽头：Ontology Engineering" }),
+  ).toHaveAttribute("href", "/blog/graph-engineering-ontology");
+  await expect(
+    writing.getByRole("heading", { name: "深入研究Palantir本体论" }),
+  ).toBeVisible();
+  await expect(
+    writing.getByRole("link", { name: "阅读文章：深入研究Palantir本体论" }),
   ).toHaveAttribute("href", "/blog/palantir-ontology-notes");
   await expect(
     writing.getByRole("heading", { name: "从 Semantica 开源贡献看 Agent 项目的工程协作" }),
