@@ -68,7 +68,8 @@ async function expectNoHiddenOffscreenContent(page: Page) {
     const tolerance = 1;
     // SVG <text> 的 clientWidth 固定为约一个字符宽（浏览器度量怪癖），
     // 与视口/字号无关，并不代表真实溢出，故一并豁免。
-    const allowedOverflow = ".table-scroll, .table-scroll *, svg text";
+    // Tables and code blocks intentionally scroll inside separately checked containers.
+    const allowedOverflow = ".table-scroll, .table-scroll *, .code-frame pre, .code-frame pre *, svg text";
     const labels = (element: Element) => {
       const className = typeof element.className === "string" ? `.${element.className.trim().replaceAll(" ", ".")}` : "";
       return `${element.tagName.toLowerCase()}${className}`;
@@ -180,7 +181,7 @@ for (const viewport of viewports) {
     await expectHorizontallyContained(page.getByRole("searchbox", { name: "搜索文章" }));
     await expectHorizontallyContained(page.getByRole("group", { name: "按标签筛选" }));
     await expectHorizontallyContained(page.locator(".blog-card").first());
-    await expectHorizontallyContained(page.getByRole("link", { name: "阅读文章：从 Semantica 开源贡献看 Agent 项目的工程协作" }));
+    await expectHorizontallyContained(page.getByRole("link", { name: "阅读文章：Graph Engineering 的尽头：Ontology Engineering" }));
 
     if (viewport.width <= 760) {
       await expect(page.getByRole("button", { name: "打开导航菜单" })).toBeVisible();
@@ -196,20 +197,34 @@ for (const viewport of viewports) {
   }) => {
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/blog/first-agent-system");
+    await page.goto("/blog/graph-engineering-ontology");
 
     await expectNoHorizontalOverflow(page);
     const articleHeading = page.getByRole("heading", {
       level: 1,
-      name: "从 Semantica 开源贡献看 Agent 项目的工程协作",
+      name: "Graph Engineering 的尽头：Ontology Engineering",
     });
     await expectHorizontallyContained(articleHeading);
     await expectHorizontallyContained(page.locator(".article-header"));
     await expectHorizontallyContained(page.getByRole("navigation", { name: "文章目录" }));
     await expectHorizontallyContained(page.locator(".article-prose"));
-    await expectHorizontallyContained(page.locator(".code-frame"));
+    for (const frame of await page.locator(".code-frame").all()) {
+      await expectHorizontallyContained(frame);
+      const codeBlock = frame.locator("pre");
+      await expectHorizontallyContained(codeBlock, { allowSelfScroll: true });
+      await expect(codeBlock).toHaveCSS("overflow-x", "auto");
+      await expect(codeBlock).toHaveAttribute("tabindex", "0");
+      if (await codeBlock.evaluate((element) => element.scrollWidth > element.clientWidth)) {
+        await codeBlock.focus();
+        await expect(codeBlock).toBeFocused();
+        await codeBlock.press("ArrowRight");
+        await expect.poll(() => codeBlock.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+      }
+    }
     await expectHorizontallyContained(page.getByRole("link", { name: "返回博客" }));
-    await expectHorizontallyContained(page.locator(".table-scroll"), { allowSelfScroll: true });
+    for (const table of await page.locator(".table-scroll").all()) {
+      await expectHorizontallyContained(table, { allowSelfScroll: true });
+    }
     await expectNoHiddenOffscreenContent(page);
   });
 }

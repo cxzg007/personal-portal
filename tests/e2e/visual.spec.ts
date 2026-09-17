@@ -115,7 +115,7 @@ test("blog index visual", async ({ page }) => {
 });
 
 test("article detail visual", async ({ page }) => {
-  await prepareStablePage(page, "/blog/first-agent-system");
+  await prepareStablePage(page, "/blog/graph-engineering-ontology");
 
   await expect(page.locator(".article-layout")).toHaveScreenshot("article-detail.png");
 });

@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 
 const siteOrigin = "https://portfolio.example.test";
-const articleSlug = "first-agent-system";
-const articleTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
-const articleDescription = "江俊杰基于 Semantica 公开 PR 快照，对 Agent 项目中的数据契约、回归测试与开源协作进行工程复盘。";
+const articleSlug = "graph-engineering-ontology";
+const articleTitle = "Graph Engineering 的尽头：Ontology Engineering";
+const articleDescription =
+  "从 Graph Engineering 综述出发，讨论图工程的语义缺口与本体工程的融合路径：图工程的尽头，是本体工程。";
 const blogDescription = "关于 AI Agent、后端系统、知识图谱与工程协作的公开技术文章。";
 
 test("homepage publishes canonical, share metadata, and validated ProfilePage JSON-LD", async ({ page }) => {
@@ -107,8 +108,8 @@ test("sitemap, robots, and RSS expose every public article with absolute URLs", 
   const rssXml = await rss.text();
   expect(rssXml).toContain(`<title>${articleTitle}</title>`);
   expect(rssXml).toContain(`<link>${siteOrigin}/blog/${articleSlug}</link>`);
-  expect(rssXml).toContain("<pubDate>Fri, 21 Aug 2026 00:00:00 GMT</pubDate>");
-  expect(rssXml).toContain("<category>Agent 工程</category>");
+  expect(rssXml).toContain("<pubDate>Thu, 03 Sep 2026 00:00:00 GMT</pubDate>");
+  expect(rssXml).toContain("<category>本体工程</category>");
 });
 
 test("article publishes its own metadata and BlogPosting JSON-LD", async ({ page }) => {
@@ -131,8 +132,8 @@ test("article publishes its own metadata and BlogPosting JSON-LD", async ({ page
     "@type": "BlogPosting",
     headline: articleTitle,
     description: articleDescription,
-    datePublished: "2026-08-21",
-    dateModified: "2026-08-21",
+    datePublished: "2026-09-03",
+    dateModified: "2026-09-14",
     url: `${siteOrigin}/blog/${articleSlug}`,
     author: { "@type": "Person", name: "江俊杰" },
   });

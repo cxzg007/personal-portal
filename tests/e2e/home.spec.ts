@@ -159,9 +159,9 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
     "href",
     "https://github.com/semantica-agi/semantica",
   );
-  await expect(openSource.getByRole("link", { name: "阅读 Semantica 贡献复盘" })).toHaveAttribute(
+  await expect(openSource.getByRole("link", { name: "阅读相关技术文章" })).toHaveAttribute(
     "href",
-    "/blog/first-agent-system",
+    "/blog/graph-engineering-ontology",
   );
 
   const contact = page.locator("main > section#contact");
@@ -371,10 +371,20 @@ test("writing stage renders the public articles with full-read destinations", as
   const writing = page.locator("main > section#writing");
   await expect(writing.getByRole("article")).toHaveCount(3);
   await expect(
-    writing.getByRole("heading", { name: "【AI学习笔记】Graph Engineering 的尽头：Ontology Engineering" }),
+    writing.getByRole("heading", {
+      name: "从 Prompt 到 Graph：智能体工程五层演进的第一性原理",
+    }),
   ).toBeVisible();
   await expect(
-    writing.getByRole("link", { name: "阅读文章：【AI学习笔记】Graph Engineering 的尽头：Ontology Engineering" }),
+    writing.getByRole("link", {
+      name: "阅读文章：从 Prompt 到 Graph：智能体工程五层演进的第一性原理",
+    }),
+  ).toHaveAttribute("href", "/blog/agent-engineering-five-layers");
+  await expect(
+    writing.getByRole("heading", { name: "Graph Engineering 的尽头：Ontology Engineering" }),
+  ).toBeVisible();
+  await expect(
+    writing.getByRole("link", { name: "阅读文章：Graph Engineering 的尽头：Ontology Engineering" }),
   ).toHaveAttribute("href", "/blog/graph-engineering-ontology");
   await expect(
     writing.getByRole("heading", { name: "深入研究Palantir本体论" }),
@@ -382,12 +392,6 @@ test("writing stage renders the public articles with full-read destinations", as
   await expect(
     writing.getByRole("link", { name: "阅读文章：深入研究Palantir本体论" }),
   ).toHaveAttribute("href", "/blog/palantir-ontology-notes");
-  await expect(
-    writing.getByRole("heading", { name: "从 Semantica 开源贡献看 Agent 项目的工程协作" }),
-  ).toBeVisible();
-  await expect(
-    writing.getByRole("link", { name: "阅读文章：从 Semantica 开源贡献看 Agent 项目的工程协作" }),
-  ).toHaveAttribute("href", "/blog/first-agent-system");
 });
 
 test("brand marks load eagerly and never shift page height after load", async ({ page }) => {

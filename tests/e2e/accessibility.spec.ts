@@ -5,9 +5,9 @@ import type { Locator, Page } from "@playwright/test";
 const auditedRoutes = [
   "/",
   "/blog",
-  "/blog/first-agent-system",
   "/blog/palantir-ontology-notes",
   "/blog/graph-engineering-ontology",
+  "/blog/agent-engineering-five-layers",
 ] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
 const primaryNavItems = ["实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
@@ -61,9 +61,9 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
 
   const hero = page.getByRole("region", { name: "cxzg007" });
   const postTitles = [
-    "【AI学习笔记】Graph Engineering 的尽头：Ontology Engineering",
+    "从 Prompt 到 Graph：智能体工程五层演进的第一性原理",
+    "Graph Engineering 的尽头：Ontology Engineering",
     "深入研究Palantir本体论",
-    "从 Semantica 开源贡献看 Agent 项目的工程协作",
   ];
   const openSource = page.locator("main > section#open-source");
   const contact = page.locator("main > section#contact");
@@ -95,7 +95,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     ),
     openSource.locator("summary", { hasText: "查看剩余 7 个已合并 PR" }),
     openSource.getByRole("link", { name: "Semantica GitHub repository", exact: true }),
-    openSource.getByRole("link", { name: "阅读 Semantica 贡献复盘", exact: true }),
+    openSource.getByRole("link", { name: "阅读相关技术文章", exact: true }),
     // 写作区每条目含两个链接（h3 标题链接在前，aria-label 的阅读全文在后），条目后为列表页入口。
     ...postTitles.flatMap((postTitle) => [
       page.locator("main > section#writing").getByRole("link", { name: postTitle, exact: true }),
@@ -158,7 +158,7 @@ test("blog filters and article actions remain keyboard operable", async ({ page 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/blog");
 
-  const articleTitle = "从 Semantica 开源贡献看 Agent 项目的工程协作";
+  const articleTitle = "深入研究Palantir本体论";
   const skipLink = page.getByRole("link", { name: "跳到主要内容" });
   // 用类选择器精确定位站点标识，避免与博客 hero 的“返回首页”链接产生可访问名冲突。
   const siteMark = page.locator(".site-mark");
@@ -177,10 +177,22 @@ test("blog filters and article actions remain keyboard operable", async ({ page 
   }
 
   await expectVisibleFocus(search);
-  await search.fill("Semantica");
+  await search.fill("Palantir");
 
   const filterGroup = page.getByRole("group", { name: "按标签筛选" });
-  for (const name of ["全部", "Palantir", "本体论", "AI工程", "Agent 工程", "知识图谱", "开源协作"]) {
+  for (const name of [
+    "全部",
+    "Agent 工程",
+    "Graph Engineering",
+    "Context Engineering",
+    "第一性原理",
+    "Ontology Engineering",
+    "多智能体",
+    "本体工程",
+    "Palantir",
+    "本体论",
+    "AI学习笔记",
+  ]) {
     const filter = filterGroup.getByRole("button", { exact: true, name });
     await expectNextTab(page, filter);
     await expectVisibleFocus(filter);
