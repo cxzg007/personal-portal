@@ -211,7 +211,7 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
         <p className="open-source-showcase-boundary">{`截至 ${project.snapshotDate}：${merged.length} 个贡献已合并`}</p>
         <nav aria-label="Semantica 公开资料" className="open-source-showcase-links">
           <a aria-label="Semantica GitHub repository" href={project.repositoryUrl} rel="noreferrer" target="_blank">访问 GitHub <span aria-hidden="true">↗</span></a>
-          <a href={project.articlePath}>阅读 Semantica 贡献复盘</a>
+          <a href={project.articlePath}>阅读相关技术文章</a>
         </nav>
       </footer>
     </article>

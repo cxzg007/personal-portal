@@ -20,7 +20,7 @@ export const blogMdxComponents = {
       <span aria-hidden="true" className="code-frame-label">
         PSEUDOCODE
       </span>
-      <pre {...props}>{children}</pre>
+      <pre {...props} tabIndex={0}>{children}</pre>
     </div>
   ),
   table: ({ children, ...props }) => (

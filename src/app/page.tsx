@@ -70,7 +70,7 @@ export default async function HomePage() {
         </section>
         {featuredPosts.length > 0 ? (
           <section aria-labelledby="writing-heading" className="profile-stage profile-stage--sage" id="writing">
-            <h2 className="profile-reveal" id="writing-heading">工程复盘</h2>
+            <h2 className="profile-reveal" id="writing-heading">技术博客</h2>
             <WritingStage posts={featuredPosts} />
           </section>
         ) : null}

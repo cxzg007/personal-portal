@@ -21,7 +21,7 @@ export function WritingStage({ posts }: WritingStageProps) {
   }
 
   return (
-    <section aria-label="工程复盘" className="writing-stage">
+    <section aria-label="技术博客" className="writing-stage">
       <ul className="writing-list">
         {posts.map((post) => (
           <li key={post.slug}>

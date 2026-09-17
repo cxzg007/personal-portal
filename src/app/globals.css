@@ -961,6 +961,7 @@ main {
   color: var(--ink);
   font-size: clamp(0.94rem, 1.7vw, 1.02rem);
   line-height: 1.8;
+  overflow-wrap: anywhere;
 }
 
 .article-prose > :first-child {

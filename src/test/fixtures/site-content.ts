@@ -191,7 +191,7 @@ export const validSiteContent = {
       },
     ],
     repositoryUrl: "https://github.com/semantica-agi/semantica",
-    articlePath: "/blog/first-agent-system",
+    articlePath: "/blog/graph-engineering-ontology",
   },
   caseStudies: [
     {

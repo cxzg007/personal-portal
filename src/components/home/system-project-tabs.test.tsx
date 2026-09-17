@@ -186,7 +186,7 @@ describe("system project tabs", () => {
     }
   });
 
-  it("renders the internal link only inside the Semantica panel", async () => {
+  it("renders the Semantica panel fully and drops the retired article link", async () => {
     const user = userEvent.setup();
     render(<SystemProjectTabs architectures={architectures} projects={caseStudies} />);
     const tabs = screen.getAllByRole("tab");
@@ -203,10 +203,8 @@ describe("system project tabs", () => {
     expect(within(panel).getByText(project.contribution)).toBeVisible();
     expect(within(panel).getByText(project.stack.join("、"))).toBeVisible();
 
-    const link = within(panel).getByRole("link", { name: "过程复盘" });
-    expect(link).toHaveAttribute("href", project.links[0].url);
-    expect(link).not.toHaveAttribute("target");
-    expect(link).not.toHaveAttribute("rel");
+    expect(project.links).toEqual([]);
+    expect(within(panel).queryByRole("link", { name: "过程复盘" })).toBeNull();
   });
 
   it("renders merged PR links inside the Semantica contribution map", async () => {

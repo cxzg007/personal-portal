@@ -149,7 +149,7 @@ describe("OpenSourceShowcase", () => {
     expect(repository).toHaveAttribute("target", "_blank");
     expect(repository).toHaveAttribute("rel", "noreferrer");
 
-    const article = screen.getByRole("link", { name: "阅读 Semantica 贡献复盘" });
-    expect(article).toHaveAttribute("href", "/blog/first-agent-system");
+    const article = screen.getByRole("link", { name: "阅读相关技术文章" });
+    expect(article).toHaveAttribute("href", "/blog/graph-engineering-ontology");
   });
 });
