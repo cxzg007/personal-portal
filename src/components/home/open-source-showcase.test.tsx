@@ -167,15 +167,15 @@ describe("OpenSourceShowcase", () => {
     expect(within(recognition).queryByText("已合并 PR")).toBeNull();
   });
 
-  it("illustrates the rule reasoning theme with a RETE matching diagram", () => {
+  it("renders every theme card with the same structure and no featured variant", () => {
     const { container } = renderShowcase();
 
-    const lead = container.querySelector('[data-theme-id="rule-reasoning"]');
-    expect(lead).not.toBeNull();
-    expect(within(lead as HTMLElement).getByRole("img", { name: /RETE 多条件匹配/ })).toBeVisible();
-
-    const parallel = container.querySelector('[data-theme-id="pipeline-parallelism"]');
-    expect(within(parallel as HTMLElement).queryByRole("img")).toBeNull();
+    const themeItems = Array.from(container.querySelectorAll(".open-source-theme-item"));
+    expect(themeItems).toHaveLength(4);
+    for (const item of themeItems) {
+      expect(item.className).toBe("open-source-theme-item");
+      expect(within(item as HTMLElement).queryByRole("img")).toBeNull();
+    }
   });
 
   it("links to the external repository and the internal article", () => {

@@ -23,14 +23,6 @@ export function ProfileHero({ profile }: ProfileHeroProps) {
               查看实习
             </a>
             <a
-              aria-label="下载简历 PDF"
-              className="profile-cta profile-cta-secondary"
-              download
-              href="/resume.pdf"
-            >
-              下载简历 PDF
-            </a>
-            <a
               className="profile-cta profile-cta-secondary"
               href={profile.github}
               rel="noreferrer"

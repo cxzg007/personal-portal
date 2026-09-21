@@ -21,21 +21,21 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
   );
 
   const viewInternships = hero.getByRole("link", { name: "查看实习" });
-  const downloadResume = hero.getByRole("link", { name: "下载简历 PDF" });
   const githubCta = hero.getByRole("link", { name: "GitHub ↗" });
   await expect(viewInternships).toHaveAttribute("href", "#internships");
-  await expect(downloadResume).toHaveAttribute("href", "/resume.pdf");
   await expect(githubCta).toHaveAttribute("href", "https://github.com/cxzg007");
   await expect(githubCta).toHaveAttribute("target", "_blank");
 
+  // 简历 PDF 下载能力已整体下线：页面不再提供入口，静态资源亦不再暴露。
+  await expect(page.getByRole("link", { name: "下载简历 PDF" })).toHaveCount(0);
   const resume = await page.request.get("/resume.pdf");
-  expect(resume.status()).toBe(200);
+  expect(resume.status()).toBe(404);
 
   for (const target of [
     hero.locator(".profile-dock-name"),
     hero.getByRole("list", { name: "教育经历" }),
     hero.getByRole("link", { name: "查看实习", exact: true }),
-    hero.getByRole("link", { name: "下载简历 PDF", exact: true }),
+    hero.getByRole("link", { name: "GitHub ↗", exact: true }),
   ]) {
     await expect(target).toBeInViewport({ ratio: 1 });
     const box = await target.boundingBox();

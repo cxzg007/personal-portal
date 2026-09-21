@@ -73,7 +73,6 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     page.getByRole("link", { name: "返回首页" }),
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
     hero.getByRole("link", { name: "查看实习", exact: true }),
-    hero.getByRole("link", { name: "下载简历 PDF", exact: true }),
     hero.getByRole("link", { name: "GitHub ↗", exact: true }),
     hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com", exact: true }),
     hero.getByRole("link", { name: "GitHub", exact: true }),
@@ -103,7 +102,6 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     ]),
     page.locator("main > section#writing").getByRole("link", { name: "全部文章", exact: true }),
     contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }),
-    contact.getByRole("link", { name: "下载简历 PDF", exact: true }),
     contact.getByRole("link", { name: "GitHub", exact: true }),
   ];
 

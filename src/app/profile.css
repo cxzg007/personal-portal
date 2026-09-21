@@ -993,7 +993,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
 }
 
 .open-source-theme-item { min-width: 0; }
-.open-source-theme-lead { grid-column: 1 / -1; }
 
 .open-source-theme-card {
   display: flex;
@@ -1010,14 +1009,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
 .open-source-theme-card:hover {
   border-color: rgb(182 83 53 / 40%);
   box-shadow: 0 6px 18px rgb(111 64 32 / 6%);
-}
-
-.open-source-theme-lead .open-source-theme-card {
-  padding: 1.45rem 1.5rem;
-  border-color: rgb(182 83 53 / 28%);
-  background:
-    radial-gradient(ellipse at 90% 100%, rgb(223 165 100 / 13%), transparent 70%),
-    linear-gradient(135deg, #fbebdf, #fbf1e5);
 }
 
 .open-source-theme-header {
@@ -1043,8 +1034,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
   letter-spacing: -0.01em;
   line-height: 1.4;
 }
-
-.open-source-theme-lead .open-source-theme-name { font-size: clamp(1.1rem, 1.6vw, 1.3rem); }
 
 .open-source-theme-count {
   flex: 0 0 auto;
@@ -1095,12 +1084,6 @@ html[data-profile-motion="static"] .sticky-internship-card {
 }
 
 .open-source-other-summary { margin-bottom: 0.65rem; }
-
-.open-source-rete { display: block; width: 100%; margin: auto 0; }
-.open-source-rete-paths { color: #b57a58; }
-.open-source-rete-nodes rect { fill: #fffcf6; stroke: #c0a389; stroke-width: 1; }
-.open-source-rete-nodes .open-source-rete-join { fill: #f5dfca; stroke: #b77e52; }
-.open-source-rete-labels { fill: #61432e; font-family: var(--font-mono); font-size: 13px; }
 
 .open-source-showcase-details { border-block: 1px solid var(--profile-line); }
 
@@ -1156,16 +1139,13 @@ html[data-profile-motion="static"] .sticky-internship-card {
   .open-source-project-overview { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .open-source-recognition { padding: 1.25rem 0 0; border-left: none; border-top: 1px solid var(--profile-line); }
   .open-source-theme-grid { grid-template-columns: minmax(0, 1fr); }
-  .open-source-theme-lead { grid-column: auto; }
-  .open-source-rete { max-width: 30rem; margin: 1rem auto; }
 }
 
 @media (max-width: 480px) {
   .open-source-project-heading { flex-wrap: wrap; }
   .open-source-contributions-heading { align-items: flex-start; }
   .open-source-stat { flex-direction: column; gap: 0.35rem; padding-top: 0.25rem; }
-  .open-source-theme-card,
-  .open-source-theme-lead .open-source-theme-card { padding: 1rem; }
+  .open-source-theme-card { padding: 1rem; }
   .open-source-theme-count { font-size: 0.6rem; }
   .open-source-pr-chip { font-size: 0.66rem; }
 }

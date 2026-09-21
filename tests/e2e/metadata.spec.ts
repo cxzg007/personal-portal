@@ -38,11 +38,9 @@ test("homepage publishes canonical, share metadata, and validated ProfilePage JS
   await expect(page.locator("#writing").getByRole("article")).toHaveCount(3);
 });
 
-test("public resume and share card are stable, sanitized assets", async ({ request }) => {
+test("share card is a stable sanitized asset and the resume PDF is not exposed", async ({ request }) => {
   const resume = await request.get("/resume.pdf");
-  expect(resume.ok()).toBe(true);
-  expect(resume.headers()["content-type"]).toContain("application/pdf");
-  expect((await resume.body()).subarray(0, 5).toString()).toBe("%PDF-");
+  expect(resume.status()).toBe(404);
 
   const socialCard = await request.get("/social-card.svg");
   expect(socialCard.ok()).toBe(true);

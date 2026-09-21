@@ -16,7 +16,7 @@ describe("profile hero", () => {
     expect(screen.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
     expect(screen.queryByText("cxzg007 Profile")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "查看实习" })).toHaveAttribute("href", "#internships");
-    expect(screen.getByRole("link", { name: "下载简历 PDF" })).toHaveAttribute("href", "/resume.pdf");
+    expect(screen.queryByRole("link", { name: "下载简历 PDF" })).toBeNull();
     expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", profile.github);
     expect(screen.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
     expect(screen.getByText(`2027 届校招 · ${profile.targetRole}`)).toBeVisible();

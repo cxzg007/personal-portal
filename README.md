@@ -69,18 +69,11 @@ pnpm test -- src/content/schema.test.ts
 
 公开页面的隐私基线是不展示手机号、政治面貌和籍贯，也不写入内部地址、密钥、客户信息、未公开数据或受保密协议约束的实现细节。更新简历或经历时，应重新从源文件提取文本，逐项核对姓名、教育、时间、成果数字和公开链接，再运行内容校验与完整门禁；自动扫描不能替代人工脱敏检查。
 
-## 替换 PDF 简历
+## 简历 PDF 已下线
 
-公开路径固定为 `public/resume.pdf`。先在仓库外生成脱敏 PDF，人工检查每一页及文本提取结果，确认不含上述隐私字段和隐藏元数据，再替换文件。不要直接覆盖唯一的源简历；保留可恢复的源文件副本。
+站点不再提供简历 PDF 的下载入口，也不再暴露 `/resume.pdf` 静态路径。相关组件链接、`public/resume.pdf`、`src/lib/resume-asset.ts` 构建期校验与对应测试均已移除，`tests/e2e/{home,metadata,server-rendering}.spec.ts` 反向断言该路径返回 404、页面不含下载链接。
 
-替换后执行：
-
-```bash
-pnpm test -- src/lib/resume-asset.test.ts
-NEXT_PUBLIC_SITE_URL=https://portfolio.example.test pnpm build
-```
-
-最后在浏览器访问 `/resume.pdf`，确认响应为 PDF、页面完整且下载链接可用。当前构建校验能确认文件存在、非空且有 PDF 签名，但不能判断版式、事实准确性或隐私安全，因此每次更新都必须重新提取和人工审阅。
+如需恢复对外提供简历，必须同时补回四层：组件入口、`public/resume.pdf`、构建期签名校验、以及上述测试断言；并先在仓库外完成脱敏与人工逐页审阅。
 
 ## 发布 MDX 文章
 
@@ -179,12 +172,12 @@ pnpm test:e2e -- tests/e2e/visual.spec.ts --update-snapshots
 
 在 1440×900 和 390×844 两个视口至少检查：
 
-- 首页姓名、岗位、两行教育、邮箱/GitHub、实习 CTA 与简历入口；
+- 首页姓名、岗位、两行教育、邮箱/GitHub 与实习 CTA；
 - 展开每段实习，检查行动、结果、个人边界和外链；
 - 系统设计案例、架构说明与 Semantica 公开 PR 链接；
 - `/blog` 的筛选与搜索、文章详情、目录、代码块和上一篇/下一篇；
 - 系统减少动态效果时页面动效自动关闭，内容、导航与所有板块仍完整可用；
-- `/resume.pdf` 返回成功且内容正确；站内链接、邮箱、GitHub 和所有 `target="_blank"` 外链目标正确；
+- `/resume.pdf` 返回 404（简历下载已下线）；站内链接、邮箱、GitHub 和所有 `target="_blank"` 外链目标正确；
 - 浏览器 Console 与 Network 中没有未解释的页面错误。
 
 还要访问 `/robots.txt`、`/sitemap.xml` 和 `/rss.xml`，确认其中的 Origin 与当前 canonical Origin（`NEXT_PUBLIC_SITE_URL` 或 Vercel 的生产 URL）一致。

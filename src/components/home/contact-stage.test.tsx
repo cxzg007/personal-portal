@@ -28,7 +28,6 @@ describe("ContactStage", () => {
     expect(github).toHaveAttribute("target", "_blank");
     expect(github).toHaveAttribute("rel", "noreferrer");
 
-    const pdf = screen.getByRole("link", { name: "下载简历 PDF" });
-    expect(pdf).toHaveAttribute("href", "/resume.pdf");
+    expect(screen.queryByRole("link", { name: "下载简历 PDF" })).toBeNull();
   });
 });

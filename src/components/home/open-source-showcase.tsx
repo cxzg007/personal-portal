@@ -13,42 +13,6 @@ export type ContributionThemeGroup = {
 };
 
 const OTHER_CONTRIBUTIONS_THEME_ID = "other-contributions";
-const DIAGRAM_THEME_ID = "rule-reasoning";
-
-function ReteMatchingDiagram() {
-  return (
-    <svg
-      aria-label="RETE 多条件匹配示意：Alpha 节点产生 Token，Beta 逐层合并并检查共享变量，绑定一致时命中规则"
-      className="open-source-rete"
-      role="img"
-      viewBox="0 0 480 206"
-    >
-      <g className="open-source-rete-paths" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M116 28H148Q158 28 158 38V52Q158 62 174 62H190" />
-        <path d="M116 88H148Q158 88 158 78V72Q158 62 174 62" />
-        <path d="M296 62H308Q322 62 322 76V102Q322 116 338 116" />
-        <path d="M116 148H308Q322 148 322 134V130Q322 116 338 116" />
-        <path d="M398 138V166" />
-      </g>
-      <g className="open-source-rete-nodes">
-        <rect x="12" y="10" width="104" height="36" rx="10" />
-        <rect x="12" y="70" width="104" height="36" rx="10" />
-        <rect x="12" y="130" width="104" height="36" rx="10" />
-        <rect className="open-source-rete-join" x="190" y="40" width="106" height="44" rx="12" />
-        <rect className="open-source-rete-join" x="338" y="94" width="120" height="44" rx="12" />
-        <rect x="350" y="166" width="96" height="32" rx="10" />
-      </g>
-      <g className="open-source-rete-labels" textAnchor="middle" dominantBaseline="central">
-        <text x="64" y="28">Alpha A</text>
-        <text x="64" y="88">Alpha B</text>
-        <text x="64" y="148">Alpha C</text>
-        <text x="243" y="62">Beta A+B</text>
-        <text x="398" y="116">Beta A+B+C</text>
-        <text x="398" y="182">规则命中</text>
-      </g>
-    </svg>
-  );
-}
 
 export function groupContributionsByTheme(project: OpenSourceProject): ContributionThemeGroup[] {
   const mergedByNumber = new Map(
@@ -128,11 +92,7 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
 
       <ul aria-label="Semantica 贡献主题" className="open-source-theme-grid">
         {themeGroups.map(({ theme, contributions }, index) => (
-          <li
-            className={`open-source-theme-item${index === 0 ? " open-source-theme-lead" : ""}`}
-            data-theme-id={theme.id}
-            key={theme.id}
-          >
+          <li className="open-source-theme-item" data-theme-id={theme.id} key={theme.id}>
             <div className="open-source-theme-card">
               <div className="open-source-theme-header">
                 <span aria-hidden="true" className="open-source-theme-index">
@@ -142,7 +102,6 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
                 <span className="open-source-theme-count">{`${contributions.length} 个已合并 PR`}</span>
               </div>
               <p className="open-source-theme-summary">{theme.summary}</p>
-              {theme.id === DIAGRAM_THEME_ID ? <ReteMatchingDiagram /> : null}
               <ul aria-label={`${theme.name}相关 PR`} className="open-source-theme-prs">
                 {contributions.map((contribution) => (
                   <li key={contribution.number}>

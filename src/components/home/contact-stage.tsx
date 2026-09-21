@@ -11,7 +11,6 @@ export function ContactStage({ profile }: { profile: SiteContent["profile"] }) {
         >
           发送邮件
         </a>
-        <a href="/resume.pdf">下载简历 PDF</a>
         <a href={profile.github} rel="noreferrer" target="_blank">
           GitHub
         </a>
