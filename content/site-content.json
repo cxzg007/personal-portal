@@ -3,7 +3,7 @@
     "name": "江俊杰",
     "technicalId": "cxzg007",
     "targetRole": "AI Agent / 后端开发",
-    "positioning": "具备本体语义层、Agent 执行链路、流式回放与知识图谱系统实习经验，关注可靠 AI 应用与后端系统设计。",
+    "positioning": "具备本体语义层与规则动作、流式回放后端、RAG 多智能体三段实习经验，关注可靠 AI 应用与后端系统设计。",
     "recruitingStatus": "2027 届校招｜AI Agent / 后端开发",
     "education": [
       {
@@ -39,22 +39,10 @@
       "evidence": "简历列出京东、智元机器人、中国船舶集团 722 研究所三段实习。"
     },
     {
-      "label": "Semantica PR",
-      "value": 15,
+      "label": "已合并 PR",
+      "value": 16,
       "suffix": "个",
-      "evidence": "GitHub 查询于 2026-09-04 返回十五个 PR，其中十个已合并。"
-    },
-    {
-      "label": "本科专业排名",
-      "value": 12,
-      "suffix": "/62",
-      "evidence": "简历教育背景。"
-    },
-    {
-      "label": "V2X 方案性能",
-      "value": 90,
-      "suffix": "%",
-      "evidence": "简历科研经历称所提 GNN-D3QN 方案平均性能达到最优方案约 90%，随机方案约 60%。"
+      "evidence": "Semantica 仓库中十六个 PR 已合并入 main，快照核对于 2026-09-20。"
     }
   ],
   "internships": [
@@ -65,45 +53,57 @@
       "role": "后端开发实习生",
       "period": "2026-07 – 至今",
       "logo": { "src": "/brands/jd.png", "alt": "京东品牌标志", "theme": "jd" },
-      "valueHeadline": "建设本体驱动的数据智能与 Agent 执行链路",
+      "valueHeadline": "以本体建模与规则引擎支撑数据资产治理与 Agent 动作执行",
       "journey": [
-        { "label": "语义治理", "detail": "建立业务实体、关系与物理字段的可校验映射。" },
-        { "label": "查询推导", "detail": "通过 OntologyGraph、BFS 与 TopK 生成受控语义查询。" },
-        { "label": "安全执行", "detail": "以规则 Schema、确定性映射和批量写入约束业务动作。" }
+        { "label": "本体建模", "detail": "以实体、属性、关系描述业务语义，属性编码在实体内唯一。" },
+        { "label": "规则编译", "detail": "把结构化条件与语义描述编译为可复用的查询 SQL。" },
+        { "label": "动作执行", "detail": "整批动作单事务写回，人工执行前先预览计划并校验配置指纹。" }
       ],
       "highlights": [
-        "建设业务实体、属性、关系与物理表字段的映射治理，完善绑定校验、失效检测、Schema 同步、反向引用与绑定修正。",
-        "将字符串 JOIN 条件改造为结构化 joinKeys，设计内存 OntologyGraph，并基于 BFS 推导跨实体最短关联路径。",
-        "通过实体相关性评分和 TopK 召回筛选 LLM 查询上下文，生成语义 SQL 后由确定性映射转换为物理 SQL。",
-        "参与“场景理解—本体匹配—规则生成—Action 编排—预览确认—发布调度”链路，设计规则输出 Schema 编译与版本化，支持新旧规则格式兼容的依赖检查与安全批量删除。",
-        "引入 Caffeine 域级缓存、主动失效与定时重建，治理本体查询 N+1 和规则重复编译。"
+        "参与 findata-platform 数据资产管理与治理平台建设，支撑供应商寻源、资质审核与 OIE 审核诊断场景。",
+        "设计实体、属性、关系三层本体模型，属性编码只需在实体内唯一，降低跨实体命名冲突成本。",
+        "将结构化条件与语义描述编译为查询 SQL，支持 13 个比较算子与 11 个聚合算子，并用分组子查询回连避免一对多 JOIN 放大行数。",
+        "SQL 与参数顺序在同一次构建中生成；整批动作放入单事务，任一行影响数不为 1 时整批回滚。",
+        "IM 卡片与 HTTP 请求体的占位符先掩码再验证 JSON，保存时校验占位符可解析，动作按规则 ID 精确绑定。",
+        "AI 只输出属性编码，由引擎转换为物理 SQL 并按本体关系取 JOIN，再经人工确认；多表并发生成，推理模型退化时串行执行。",
+        "拆解 7 个原子步骤并以 Skill v2.6 接入 Hermes 编排，把授权校验下沉到服务端，透传 traceId 与异步上下文。"
       ],
-      "context": "面向内部数据分析与业务自动化场景，建设以本体语义层为核心的 AI 数据智能平台，为 LLM 和 Agent 提供统一语义上下文与可控业务执行链路。",
+      "context": "面向供应商寻源、资质审核与 OIE 审核诊断场景，建设 findata-platform 数据资产管理与治理平台，用本体语义与规则引擎为 AI 提供可控的查询与动作能力。",
       "actions": [
-        "建设业务实体、属性、关系与物理表字段的映射治理，完善绑定校验、失效检测、Schema 同步、反向引用与绑定修正。",
-        "将字符串 JOIN 条件改造为结构化 joinKeys，设计内存 OntologyGraph，并基于 BFS 推导跨实体最短关联路径。",
-        "通过实体相关性评分和 TopK 召回筛选 LLM 查询上下文，生成语义 SQL 后由确定性映射转换为物理 SQL。",
-        "参与“场景理解—本体匹配—规则生成—Action 编排—预览确认—发布调度”链路，设计规则输出 Schema 编译与版本化，支持新旧规则格式兼容的依赖检查与安全批量删除。",
-        "引入 Caffeine 域级缓存、主动失效与定时重建，治理本体查询 N+1 和规则重复编译。"
+        "设计实体、属性、关系三层本体模型，属性编码只需在实体内唯一。",
+        "将结构化条件与语义描述编译为查询 SQL，支持 13 个比较算子与 11 个聚合算子，并以分组子查询回连避免一对多 JOIN 放大行数，同时缓存结构化编译结果。",
+        "让 SQL 与参数顺序在同一次构建中产生，整批动作进入单事务，任一行影响数不为 1 即整批回滚；人工执行先预览计划并校验配置指纹。",
+        "对 IM 卡片与 HTTP 请求体的占位符先掩码再验证 JSON，保存时校验占位符可解析，并按规则 ID 精确绑定动作。",
+        "约束 AI 仅输出属性编码，由引擎转换物理 SQL、按本体关系取 JOIN，并加入置信度过滤与外键命名兜底。",
+        "把链路拆为 7 个原子步骤，以 Skill v2.6 接入 Hermes 编排，授权校验下沉服务端并透传 traceId。"
       ],
       "results": [
-        "形成“建立—校验—同步—修正”的本体绑定生命周期。",
-        "将语义查询从单跳关系扩展到多跳 JOIN，并支持关系变更后的失效与重建。",
-        "通过确定性字段校验、类型转换、SQL 构建和批量写入控制 AI 直接操作业务数据的风险。"
+        "本体模型把业务语义与物理表结构解耦，属性编码在实体内唯一即可维护。",
+        "规则查询覆盖 13 个比较算子与 11 个聚合算子，聚合结果不再被一对多 JOIN 放大。",
+        "动作写回具备单事务原子性、影响行数校验与配置指纹确认，避免 AI 误写业务数据。"
       ],
-      "ownership": "负责本体映射治理、多跳关系推导和查询性能治理，并参与 Agent 规则执行链路建设。",
+      "ownership": "负责本体建模、规则查询编译与动作执行链路，并参与 Agent Skill 编排与服务端授权改造。",
       "stack": [
         "Java",
         "Spring Boot",
-        "Spring Data JPA",
         "MySQL",
-        "Caffeine",
-        "LLM",
-        "NL2SQL",
-        "Ontology",
-        "规则引擎"
+        "本体建模",
+        "规则引擎",
+        "Agent Skill"
       ],
-      "status": "Shipped"
+      "status": "Shipped",
+      "projects": [
+        {
+          "id": "findata-platform",
+          "name": "findata-platform",
+          "summary": "数据资产管理与治理平台，支撑供应商寻源、资质审核与 OIE 审核诊断",
+          "highlights": [
+            "以实体、属性、关系建模业务语义，属性编码只需在实体内唯一。",
+            "把结构化条件与语义描述编译为查询 SQL，支持 13 个比较算子与 11 个聚合算子，并以分组子查询回连避免一对多 JOIN 放大行数。",
+            "整批动作在单事务内写回，任一行影响数不为 1 即回滚；人工执行先预览计划并校验配置指纹。"
+          ]
+        }
+      ]
     },
     {
       "id": "agibot-agent",
@@ -112,19 +112,19 @@
       "role": "机器人 Agent 开发实习生",
       "period": "2026-06 – 2026-07",
       "logo": { "src": "/brands/agibot.png", "alt": "智元机器人 AGIBOT 品牌标志", "theme": "agibot" },
-      "valueHeadline": "打通机器人流式回放与知识图谱可靠链路",
+      "valueHeadline": "用双通道流式回放把数百 MB 录制变成可控的在线调试体验",
       "journey": [
-        { "label": "流式读取", "detail": "构建本地、远端索引与对象存储 RangeReader 三级链路。" },
-        { "label": "会话一致性", "detail": "用虚拟时钟、世代计数和慢消费者隔离保障并发播放。" },
-        { "label": "知识自愈", "detail": "通过实体去重、幂等状态机与异步补偿恢复抽取任务。" }
+        { "label": "流式读取", "detail": "共用解析层，按时间与主题读取云端录制数据。" },
+        { "label": "会话控制", "detail": "虚拟时钟与世代标记保障播放、跳转与共享会话一致。" },
+        { "label": "并发稳定", "detail": "分层缓存、接纳控制与慢消费者隔离支撑高并发回放。" }
       ],
       "highlights": [
-        "为 clip-player 建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制、共享会话，并对接 Lichtblick 可视化调试链路。",
-        "设计本地持久化、远端 IndexedReader 与 S3 RangeReader 三级读取链路，加入 tail cache、顺序读窗口和 singleflight 去重。",
-        "使用虚拟时钟和原子世代计数器实现播放状态一致性，以请求取消与 requestId 过滤实现低开销 seek，修复 bufio.Writer 并发 data race，并通过有界队列和慢消费者隔离保障稳定性。",
-        "为 agibot_retriever 设计“SQL 精确匹配—向量 TopK—LLM 消歧”三级实体去重和 Redis 分布式锁创建临界区。",
-        "通过 MySQL CAS 状态机、dead-letter、异步补偿和 Reaper 实现幂等抽取与故障自愈。",
-        "通过关系合法集、latest-wins、跨 Chunk 滚动上下文和文档锚点增强知识图谱连通性。"
+        "参与 clip-player 机器人数据回放平台建设，把云端数百 MB 录制按时间与主题读取，共用解析层对外提供功能对等的 HTTP 与 WebSocket 双通道。",
+        "实现播放、暂停、跳转、变速与共享会话；用虚拟时钟与世代标记区分有效与过期指令。",
+        "让读取进度独立于播放时钟推进，并为中途加入的客户端补齐必要消息。",
+        "分享链接只传数据标识，预签名凭证不进入浏览器，由后端按平台身份查询。",
+        "对未知格式给出降级诊断，缺索引时以顺序扫描恢复读取。",
+        "引入分层缓存、读取器复用、并发接纳与慢消费者隔离，并通过梯度压测定位瓶颈；修复并发写导致的数据流损坏。"
       ],
       "projects": [
         {
@@ -132,45 +132,33 @@
           "name": "clip-player",
           "summary": "机器人多传感器数据流式回放平台",
           "highlights": [
-            "建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制、共享会话，并对接 Lichtblick 可视化调试链路。",
-            "设计本地持久化、远端 IndexedReader 与 S3 RangeReader 三级读取链路。",
-            "使用虚拟时钟、原子世代计数器、请求取消与 requestId 过滤实现低开销 seek，并以有界队列和慢消费者隔离保障并发稳定性。"
-          ]
-        },
-        {
-          "id": "agibot-retriever",
-          "name": "agibot_retriever",
-          "summary": "面向企业 AI Agent 的知识检索和长期记忆管理系统",
-          "highlights": [
-            "设计“SQL 精确匹配—向量 TopK—LLM 消歧”三级实体去重。",
-            "通过 Redis 分布式锁与 MySQL CAS 状态机实现幂等创建和抽取。",
-            "通过 dead-letter、异步补偿、Reaper 与关系约束实现故障自愈。"
+            "共用解析层对外提供功能对等的 HTTP 与 WebSocket 双通道回放。",
+            "虚拟时钟与世代标记保障播放、跳转与共享会话的一致性。",
+            "分层缓存、读取器复用、并发接纳与慢消费者隔离支撑高并发回放。"
           ]
         }
       ],
-      "context": "参与机器人多传感器数据回放，以及面向企业 AI Agent 的知识检索和长期记忆管理系统建设。",
+      "context": "云端录制文件动辄数百 MB，调试需要按时间与主题快速定位，并支持多人共享同一段回放；目标是把解析与凭证管理收敛到服务端，浏览器只处理播放交互。",
       "actions": [
-        "为 clip-player 建设 MCAP HTTP/WebSocket 双通道流式回放，支持 seek、播放控制、共享会话，并对接 Lichtblick 可视化调试链路。",
-        "设计本地持久化、远端 IndexedReader 与 S3 RangeReader 三级读取链路，加入 tail cache、顺序读窗口和 singleflight 去重。",
-        "使用虚拟时钟和原子世代计数器实现播放状态一致性，以请求取消与 requestId 过滤实现低开销 seek，修复 bufio.Writer 并发 data race，并通过有界队列和慢消费者隔离保障稳定性。",
-        "为 agibot_retriever 设计“SQL 精确匹配—向量 TopK—LLM 消歧”三级实体去重和 Redis 分布式锁创建临界区。",
-        "通过 MySQL CAS 状态机、dead-letter、异步补偿和 Reaper 实现幂等抽取与故障自愈。",
-        "通过关系合法集、latest-wins、跨 Chunk 滚动上下文和文档锚点增强知识图谱连通性。"
+        "共用解析层按时间与主题读取云端录制，对外提供功能对等的 HTTP 与 WebSocket 双通道。",
+        "实现播放、暂停、跳转、变速与共享会话，用虚拟时钟与世代标记丢弃过期指令。",
+        "让读取进度独立于播放时钟推进，并为中途加入的客户端补齐必要消息。",
+        "分享链接只传数据标识，预签名凭证不进入浏览器，由后端按平台身份查询。",
+        "对未知格式给出降级诊断，缺索引时以顺序扫描恢复读取。",
+        "引入分层缓存、读取器复用、并发接纳与慢消费者隔离，并通过梯度压测定位瓶颈。"
       ],
       "results": [
-        "将 MCAP 解析、转码和错误处理收敛到服务端，并提供功能对等的 HTTP 与 WebSocket 回放通道。",
-        "降低对象存储往返和重复解析开销，隔离高并发下的慢消费者与写入竞争。",
-        "建立跨 MySQL、Milvus、Redis 的实体一致性和可恢复知识抽取链路。"
+        "解析、转码与凭证管理收敛到服务端，HTTP 与 WebSocket 两条通道功能对等。",
+        "50 并发下已接纳请求的 P99 时延由 810ms 降至 375ms。",
+        "修复并发写导致的数据流损坏，高并发回放不再受慢消费者拖累。"
       ],
-      "ownership": "负责流式回放后端的读取、会话与并发稳定性设计，并承担知识图谱实体去重、幂等任务和关系约束模块。",
+      "ownership": "负责流式回放后端的读取链路、会话状态与并发稳定性设计。",
       "stack": [
         "Go",
-        "Python",
         "GoFrame",
-        "FastAPI",
+        "HTTP",
+        "WebSocket",
         "MySQL",
-        "Redis",
-        "Milvus",
         "S3/TOS",
         "Docker",
         "K8s"
@@ -180,37 +168,55 @@
     {
       "id": "cssc-722",
       "company": "中国船舶集团 722 研究所",
-      "team": "总体部",
-      "role": "算法实习生",
+      "team": "研发部",
+      "role": "研发实习生",
       "period": "2025-07 – 2026-05",
       "logo": { "src": "/brands/cssc.png", "alt": "中国船舶集团 CSSC 品牌标志", "theme": "cssc" },
-      "valueHeadline": "验证海上通信网络重构与集群通信方案",
+      "valueHeadline": "用 RAG 增强型多智能体支撑技术文档问答与通信任务方案生成",
       "journey": [
-        { "label": "问题建模", "detail": "抽象海上通信节点组建、节点受损与恢复约束。" },
-        { "label": "仿真验证", "detail": "评估通信建立成功率、恢复时延与链路稳定性。" },
-        { "label": "方案交付", "detail": "整理验证结果并完成无人机集群通信方案文档。" }
+        { "label": "混合召回", "detail": "关键词与向量混合检索，配合融合重排与父子分块。" },
+        { "label": "任务分流", "detail": "Supervisor 按问题类型分流到问答、工具或任务规划。" },
+        { "label": "状态可追", "detail": "会话状态与工具调用记录可追溯，全链路串联 trace_id。" }
       ],
       "highlights": [
-        "围绕链路建立、波束匹配、网络重构与通信恢复开展算法设计。",
-        "开发仿真脚本，评估通信建立成功率、恢复时延与链路稳定性。",
-        "参与研究所与上海交通大学、同济大学合作项目论证，负责无人机集群智能通信方案设计和技术文档编写。"
+        "参与 UAV-pilot RAG 增强型多智能体辅助决策系统，覆盖技术文档问答与通信任务方案生成。",
+        "以 Elasticsearch 关键词检索与向量检索做混合召回，再经融合重排与父子分块提升长文档命中质量。",
+        "由 Supervisor 把请求分流到直接回答、知识库问答、确定性工具调用与任务规划四条路径。",
+        "以可配置 Skill、工具注册表与调用范围权限约束智能体可用能力。",
+        "用 Redis 保存短期会话状态，数据库落库历史任务与工具调用记录，并以 trace_id 串联全链路。"
       ],
-      "context": "面向海上通信节点组建、节点受损后的快速恢复和大规模无人机集群通信方案论证。",
+      "projects": [
+        {
+          "id": "uav-pilot",
+          "name": "UAV-pilot",
+          "summary": "RAG 增强型多智能体辅助决策系统",
+          "highlights": [
+            "关键词与向量混合召回，配合融合重排与父子分块。",
+            "Supervisor 分流到直接回答、知识库问答、确定性工具与任务规划。",
+            "可配置 Skill、工具注册表与调用范围权限约束能力边界。"
+          ]
+        }
+      ],
+      "context": "技术文档分散且专业性强，通信任务方案又需要结构化推演；目标是让检索结果可追溯、让智能体的工具调用范围可控。",
       "actions": [
-        "围绕链路建立、波束匹配、网络重构与通信恢复开展算法设计。",
-        "开发仿真脚本，评估通信建立成功率、恢复时延与链路稳定性。",
-        "参与研究所与上海交通大学、同济大学合作项目论证，负责无人机集群智能通信方案设计和技术文档编写。"
+        "搭建 Elasticsearch 关键词与向量混合召回链路，加入融合重排与父子分块。",
+        "设计 Supervisor 分流策略，把请求导向直接回答、知识库问答、确定性工具或任务规划。",
+        "建设可配置 Skill、工具注册表与调用范围权限机制。",
+        "用 Redis 管理短期会话状态，数据库记录历史任务与工具调用，并透传 trace_id。"
       ],
       "results": [
-        "完成通信网络重构算法验证、结果整理和项目交付。",
-        "完成工程问题抽象与大规模无人机集群通信算法路径梳理。"
+        "默认评测集上 Recall@5 达 91.67%，MRR@10 达 75.69%。",
+        "默认评测集上任务规划完整率达 95.83%。",
+        "工具调用范围与会话状态可审计，问答结果可回溯到具体文档片段。"
       ],
-      "ownership": "负责算法建模、仿真验证、结果整理与方案文档。",
+      "ownership": "负责检索链路、Supervisor 分流与工具权限治理，并参与会话状态与可观测设计。",
       "stack": [
         "Python",
-        "MATLAB",
-        "无线通信仿真",
-        "算法建模"
+        "FastAPI",
+        "Elasticsearch",
+        "Redis",
+        "RAG",
+        "Agent"
       ],
       "status": "Deployed"
     }
@@ -220,10 +226,10 @@
     "logo": { "src": "/brands/semantica.png", "alt": "Semantica 项目标志", "theme": "semantica" },
     "identity": "Open-source Contributor · cxzg007",
     "background": "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施，将分散的数据组织为知识图谱，为推理、检索与决策提供可追溯的上下文。",
-    "snapshotDate": "2026-09-04",
+    "snapshotDate": "2026-09-20",
     "recognition": {
-      "stars": 12455,
-      "checkedAt": "2026-09-09",
+      "stars": 13300,
+      "checkedAt": "2026-09-20",
       "honors": [
         {
           "rank": 1,
@@ -241,22 +247,28 @@
     },
     "contributions": [
       {
+        "number": 1544,
+        "title": "非递归规则独立支持与源级撤回：让规则批量更新在单次原子操作内完成。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1544",
+        "status": "merged"
+      },
+      {
         "number": 1364,
         "title": "对齐 enforce_decision_policy 与 record_decision 的默认推理上限。",
         "url": "https://github.com/semantica-agi/semantica/pull/1364",
-        "status": "open"
+        "status": "merged"
       },
       {
         "number": 1360,
         "title": "决策因果追踪中启发式原因去重。",
         "url": "https://github.com/semantica-agi/semantica/pull/1360",
-        "status": "open"
+        "status": "merged"
       },
       {
         "number": 1243,
         "title": "SPARQLReasoner.execute_query 三路径实现：store 委托、rdflib 回退与缓存隔离。",
         "url": "https://github.com/semantica-agi/semantica/pull/1243",
-        "status": "open"
+        "status": "merged"
       },
       {
         "number": 1226,
@@ -280,13 +292,13 @@
         "number": 1208,
         "title": "冲突解决修复：修复冲突解决路径中的 unhashable TypeError。",
         "url": "https://github.com/semantica-agi/semantica/pull/1208",
-        "status": "open"
+        "status": "merged"
       },
       {
         "number": 1160,
         "title": "PolicyEngine compliance 失败处理：将合规检查失败从静默结果改为显式抛出。",
         "url": "https://github.com/semantica-agi/semantica/pull/1160",
-        "status": "open"
+        "status": "merged"
       },
       {
         "number": 1153,
@@ -339,34 +351,33 @@
       "id": "ontology-agent-platform",
       "tabLabel": "Ontology Agent",
       "visualKind": "ontology",
-      "title": "本体驱动的 Agent 数据智能平台",
-      "problem": "LLM 缺乏稳定的业务语义上下文，直接面向物理表生成 SQL 容易产生字段幻觉，并难以安全执行和回写业务动作。",
+      "title": "本体驱动的数据资产治理与 Agent 动作平台",
+      "problem": "AI 直接面向物理表生成 SQL 容易产生字段幻觉，业务动作一旦写错数据又难以回退，需要一层可校验的业务语义与受控执行链路。",
       "constraints": [
         "物理 Schema 持续变化",
         "实体关系存在多跳连接",
         "AI 输出不可信",
-        "规则需要版本兼容",
-        "查询和编译存在重复开销"
+        "批量动作必须原子写回",
+        "查询与规则编译存在重复开销"
       ],
       "decisions": [
-        "用本体语义层隔离业务概念与物理数据模型。",
-        "用 OntologyGraph + BFS 推导多跳关联路径。",
-        "用相关性评分与 TopK 控制 LLM 上下文，再通过确定性映射生成物理 SQL。",
-        "对规则输出进行 Schema 编译、版本化和确定性回写。"
+        "以实体、属性、关系三层本体隔离业务语义与物理表结构，属性编码仅在实体内唯一。",
+        "把结构化条件与语义描述编译为查询 SQL，支持 13 个比较算子与 11 个聚合算子。",
+        "用分组子查询回连避免一对多 JOIN 放大行数，并缓存结构化编译结果。",
+        "AI 只输出属性编码，由引擎转物理 SQL 并按本体关系取 JOIN，再经人工确认执行。"
       ],
       "tradeoffs": [
-        "将部分灵活性收敛到受控语义模型和规则 Schema，以换取可验证性、兼容性和业务数据安全。"
+        "把部分灵活性收敛到受控语义模型与规则 Schema，换取结果可验证与业务数据安全。"
       ],
-      "contribution": "负责本体映射治理、多跳关系推导、缓存与失效治理，并参与 Agent 执行链路设计。",
-      "result": "形成可校验、可同步、可修正的本体生命周期，以及受控的 Agent 业务执行链路。",
+      "contribution": "负责本体建模、规则查询编译与动作执行链路，并参与 Agent Skill 编排与服务端授权改造。",
+      "result": "整批动作在单事务内写回，任一行影响数不为 1 即整批回滚；人工执行先预览计划并校验配置指纹。",
       "stack": [
         "Java",
         "Spring Boot",
         "MySQL",
-        "Caffeine",
-        "LLM",
-        "NL2SQL",
-        "Ontology"
+        "本体建模",
+        "规则引擎",
+        "Agent Skill"
       ],
       "links": []
     },
@@ -375,27 +386,27 @@
       "tabLabel": "Streaming Backend",
       "visualKind": "streaming",
       "title": "机器人多传感器数据流式回放平台",
-      "problem": "MCAP 录制数据体量大，在线检索困难，多人协同分析时需要可靠的 seek、播放控制和共享会话。",
+      "problem": "云端录制动辄数百 MB，调试需要按时间与主题快速定位，多人还要共享同一段回放，而预签名凭证不能暴露到浏览器。",
       "constraints": [
-        "对象存储随机读取成本高",
+        "云端随机读取成本高",
         "HTTP 与 WebSocket 需功能对等",
-        "并发 seek 和慢消费者会破坏会话一致性",
-        "服务端存在共享写入竞争"
+        "并发跳转与慢消费者会破坏会话一致性",
+        "凭证不能进入浏览器"
       ],
       "decisions": [
-        "复用同一 MCAP 解码与流式写入内核，提供 HTTP 分段流和 WebSocket 双通道。",
-        "设计本地、IndexedReader、S3 RangeReader 三级读取链路和自适应缓存。",
-        "使用虚拟时钟、原子世代计数器、请求取消和 requestId 过滤管理播放状态。",
-        "以有界队列、并发信号量和慢消费者隔离控制资源。"
+        "共用同一解析层，对外提供功能对等的 HTTP 与 WebSocket 双通道。",
+        "用虚拟时钟与世代标记区分有效与过期指令，让读取进度独立于播放时钟推进。",
+        "分享链接只传数据标识，由后端按平台身份查询预签名凭证。",
+        "以分层缓存、读取器复用、并发接纳与慢消费者隔离控制资源。"
       ],
       "tradeoffs": [
-        "增加服务端状态与缓存复杂度，以降低客户端复杂度、对象存储往返和多人协作时的不一致。"
+        "增加服务端状态与缓存复杂度，换取客户端简化、更少的云端往返与多人协作一致性。"
       ],
-      "contribution": "负责读取链路、双通道回放、会话控制、并发安全与稳定性治理。",
-      "result": "支持任意时间点 seek、播放控制和多视图共享会话，并修复主写入链路 data race。",
+      "contribution": "负责读取链路、双通道回放、会话控制与并发稳定性治理。",
+      "result": "50 并发下已接纳请求的 P99 时延由 810ms 降至 375ms，并修复并发写导致的数据流损坏。",
       "stack": [
         "Go",
-        "MCAP",
+        "GoFrame",
         "HTTP",
         "WebSocket",
         "S3/TOS",
@@ -405,34 +416,35 @@
       "links": []
     },
     {
-      "id": "knowledge-memory",
-      "tabLabel": "Knowledge Memory",
-      "visualKind": "memory",
-      "title": "面向企业 AI Agent 的知识检索与长期记忆系统",
-      "problem": "企业 AI Agent 需要跨 MySQL、Milvus、Redis 的一致知识记忆，抽取任务失败后必须可恢复，否则知识图谱会持续劣化。",
+      "id": "rag-agent",
+      "tabLabel": "RAG Agent",
+      "visualKind": "retrieval",
+      "title": "RAG 增强型多智能体辅助决策系统",
+      "problem": "技术文档分散且专业性强，通信任务方案又需要结构化推演；智能体必须给出可追溯的答案，并把工具调用限制在安全范围内。",
       "constraints": [
-        "实体存在重复与歧义",
-        "抽取任务需要幂等",
-        "故障后需要自愈",
-        "知识图谱需要关系约束"
+        "长文档检索容易召回片段却丢上下文",
+        "问答、工具调用与任务规划诉求混在同一入口",
+        "智能体可用能力需要按范围授权",
+        "会话状态与调用记录需可追溯"
       ],
       "decisions": [
-        "设计“SQL 精确匹配—向量 TopK—LLM 消歧”三级实体去重。",
-        "通过 Redis 分布式锁与 MySQL CAS 状态机实现幂等创建和抽取。",
-        "通过 dead-letter、异步补偿、Reaper 与关系约束实现故障自愈。",
-        "以 latest-wins、跨 Chunk 滚动上下文和文档锚点增强知识图谱连通性。"
+        "用 Elasticsearch 关键词检索与向量检索做混合召回，再经融合重排排序。",
+        "采用父子分块，命中子块后回溯父块补齐上下文。",
+        "由 Supervisor 把请求分流到直接回答、知识库问答、确定性工具调用与任务规划。",
+        "以可配置 Skill、工具注册表与调用范围权限约束智能体能力边界。"
       ],
       "tradeoffs": [
-        "以状态机与补偿机制的复杂度，换取知识链路的一致性与可恢复性。"
+        "增加检索与编排链路的复杂度，换取答案可追溯性与工具调用的可控性。"
       ],
-      "contribution": "负责知识库构建中的实体去重、幂等抽取、故障自愈与关系约束模块。",
-      "result": "建立跨 MySQL、Milvus、Redis 的实体一致性和可恢复知识抽取链路。",
+      "contribution": "负责混合召回与重排链路、Supervisor 分流策略、工具注册表与权限治理，并参与会话状态与可观测设计。",
+      "result": "默认评测集上 Recall@5 达 91.67%、MRR@10 达 75.69%、任务规划完整率达 95.83%，工具调用与会话状态均可审计。",
       "stack": [
         "Python",
         "FastAPI",
-        "MySQL",
+        "Elasticsearch",
         "Redis",
-        "Milvus"
+        "RAG",
+        "Agent"
       ],
       "links": []
     },
@@ -467,7 +479,7 @@
     }
   ],
   "about": [
-    "同济大学电子信息硕士，研究方向为多无人机场景通感一体化联合优化，具备强化学习、无线资源分配与系统级仿真背景。",
-    "实习与开源工作聚焦可靠 AI 应用和后端系统设计，覆盖本体语义层、Agent 执行链路、知识图谱、流式数据处理、跨存储一致性和故障恢复。"
+    "同济大学电子信息硕士（推免），研究方向为多无人机场景通感一体化（ISAC）联合优化。",
+    "实习与开源工作聚焦可靠 AI 应用和后端系统设计，覆盖本体语义层与规则动作执行、流式回放后端、RAG 多智能体链路与知识图谱基础设施。"
   ]
 }

@@ -65,8 +65,8 @@ export type Internship = {
 
 export type CaseStudy = {
   id: string;
-  tabLabel: "Ontology Agent" | "Streaming Backend" | "Knowledge Memory" | "Semantica";
-  visualKind: "ontology" | "streaming" | "memory" | "graph";
+  tabLabel: "Ontology Agent" | "Streaming Backend" | "RAG Agent" | "Semantica";
+  visualKind: "ontology" | "streaming" | "retrieval" | "graph";
   title: string;
   problem: string;
   constraints: string[];
@@ -110,13 +110,13 @@ const INTERNSHIP_STATUSES = new Set<Internship["status"]>([
 const CASE_STUDY_TAB_LABELS = new Set<CaseStudy["tabLabel"]>([
   "Ontology Agent",
   "Streaming Backend",
-  "Knowledge Memory",
+  "RAG Agent",
   "Semantica",
 ]);
 const CASE_STUDY_VISUAL_KINDS = new Set<CaseStudy["visualKind"]>([
   "ontology",
   "streaming",
-  "memory",
+  "retrieval",
   "graph",
 ]);
 const CONTRIBUTION_STATUSES = new Set<OpenSourceContribution["status"]>(["merged", "open"]);
@@ -347,8 +347,8 @@ export function validateSiteContent(input: unknown): ValidationResult {
         });
       }
     }
-    if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 15) {
-      errors.push("openSource.contributions must contain exactly 15 entries");
+    if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 16) {
+      errors.push("openSource.contributions must contain exactly 16 entries");
     } else {
       let mergedCount = 0;
       const seenPrNumbers = new Set<number>();
@@ -386,8 +386,8 @@ export function validateSiteContent(input: unknown): ValidationResult {
           errors.push(`openSource.contributions[${index}].url must be an HTTPS GitHub PR URL`);
         }
       });
-      if (mergedCount !== 10) {
-        errors.push("openSource.contributions must contain exactly 10 merged entries");
+      if (mergedCount !== 16) {
+        errors.push("openSource.contributions must contain exactly 16 merged entries");
       }
     }
     checkHttpsUrl(openSource.repositoryUrl, "openSource.repositoryUrl");
@@ -414,14 +414,14 @@ export function validateSiteContent(input: unknown): ValidationResult {
         }
       }
       if (typeof value.tabLabel !== "string" || !CASE_STUDY_TAB_LABELS.has(value.tabLabel as CaseStudy["tabLabel"])) {
-        errors.push(`caseStudies[${index}].tabLabel must be Ontology Agent, Streaming Backend, Knowledge Memory, or Semantica`);
+        errors.push(`caseStudies[${index}].tabLabel must be Ontology Agent, Streaming Backend, RAG Agent, or Semantica`);
       } else if (seenTabLabels.has(value.tabLabel)) {
         errors.push("caseStudies must have unique tab labels");
       } else {
         seenTabLabels.add(value.tabLabel);
       }
       if (typeof value.visualKind !== "string" || !CASE_STUDY_VISUAL_KINDS.has(value.visualKind as CaseStudy["visualKind"])) {
-        errors.push(`caseStudies[${index}].visualKind must be ontology, streaming, memory, or graph`);
+        errors.push(`caseStudies[${index}].visualKind must be ontology, streaming, retrieval, or graph`);
       }
       ["title", "problem", "contribution", "result"].forEach((field) =>
         checkText(value[field], `caseStudies[${index}].${field}`),

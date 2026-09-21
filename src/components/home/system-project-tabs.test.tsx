@@ -21,7 +21,7 @@ describe("system project tabs", () => {
     expect(tabs.map((tab) => tab.textContent)).toEqual([
       "Ontology Agent",
       "Streaming Backend",
-      "Knowledge Memory",
+      "RAG Agent",
       "Semantica",
     ]);
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
@@ -33,7 +33,7 @@ describe("system project tabs", () => {
       screen.queryByRole("tabpanel", { name: "Ontology Agent" }),
     ).toBeNull();
     expect(
-      screen.queryByRole("tabpanel", { name: "Knowledge Memory" }),
+      screen.queryByRole("tabpanel", { name: "RAG Agent" }),
     ).toBeNull();
     expect(screen.queryByRole("tabpanel", { name: "Semantica" })).toBeNull();
     expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
@@ -106,7 +106,7 @@ describe("system project tabs", () => {
     tabs[2].focus();
     await user.keyboard("{Enter}");
     expect(tabs[2]).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("tabpanel", { name: "Knowledge Memory" })).toBeVisible();
+    expect(screen.getByRole("tabpanel", { name: "RAG Agent" })).toBeVisible();
 
     tabs[3].focus();
     await user.keyboard(" ");

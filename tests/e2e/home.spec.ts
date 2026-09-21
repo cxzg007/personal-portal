@@ -100,7 +100,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   ).toHaveCount(3);
   await expect(
     internshipCards.nth(2).getByLabel("中国船舶集团 722 研究所 核心成果").getByRole("listitem"),
-  ).toHaveCount(2);
+  ).toHaveCount(3);
 
   const jdDetails = internshipCards.nth(0).locator("details.internship-details");
   await expect(jdDetails).not.toHaveAttribute("open");
@@ -119,18 +119,18 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(internshipCards.nth(0).getByLabel("京东 能力建设记录")).toBeVisible();
   await expect(
     internshipCards.nth(0).getByLabel("京东 能力建设记录").getByRole("listitem"),
-  ).toHaveCount(5);
+  ).toHaveCount(7);
   await expect(
     internshipCards.nth(1).getByLabel("智元机器人 能力建设记录").locator("li"),
   ).toHaveCount(6);
   await expect(
     internshipCards.nth(2).getByLabel("中国船舶集团 722 研究所 能力建设记录").locator("li"),
-  ).toHaveCount(3);
+  ).toHaveCount(5);
 
   const systems = page.locator("main > section#systems");
   const tabs = systems.getByRole("tab");
   await expect(tabs).toHaveCount(4);
-  await expect(systems.getByRole("tabpanel")).toContainText("本体驱动的 Agent 数据智能平台");
+  await expect(systems.getByRole("tabpanel")).toContainText("本体驱动的数据资产治理与 Agent 动作平台");
 
   for (let step = 0; step < 40; step += 1) {
     if (await tabs.nth(0).evaluate((button) => document.activeElement === button)) break;
@@ -150,11 +150,11 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
 
   await page.keyboard.press("Home");
   await expect(tabs.nth(0)).toBeFocused();
-  await expect(systems.getByRole("tabpanel")).toContainText("本体驱动的 Agent 数据智能平台");
+  await expect(systems.getByRole("tabpanel")).toContainText("本体驱动的数据资产治理与 Agent 动作平台");
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
-  await expect(openSource.getByText(/截至 2026-09-04：10 个贡献已合并/)).toBeVisible();
+  await expect(openSource.getByText(/截至 2026-09-20：16 个贡献已合并/)).toBeVisible();
   await expect(openSource.getByRole("link", { name: "Semantica GitHub repository" })).toHaveAttribute(
     "href",
     "https://github.com/semantica-agi/semantica",
@@ -325,7 +325,7 @@ test("open source showcase leads with featured PR links and a collapsed remainde
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("list", { name: "Semantica 代表性贡献" })).toBeVisible();
   const recognition = openSource.getByRole("region", { name: "项目影响力与荣誉" });
-  await expect(recognition.getByRole("link", { name: "12,455 GitHub Stars" })).toHaveAttribute(
+  await expect(recognition.getByRole("link", { name: "13,300 GitHub Stars" })).toHaveAttribute(
     "href", "https://github.com/semantica-agi/semantica",
   );
   await expect(recognition.getByRole("link", { name: /#1 GitHub Trending 日榜/ })).toBeVisible();
@@ -341,10 +341,12 @@ test("open source showcase leads with featured PR links and a collapsed remainde
   await expect(details).not.toHaveAttribute("open");
 
   await details.locator("summary").click();
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(10);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(16);
   const otherLinks = details.getByRole("link", { name: /^已合并 · PR #/ });
-  await expect(otherLinks).toHaveCount(7);
-  for (const [index, number] of [1217, 1215, 1153, 1143, 1113, 1094, 1081].entries()) {
+  await expect(otherLinks).toHaveCount(13);
+  for (const [index, number] of [
+    1544, 1364, 1360, 1243, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081,
+  ].entries()) {
     await expect(otherLinks.nth(index)).toHaveAttribute(
       "href",
       `https://github.com/semantica-agi/semantica/pull/${number}`,

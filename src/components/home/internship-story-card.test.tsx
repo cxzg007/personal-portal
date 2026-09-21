@@ -76,7 +76,7 @@ describe("internship story card", () => {
     expect(within(card).queryByRole("button")).not.toBeInTheDocument();
   });
 
-  it("keeps all six agibot capability records including both projects inside the disclosure", () => {
+  it("keeps all six agibot capability records including the clip-player project inside the disclosure", () => {
     const internship = internships.find((item) => item.id === "agibot-agent");
     expect(internship).toBeDefined();
     render(<InternshipStoryCard internship={internship!} index={1} />);
@@ -93,9 +93,9 @@ describe("internship story card", () => {
       expect(recordItems[index]).toHaveTextContent(highlight);
     });
     expect(details!.textContent).toContain("clip-player");
-    expect(details!.textContent).toContain("agibot_retriever");
-    expect(details!.textContent).toContain("三级读取链路");
-    expect(details!.textContent).toContain("三级实体去重");
+    expect(details!.textContent).not.toContain("agibot_retriever");
+    expect(details!.textContent).toContain("虚拟时钟");
+    expect(details!.textContent).toContain("慢消费者隔离");
   });
 
   it("maps each internship brand theme to its explicit engineering visual kind", () => {

@@ -45,7 +45,7 @@ const baseArchitectures: SystemArchitecture[] = [
     edges: [],
   },
   {
-    projectId: "knowledge-memory",
+    projectId: "rag-agent",
     kind: "concept-flow",
     caption: "工程示意 · 按技术关注点简化",
     defaultNodeId: "node-a",

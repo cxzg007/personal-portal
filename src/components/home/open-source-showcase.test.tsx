@@ -22,7 +22,7 @@ describe("selectFeaturedContributions", () => {
       1077, 1226, 1096,
     ]);
     expect(selectFeaturedContributions(openSource).remaining.map(({ number }) => number)).toEqual([
-      1217, 1215, 1153, 1143, 1113, 1094, 1081,
+      1544, 1364, 1360, 1243, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081,
     ]);
   });
 
@@ -33,7 +33,7 @@ describe("selectFeaturedContributions", () => {
     };
     const { featured, remaining } = selectFeaturedContributions(missingLead);
 
-    expect(featured.map(({ number }) => number)).toEqual([1226, 1096, 1217]);
+    expect(featured.map(({ number }) => number)).toEqual([1226, 1096, 1544]);
     expect(featured.every(({ status }) => status === "merged")).toBe(true);
     expect(remaining).toHaveLength(merged.length - 4);
   });
@@ -54,7 +54,7 @@ describe("OpenSourceShowcase", () => {
 
     const statistic = screen.getByText("已合并 PR").closest("p");
     expect(statistic).not.toBeNull();
-    expect(statistic).toHaveTextContent("10");
+    expect(statistic).toHaveTextContent("16");
     expect(screen.getByRole("heading", { name: "我的关键贡献" })).toBeVisible();
   });
 
@@ -82,13 +82,13 @@ describe("OpenSourceShowcase", () => {
     });
   });
 
-  it("folds the remaining seven merged PRs into a closed details disclosure", () => {
+  it("folds the remaining thirteen merged PRs into a closed details disclosure", () => {
     const { container } = renderShowcase();
 
     const details = container.querySelector("details");
     expect(details).not.toBeNull();
     expect(details?.open).toBe(false);
-    expect(within(details as HTMLElement).getByText("查看剩余 7 个已合并 PR")).toBeVisible();
+    expect(within(details as HTMLElement).getByText("查看剩余 13 个已合并 PR")).toBeVisible();
     const remainingLinks = within(details as HTMLElement).getAllByRole("link", {
       name: /^已合并 · PR #/,
     });
@@ -115,16 +115,16 @@ describe("OpenSourceShowcase", () => {
   it("states the dated snapshot boundary computed from merged contributions", () => {
     renderShowcase();
 
-    expect(screen.getByText("截至 2026-09-04：10 个贡献已合并")).toBeVisible();
+    expect(screen.getByText("截至 2026-09-20：16 个贡献已合并")).toBeVisible();
   });
 
   it("separates sourced project recognition from the personal contribution count", () => {
     renderShowcase();
 
     const recognition = screen.getByRole("region", { name: "项目影响力与荣誉" });
-    const stars = within(recognition).getByRole("link", { name: /12,455 GitHub Stars/ });
+    const stars = within(recognition).getByRole("link", { name: /13,300 GitHub Stars/ });
     expect(stars).toHaveAttribute("href", openSource.repositoryUrl);
-    expect(within(recognition).getByText(/2026-09-09/)).toBeVisible();
+    expect(within(recognition).getByText(/2026-09-20/)).toBeVisible();
     expect(within(recognition).getByRole("link", { name: /#1 GitHub Trending 日榜/ }))
       .toHaveAttribute("href", "https://trendshift.io/api/badge/repositories/18986");
     expect(within(recognition).getByRole("link", { name: /#3 Trendshift · Python 周榜/ }))

@@ -106,14 +106,14 @@
     ]
   },
   {
-    "projectId": "knowledge-memory",
+    "projectId": "rag-agent",
     "kind": "concept-flow",
     "caption": "工程示意 · 按技术关注点简化",
-    "defaultNodeId": "dedup",
+    "defaultNodeId": "recall",
     "nodes": [
       {
-        "id": "dedup",
-        "label": "实体去重",
+        "id": "recall",
+        "label": "混合召回",
         "column": 0,
         "row": 0,
         "details": [
@@ -122,40 +122,41 @@
         ]
       },
       {
-        "id": "idempotency",
-        "label": "幂等任务",
+        "id": "context",
+        "label": "上下文补齐",
         "column": 1,
         "row": 0,
         "details": [
-          { "kind": "case", "field": "constraints", "index": 1 },
+          { "kind": "case", "field": "constraints", "index": 0 },
           { "kind": "case", "field": "decisions", "index": 1 }
         ]
       },
       {
-        "id": "recovery",
-        "label": "故障恢复",
+        "id": "routing",
+        "label": "请求分流",
         "column": 2,
         "row": 0,
         "details": [
-          { "kind": "case", "field": "constraints", "index": 2 },
+          { "kind": "case", "field": "constraints", "index": 1 },
           { "kind": "case", "field": "decisions", "index": 2 }
         ]
       },
       {
-        "id": "relations",
-        "label": "关系约束",
+        "id": "governance",
+        "label": "权限与可追溯",
         "column": 3,
         "row": 0,
         "details": [
+          { "kind": "case", "field": "constraints", "index": 2 },
           { "kind": "case", "field": "constraints", "index": 3 },
           { "kind": "case", "field": "decisions", "index": 3 }
         ]
       }
     ],
     "edges": [
-      { "from": "dedup", "to": "idempotency" },
-      { "from": "idempotency", "to": "recovery" },
-      { "from": "recovery", "to": "relations" }
+      { "from": "recall", "to": "context" },
+      { "from": "context", "to": "routing" },
+      { "from": "routing", "to": "governance" }
     ]
   },
   {

@@ -8,21 +8,22 @@ featured: true
 seoDescription: 从 Graph Engineering 综述出发，讨论图工程的语义缺口与本体工程的融合路径：图工程的尽头，是本体工程。
 draft: false
 ---
-> 当图工程（Graph Engineering）为多智能体系统立起“任务 / 智能体 / 状态”的结构骨架之后，一个更根本的问题浮出水面：图上的节点和边，凭什么彼此理解？本文从清华等机构的 Graph Engineering 综述出发，论证一个观点 —— Graph Engineering 的尽头，是本体工程（Ontology Engineering）。
+
+> 图工程给多智能体系统搭好了“任务 / 智能体 / 状态”的骨架。骨架立起来之后，还有一个问题没人回答：图上的节点和边，凭什么互相理解？本文的答案是——Graph Engineering 的尽头，是本体工程（Ontology Engineering）。
 
 ## 引言：一场关于 Agent 工程的范式之争
 
-2026 年 8 月，一篇由多家机构、数十位作者联合署名的综述《Graph Engineering in the Era of LLM Agents: From Individual Intelligence to System Intelligence》（arXiv 2608.21156）在技术圈掀起了一场关于“Agent 工程范式”的讨论。它的核心主张相当有野心：继 Prompt Engineering、Context Engineering、Harness Engineering、Loop Engineering 之后，下一代智能体系统需要一个新的范式——**Graph Engineering（图工程）**，用显式、动态、可演化的图结构来组织任务、协调智能体、管理运行时状态。
+2026 年 8 月的一篇综述（arXiv 2608.21156）提出了一个挺有野心的主张：在 Prompt、Context、Harness、Loop 之后，智能体工程该进入下一站——**Graph Engineering（图工程）**，用一张显式、可变、能演化的图来组织任务、调度智能体、管理运行状态。
 
-这个主张站得住。当我们把一个复杂任务丢给单个 Agent 时，很快会撞上一堵墙：任务需要异构专长、子任务相互依赖、部分环节要并行、结果需要独立验证、状态要跨越多轮持久保存。这些都不是“把单个 Agent 的上下文再撑大一点”能解决的——它是**架构层面的错配**。答案是把智能拆分到多个专业化 Agent，再用一张图把它们组织起来。图工程，正是给这张图立骨架的工程学。
+这个判断我认同。单个 Agent 扛复杂任务时会撞墙：需要不同专长、子任务互相依赖、有些环节要并行、结果得独立复核、状态要跨轮保存。这些都不是“把上下文窗口再撑大一点”能解决的，本质是**架构错配**。拆成多个专业 Agent、再用一张图组织起来，是合理的解法。
 
-但如果你真的动手搭过多智能体系统，会在某个规模节点上遇到一个更隐蔽、也更致命的问题：**图的骨架立起来了，可图上那些节点和边，到底是什么意思？**
+但真动手搭过的人，会在某个规模上碰到更隐蔽的麻烦：**骨架有了，图上的节点和边到底是什么意思？**
 
-一个节点标着`reviewer`，另一个子系统里也有个节点叫`reviewer`——它们是同一种角色吗？一条边写着`depends_on`，它表达的是数据依赖、控制依赖，还是时序依赖？一个 Agent 在 Agent Card 里声明自己`capability: "code-review"`，调度器凭什么判断它能不能接手一个标着`"static-analysis"`的子任务？当系统从 5 个 Agent 长成 50 个、当两个团队各自搭的图要对接、当你想让系统根据运行反馈**自动改写**这张图时，你会发现：图工程给了你结构，却没给你**意义**。节点和边的语义，全靠开发者之间“心照不宣的字符串约定”在支撑。
+节点写着 `reviewer`，隔壁子系统也有个 `reviewer`，是同一种角色吗？边写着 `depends_on`，指的是数据依赖、控制依赖还是时序依赖？一个 Agent 声明自己会 `code-review`，调度器凭什么判断它能不能接 `static-analysis` 的活？5 个 Agent 时靠口头约定就够；50 个 Agent、两个团队的图要对接、系统要根据运行反馈自动改图时，你就会发现：图工程给了你结构，没给你**意义**。节点和边的含义，全靠开发者之间心照不宣的字符串约定在撑着。
 
-这正是本文要展开的张力。我的观点是：**图工程解决了“怎么把东西组织成图”，但没有解决“图上的东西是什么”；而后者，随着系统走向规模化、跨系统互操作、可推理与自演化，会成为决定成败的瓶颈。要给图一个可组合、可推理、可互操作、可自我演化的语义地基，工程实践会被一步步推向本体工程（Ontology Engineering）。图工程的尽头，是本体工程。**
+所以本文的观点是：**图工程解决了“怎么把东西组织成图”，没解决“图上的东西是什么”。而规模化、跨系统互操作、可推理、自演化这四件事，会把工程实践一步步推向本体工程。图工程的尽头，是本体工程。**
 
-这不是要否定图工程——恰恰相反，本体工程是图工程沿着自身逻辑往前走的**自然下一站**。下面我们先把论文的演进脉络梳清楚，再一层层拆到这个结论。
+这不是否定图工程，恰恰相反——本体工程是它顺着自身逻辑往前走的下一站。
 
 ![原文配图 1](/images/graph-engineering-ontology/01-2026-09-03-20-03Ks7M3Gxkswh0s8D.png)
 
@@ -30,395 +31,395 @@ draft: false
 
 ## 1. 范式演进：从模型智能到系统智能
 
-要理解“图工程为什么是当下的范式焦点，而本体工程为什么是它的延长线”，先得看清 LLM 应用工程这几年的演进逻辑。论文给出了一条很清晰的主线：**智能的重心，正在从模型内部，一路外移到系统层面**。它把这条线分成三级。
+这几年智能的来源换了三次地方。
 
-**第一级：模型智能（Model Intelligence）。**这是 LLM 本身在预训练里习得的能力。工程师在这一级能做的，是通过**Prompt Engineering**调节“模型这一次该做什么”（指令、示例、角色设定），通过**Context Engineering**调节“给模型提供什么信息”（检索、记忆、窗口管理）。注意这两者的共同点：它们都作用在**推理层**，不改动模型参数，影响的是**单次调用**的控制信号与信息环境。它们让模型这台发动机在特定工况下输出更好，但发动机本身的边界没变。
+**第一级，模型智能。**智能装在参数里，工程的活就是把模型做大、数据喂足。谁的基座强，谁的应用就强。
 
-**第二级：个体智能（Individual Intelligence）。**当我们给模型接上工具、让它能读写外部世界、并把它放进一个“观察—思考—行动—反思”的循环里，模型就升级成了 Agent。论文用一个很精炼的公式概括这一级：
+**第二级，个体智能。**大家发现同一个模型，会用的人和不会用的人拉开好几倍差距。于是围绕“单个 Agent 怎么用好”长出四门手艺：Prompt 管一次推理怎么问；Context 管往窗口里塞什么；Harness 管模型和外部世界之间的接口（工具、文件、终端）；Loop 管“思考—行动—观察”这个循环怎么转、什么时候停。这一级的基本形态可以写成一行：
 
 ```text
 Agent = Loop(LLM + Harness)
 ```
 
-其中**Harness Engineering**负责组织外部工具与资源（扩展 Agent 的能力边界），**Loop Engineering**负责组织迭代与自省（让 Agent 能持续反思、自我改进）。这一级的优化对象是**单个智能体**：让它更能干、更会用工具、更会纠错。今天大量“Agent 框架”的工作都集中在这一级。
-
-**第三级：系统智能（System Intelligence）。**论文对它的定义是：一个智能体系统“将多个智能组件组织、协调为一个连贯、自适应的整体，去追求共同目标”的能力。关键词是**组织**与**协调**。当任务复杂到单个 Agent 无论多强都扛不住时，你需要的不再是“更强的个体”，而是“更好的组织”——把工作显式地拆解编排、把异构 Agent 协调起来、把不断演化的执行状态维护住。支撑这一级的，就是**Graph Engineering**。
+**第三级，系统智能。**单体 Agent 的天花板不在模型，而在“一个循环里塞不下一个复杂项目”。于是智能被拆到多个角色上，工程的重点从“调好一个 Agent”变成“组织好一群 Agent”——这就是图工程要干的事。
 
 ![原文配图 2](/images/graph-engineering-ontology/02-2026-09-03-20-03QxhConhsjrhmDO8.png)
 
-**图 2 五大工程范式的作用层**
+**图 2 五个范式的控制粒度：从一次推理到整个系统**
 
-把这三级和五个工程范式对齐，能看得更清楚：范式的作用域在一路上移，从“一次调用”到“一个 Agent”，再到“一整个系统”。
+**表 1 五个工程范式对比**
 
-**表 1 五大工程范式对比**
+| **范式** | **控制什么** | **典型手段** | **天花板** |
+| --- | --- | --- | --- |
+| Prompt Engineering | 单次推理的输入 | 角色设定、示例、结构化输出 | 只能影响一次问答 |
+| Context Engineering | 进入窗口的信息 | 检索、压缩、记忆、裁剪 | 窗口有限，且不管行动 |
+| Harness Engineering | 模型与世界的接口 | 工具调用、沙箱、文件与终端 | 单次接口，不管节奏 |
+| Loop Engineering | 反复行动的节奏 | 反思、重试、停止条件、预算 | 一个循环装不下复杂项目 |
+| Graph Engineering | 循环之间的关系 | 任务 DAG、角色编排、共享状态 | 有结构，但结构缺语义 |
 
-| **范式** | **作用层** | **优化对象** | **是否改模型参数** | **典型手段** |
-| --- | --- | --- | --- | --- |
-| Prompt Engineering | 推理层 | 单次调用“该做什么” | 否 | 指令 / 少样本示例 / 角色设定 |
-| Context Engineering | 推理层 | 单次调用“给什么信息” | 否 | 检索增强 / 记忆 / 上下文窗口管理 |
-| Harness Engineering | 智能体层 | 单个 Agent 的能力边界 | 否 | 工具接入 / 资源编排 |
-| Loop Engineering | 智能体层 | 单个 Agent 的迭代与自省 | 否 | 反思 / 自我改进循环 |
-| **Graph Engineering** | **系统层** | **多智能体的组织与协调** | 否 | **显式、动态、可演化的图结构** |
-
-这张表里藏着一个值得停下来想的点：**五个范式没有一个去改模型参数**。这说明整条演进线的主战场，根本不在“把模型训得更强”，而在“如何在模型之外把智能组织起来”。Prompt/Context 组织的是一次调用的输入，Harness/Loop 组织的是一个 Agent 的行为循环，Graph 组织的是一整个系统的拓扑。
-
-顺着这个逻辑往下推，一个问题就冒出来了：**当“组织”的对象从“一次调用”上升到“一整个系统”，被组织的元素（任务、智能体、状态）之间需要相互理解、相互推理、跨边界对接时，仅仅有“图这个结构”够吗？**图告诉你“谁连着谁”，但没告诉你“这个连接意味着什么”。这就是我们要在第 3 章揭开的裂缝。但在那之前，先得把图工程本身解剖清楚——它到底组织了什么。
+值得注意的是：这五个范式，一个都没动模型参数。它们全在模型之外做工程——这也说明“系统怎么组织”本身就是一门独立学问。
 
 ## 2. 剖析 Graph Engineering：它到底组织了什么
 
-论文把 Graph Engineering 拆成三个正交的维度，外加一条贯穿始终的演化线。用三个“结构化”的疑问句来记，最顺：**结构化“做什么”、结构化“谁来做”、结构化“系统怎么运转”**。
+图工程组织三样东西。
 
 ![原文配图 3](/images/graph-engineering-ontology/03-2026-09-03-20-039LxS0YAKcxhKxAL.png)
 
-**图 3 Graph Engineering 的三大维度与系统演化回路**
+**图 3 图工程的三个维度：任务、智能体、状态**
 
-**维度一：任务组织（Task Organization）——结构化“做什么”。**它回答的是“目标怎么拆、活儿怎么排”。一个复杂目标要被分解成子任务，子任务之间存在依赖（A 的输出是 B 的输入）、并行（C 和 D 互不依赖可同时跑）、汇聚（E 需要等 C、D 都完成）等关系。把这些关系画出来，就是一张任务图——通常是有向无环图（DAG），也可能带环（需要迭代重试的环节）。任务组织的工程目标有两个：**目标分解**（把模糊的大目标切成可执行的小任务）和**工作流优化**（在满足依赖约束的前提下，让关键路径最短、并行度最高）。
+**任务组织。**把一个大目标拆成子任务，画成 DAG：谁在谁前面、哪几个能并行、哪一步的产出是下一步的输入。写一篇长文就是典型例子——定选题、查资料、列大纲、分节写、交叉校对、统稿，其中“查资料”和“列大纲”可以并行，“统稿”必须最后。
 
-**维度二：智能体协调（Agent Coordination）——结构化“谁来做”。**任务图告诉你“有哪些活儿”，但活儿得有人接。这一维要解决三件事：**能力建模**（每个 Agent 会什么、不会什么，用什么来描述它的能力）、**团队组织**（是层级式的“主管—下属”，还是对等的“专家协作”，还是流水线式的“逐级传递”）、**多智能体通信**（Agent 之间怎么传消息、怎么共享中间结果、怎么就冲突达成一致）。这一维的图，节点是 Agent、边是协作关系与消息通道。
+**智能体协调。**给每个节点配一个合适的角色：研究员、写手、审稿人、事实核查。协调要解决的是谁接哪个活、结果怎么交接、有分歧怎么裁决。
 
-**维度三：运行时状态管理（Runtime State Management）——结构化“系统怎么运转”。**前两维是“设计时”的静态结构，这一维是“运行时”的动态结构。系统跑起来之后，谁在什么时候做了什么、产出了什么、当前卡在哪、哪个环节失败了、失败了怎么恢复——这些都需要被显式记录成可查询、可回溯的状态图。它包含三项能力：**状态记录**（把执行轨迹结构化地存下来）、**故障定位**（出问题时能沿着状态图定位到根因节点）、**失败恢复**（从某个检查点重放或补偿）。
-
-**贯穿三维的演化线：系统演化（System Evolution）。**系统不是一次搭好就不变的。任务组织可以根据历史执行数据优化拆解策略，Agent 协调可以根据表现调整团队编排，状态管理可以沉淀出可复用的故障模式。演化，就是用执行反馈去持续改写前三维的结构。这条线让“图”从静态蓝图变成了活的、会自我调整的有机体——论文强调 Graph Engineering 的图是“dynamic, evolving”的，关键正在于此。
-
-把这三维落到一个具体例子上会更直观。假设我们要让一个多智能体系统“写一篇技术长文”：任务组织把它拆成“检索资料 → 拟提纲 → 分章写作 → 交叉审校 → 配图 → 组装”的 DAG；智能体协调把不同环节派给`researcher`、`writer`、`reviewer`、`illustrator`等角色；运行时状态管理记录每一步的产出与状态。
+**运行时状态。**多个 Agent 得共享一块“黑板”：中间结论、引用列表、待办、失败记录。状态要能被并发追加、能回溯、能在崩溃后恢复。
 
 ![原文配图 4](/images/graph-engineering-ontology/04-2026-09-03-20-03VqJezaFQkgaYWTY.png)
 
-**图 4 一个“写技术长文”任务的多智能体任务图（DAG）**
+**图 4 一个“写长文”任务的图化表达**
 
-在工程上，这样的图式编排今天有成熟的框架支撑。以 LangGraph 为例，它把多智能体系统建模成一张状态图：**节点是 Agent（或函数），边是控制流，一个共享的 State 对象在图上流动并被逐节点更新**——这正是论文所说“用图组织系统”的直接落地。
+这三件事今天都有成熟框架能做，比如 LangGraph：
 
 ```python
-# 代码①：用 LangGraph 把多智能体系统建模成一张状态图
-from langgraph.graph import StateGraph, END
-from typing import TypedDict, Annotated
+from typing import Annotated, TypedDict
 import operator
+from langgraph.graph import StateGraph, END
 
-class SystemState(TypedDict):
-    task: str
-    # Annotated + operator.add：各节点对 findings 的产出会被"累加"合并
-    findings: Annotated[list[str], operator.add]
-    verdict: str
 
-def planner(s: SystemState) -> dict:          # 任务组织：拆解目标
-    return {"findings": [f"[plan] 拆解任务：{s['task']} → [检索, 写作, 审校]"]}
+class ArticleState(TypedDict):
+    topic: str
+    # 多个节点并发写同一个字段时，用 reducer 合并而不是覆盖
+    notes: Annotated[list[str], operator.add]
+    outline: str
+    draft: str
+    review: str
 
-def researcher(s: SystemState) -> dict:        # 智能体协调：researcher 角色
-    return {"findings": ["[research] 收集并整理证据……"]}
 
-def writer(s: SystemState) -> dict:            # 智能体协调：writer 角色
-    return {"findings": ["[write] 依据证据完成初稿……"]}
+def research(s: ArticleState):
+    return {"notes": [f"关于 {s['topic']} 的资料摘录"]}
 
-def verifier(s: SystemState) -> dict:          # 运行时状态：独立验证环节
-    return {"verdict": "approved"}
 
-g = StateGraph(SystemState)
-for name, fn in [("planner", planner), ("researcher", researcher),
-                 ("writer", writer), ("verifier", verifier)]:
+def outline(s: ArticleState):
+    return {"outline": "1. 背景 2. 论证 3. 结论"}
+
+
+def write(s: ArticleState):
+    return {"draft": f"基于 {len(s['notes'])} 条资料写成的初稿"}
+
+
+def review(s: ArticleState):
+    return {"review": "通过" if s["draft"] else "退回重写"}
+
+
+g = StateGraph(ArticleState)
+for name, fn in [("research", research), ("outline", outline),
+                 ("write", write), ("review", review)]:
     g.add_node(name, fn)
 
-g.set_entry_point("planner")
-g.add_edge("planner", "researcher")            # 边 = 控制流 / 依赖
-g.add_edge("researcher", "writer")
-g.add_edge("writer", "verifier")
-g.add_edge("verifier", END)
-
+g.set_entry_point("research")
+g.add_edge("research", "outline")   # 任务依赖
+g.add_edge("outline", "write")      # 角色交接
+g.add_edge("write", "review")
+g.add_conditional_edges(
+    "review",
+    lambda s: END if s["review"] == "通过" else "write",  # 循环由图控制
+)
 app = g.compile()
-print(app.invoke({"task": "写一篇技术长文", "findings": [], "verdict": ""}))
 ```
 
-这段代码把三个维度都体现了：`add_node`定义“谁来做”、`add_edge`定义“做什么的先后依赖”、`SystemState`承载“系统怎么运转”的运行时状态。图工程的威力一目了然——它让原本纠缠在一起的多智能体协作，变成了可显式声明、可静态分析、可动态调度的拓扑结构。
+`ArticleState` 是运行时状态，节点是智能体，边是任务依赖——三个维度齐了，代码也能跑。
 
-但是，请你盯着这段代码里的两样东西看：节点名`"researcher"`、状态字段`"findings"`。它们的**含义**，在哪里？答案是：**只在开发者的脑子里，和字符串字面量里**。`"researcher"`是什么职责、能接什么任务、和别的系统里的`"researcher"`是不是一回事——图结构本身一无所知。`verdict`字段取值`"approved"`还是别的什么、谁有权写它、下游怎么解释它——也没有任何形式化的约定。图工程给了我们完美的**结构**，却把**语义**留成了口头协议。
-
-规模小的时候，口头协议够用。规模一大，裂缝就来了。
+问题在于：`notes` 里装的是什么类型的东西？`review` 这个节点需要什么能力、能不能被另一个 Agent 替上？框架一概不知。**这些语义只存在开发者脑子里。**
 
 ## 3. 图工程的语义缺口
 
-这是全文的转折点，请慢一点读。我要论证的核心命题是：**图工程的“图”是一种纯结构（structure），而结构不等于语义（semantics）。**结构告诉你“有哪些节点、哪些边、怎么连”；语义告诉你“这个节点是什么、这条边表达什么关系、在什么约束下成立”。图工程把结构做到了极致，却把语义几乎完全外包给了“字符串约定 + 开发者默契”。当系统规模化时，这个缺口会以四种方式集中爆发。
+一句话概括这一章：**结构不等于语义。**图能告诉你 A 连着 B，但不能告诉你 A 是什么、这条连线意味着什么。
 
 ![原文配图 5](/images/graph-engineering-ontology/05-2026-09-03-20-03NbtjljrcvQr67qv.png)
 
-**图 5 语义缺口：结构层“裸图”vs 语义层“本体锚定”**
+**图 5 结构与语义的分层：图给了骨架，语义仍然缺位**
 
-**裂缝一：跨系统互操作失效。**图里的节点和边靠字符串标识。字符串有两个天然病症：**同名异义**（两个`reviewer`节点，一个指“代码评审员”，一个指“文稿校对员”）和**异名同义**（一个系统叫`code-review`，另一个叫`static-analysis`，其实指同一种能力）。单系统内部靠开发者记忆勉强维持一致，可一旦两个团队、两个组织的多智能体系统要对接——比如通过 A2A 协议让你的 Agent 调用对方的 Agent——字符串约定立刻崩塌。没有共享的语义定义，`capability: "code-review"`这行声明对接收方就是一串不透明的字节，“能力发现”退化成“能力猜测”。
+这道缺口具体会撕出四条裂缝。
 
-**裂缝二：一致性 / 约束校验缺位。**图结构本身不携带“什么样的图是合法的”这类规则。比如“每个任务节点必须至少分配给一个具备对应能力的 Agent”、“verdict 字段只能取 approved / rejected / needs-revision 三值之一”、“依赖关系不能成环（除非显式标注为可迭代环）”——这些约束在纯图结构里没有落脚点，只能散落在各处的`if`判断和运行时断言里，写一处漏一处。缺少形式化的 schema，图的合法性就无法被系统性地校验，脏数据、错连边只能等到运行崩了才暴露。
+**一、互操作失效。**两个团队各建一张图，同一个词各写各的。同名异义：你的 `reviewer` 是代码审查，我的 `reviewer` 是法务合规。异名同义：你叫 `checker`，我叫 `validator`，其实是一回事。对接时只能靠人肉写映射表。
 
-**裂缝三：无法逻辑推理、导出隐含事实。**这是最深的一道裂缝。图工程的图只记录**显式写下的**节点和边，不具备**推理**能力。举例：如果系统知道“`Researcher`是一种`Agent`”、“`Agent`都能接收消息”，那么“`alice`是`Researcher`”就应当能**自动推出**“`alice`能接收消息”。这种基于类层次与公理的推理，纯图结构做不到——它没有“公理”这个概念，只有孤立的边。结果就是：所有隐含关系都得开发者手工展开、逐条硬编码，图越大，遗漏和矛盾越多。
+**二、约束缺位。**图能画出边，但没法声明“一个任务节点最多只能有一个负责人”“测试节点必须在实现节点之后”。这类规则只能散落在各处的 if 判断里，写漏了没人知道。
 
-**裂缝四：演化时的语义漂移。**论文强调图是“动态、可演化”的——但演化恰恰是语义缺口最危险的地方。当系统根据反馈自动或半自动地改写图结构时，如果节点和边没有稳定的语义锚点，每一次改写都可能悄悄改变含义：某个 Agent 的`capability`字段被一次“优化”改写了措辞，调度逻辑就默默错位；某条边的语义在几次迭代后从“数据依赖”漂成了“时序依赖”，没人察觉。**没有共享语义作为不动点，演化就不是“改进”，而是“熵增”。**
+**三、无法推理。**系统不知道 `static-analysis` 是 `code-review` 的一种，所以“我要找会 code-review 的 Agent”这种请求永远匹配不上会 static-analysis 的 Agent。能力发现退化成字符串精确匹配。
 
-把这四道裂缝放到一个具体场景里看会更刺眼：两个团队各自的多智能体系统要协作，A 团队的`reviewer`期望收到“结构化的问题清单”，B 团队的`reviewer`产出的却是“一段自由文本评语”——两个节点名字一样、图上连得好好的，可一旦真的交互，语义对不上，协作直接失败。而这种失败不会在编译期、也不会在图的静态检查里暴露，它只在运行时、在特定数据流经那条边时才炸。
+**四、演化中语义漂移。**让系统自动改图，是图工程的高级目标。但字符串约定没有任何护栏——自动生成的新节点类型可能与旧的重复、冲突、含义微妙偏移，改到第 50 次时没人说得清这张图的规则还是什么。
 
-把这个场景再往真实里推一步，你会发现它在生产系统里几乎必然发生。多智能体系统的一个核心卖点就是“可组合”——今天接入一个新的第三方 Agent、明天替换某个环节的实现。可每一次“接入”和“替换”，都是在拿一方对节点/边语义的理解，去赌另一方的理解和它一致。赌对了，系统悄无声息地正常运行，掩盖了风险；赌错了，故障以最难排查的方式出现——不是报错栈，而是“结果看起来对但其实不对”的静默错误（silent failure）。系统越大、集成方越多，这种赌局就下得越频繁，而纯图结构连“我们其实在赌”这件事都无法让你意识到。语义缺口最可怕的地方，正是它的**隐蔽性**。
+更麻烦的是这些问题**不报错**。字段名拼错会崩，语义错位不会：`depends_on` 被一方当成数据依赖、另一方当成时序依赖，程序照跑，只是结果悄悄偏了。这种静默失败在小规模下几乎看不见，在大规模下极难定位。
 
 ![原文配图 6](/images/graph-engineering-ontology/06-2026-09-03-20-03tAVR4ie8GKznkqK.png)
 
-**图 6 节点同名、图上连通，语义却不一致，导致静默失败**
+**图 6 语义错位造成的静默失败**
 
-我们把图工程“能做”和“不能做”的边界摆成一张表，缺口就一目了然：
+**表 2 图结构能做什么、不能做什么**
 
-**表 2 Graph Engineering 能做 / 不能做**
-
-| **能力** | **纯 Graph Engineering** | **说明** |
+| **需求** | **纯图结构** | **说明** |
 | --- | --- | --- |
-| 组织任务 / 角色 / 状态的结构 | ✅ 擅长 | 显式图结构的核心价值 |
-| 并行 / 依赖 / 汇聚调度 | ✅ 擅长 | DAG 天然支持 |
-| 动态改写拓扑（演化） | ✅ 支持 | 图是 dynamic、evolving 的 |
-| 跨系统语义互操作 | ❌ 缺失 | 节点、边靠字符串约定，无共享语义 |
-| 一致性 / 约束的形式化校验 | ❌ 缺失 | 图不携带“什么图合法”的 schema |
-| 逻辑推理、导出隐含事实 | ❌ 缺失 | 图无公理，只有孤立的边 |
-| 演化中保持语义不漂移 | ⚠️ 脆弱 | 缺稳定语义锚点，改写即风险 |
+| 表达执行顺序与依赖 | ✅ | DAG 的本职 |
+| 并发与分支控制 | ✅ | 条件边、reducer |
+| 状态持久化与回溯 | ✅ | checkpoint 机制 |
+| 跨系统概念对齐 | ❌ | 字符串没有共享定义 |
+| 声明式约束校验 | ❌ | 规则散在代码里 |
+| 上下位推理与能力匹配 | ❌ | 不知道谁是谁的子类 |
+| 自动演化不漂移 | ⚠️ | 能改，但没有护栏 |
 
-看这张表的下半部分——四个 ❌ 和 ⚠️——它们有一个共同的病根：**图有结构，没语义。**而“结构 + 语义”这件事，计算机科学其实早就有一门成熟的学问来处理，只是它长期待在知识工程、语义网、数据库的圈子里，没被 Agent 社区充分重视。它就是本体工程。
-
-接下来两章，我们先把本体工程讲清楚（第 4 章），再回过头，逐一用它去补这四道裂缝（第 5 章）。你会看到，表 2 下半部分的每一个 ❌，本体工程都有对应的、经过几十年打磨的答案。
+这三个“做不到”，恰好是另一门工程学几十年来的主业。
 
 ## 4. 什么是 Ontology Engineering
 
-先给一个工程师能用的定义，绕开哲学。**本体（Ontology）是对一个领域中概念、概念间关系、以及约束这些概念与关系的公理的形式化、共享的规范说明。**拆开看四个关键词：
+本体（Ontology）在工程语境里没那么玄：**一份机器能读、多方共同认可的概念说明书。**它由四样东西构成——
 
-- **概念（Class）**：领域里的“种类”，如`Agent`、`Task`、`Capability`。
+- **Class（类）**：概念本身，以及概念之间的上下位关系，例如 `StaticAnalysis` 是 `CodeReview` 的一种。
+- **Property（属性）**：概念之间的关系，以及关系的定义域和值域，例如 `assignedTo` 只能从任务指向智能体。
+- **Axiom（公理）**：可被机器检查和推导的规则，例如“一个任务最多一个负责人”“两个类互不相交”。
+- **形式化 + 共享**：写成标准语法，而不是文档里的自然语言；由多方共同维护，而不是一个人自己约定。
 
-- **关系（Property）**：概念之间的连接，如`hasCapability`（Agent 有某能力）、`dependsOn`（任务依赖任务）。
-
-- **公理（Axiom）**：永真的规则，如“`Researcher`是`Agent`的子类”、“`hasCapability`的定义域是`Agent`、值域是`Capability`”。公理是本体区别于普通图的**灵魂**——它让推理成为可能。
-
-- **形式化 + 共享**：用机器可读的形式语言写下来（不是文档里的自然语言描述），且被一个社区共同认可、复用。
-
-**本体工程（Ontology Engineering）**，就是设计、构建、校验、演化本体的工程学科。它有一套成熟到已成为 W3C 国际标准的技术栈。
+第四点是关键差别。团队 wiki 上的名词解释只有人能读；本体是机器能读、能校验、能据此推理的。
 
 ![原文配图 7](/images/graph-engineering-ontology/07-2026-09-03-20-034KvT3GmRGErH3Kw.png)
 
-**图 7 本体技术分层栈（均为 W3C 标准）**
+**图 7 W3C 语义技术栈**
 
-从下往上看这个技术栈：
+这套东西有完整标准，各管一段：
 
-- **RDF（Resource Description Framework）**：最底层的数据模型，把一切表达成“主语—谓语—宾语”的三元组（triple）。`(alice, hasCapability, code_review)`就是一条三元组。RDF 让数据天然成为一张图——所以本体和知识图谱是同一套底座。
+- **RDF**：最小表达单元，一切都是「主语-谓语-宾语」三元组。
+- **RDFS**：加上最基础的类与属性层次（`subClassOf`、`domain`、`range`）。
+- **OWL**：真正的表达力所在，背后是描述逻辑，支持基数、不相交、属性链、传递等公理，可交给推理机。
+- **SPARQL**：图数据的查询语言，可以顺着类层次做语义检索。
+- **SHACL**：数据形状校验，负责“这条数据合不合规”。
 
-- **RDFS（RDF Schema）**：在三元组之上加“轻量 schema”，能表达类、子类（`subClassOf`）、属性的定义域与值域。
-
-- **OWL（Web Ontology Language）**：真正的重武器，基于**描述逻辑（Description Logic）**，能表达复杂公理——等价类、不相交类、属性的传递/对称/函数性、基数约束（“每个 Agent 至少有一个 Capability”）等。有了 OWL，本体就具备了**可判定的自动推理**能力。
-
-- **SPARQL**：面向 RDF 图的查询语言，相当于图数据的 SQL。
-
-- **SHACL（Shapes Constraint Language）**：面向 RDF 图的**约束校验**语言，用“形状（shape）”定义“什么样的数据是合法的”，然后自动校验。
-
-这里要点出本体工程一个常被忽视的二分法：**TBox 与 ABox**。TBox（Terminological Box）是“概念层”，存的是类与公理——即领域的**模式（schema）**；ABox（Assertional Box）是“断言层”，存的是具体实例的事实。`Researcher 是 Agent 的子类`是 TBox，`alice 是一个 Researcher`是 ABox。二者分离，正是本体能“推理”的结构基础：推理机把 ABox 的事实套进 TBox 的公理，**自动导出没有被显式写下来的新事实**。
+还有一个必须分清的概念：**TBox 是概念层（有哪些类、什么规则），ABox 是实例层（具体有哪些对象）。**图工程里的图基本都是 ABox——一堆实例和连线，缺的正是 TBox。
 
 ![原文配图 8](/images/graph-engineering-ontology/08-2026-09-03-20-03LY6F3Il7xIxjUE9.png)
 
-**图 8 TBox / ABox 分离与描述逻辑推理**
+**图 8 TBox 与 ABox：概念层与实例层**
 
-光说概念太抽象，直接上代码。下面用 Python 的`owlready2`建一个极简的“Agent 能力本体”，跑一次推理，再用 SPARQL 查询、用 SHACL 校验——把第 3 章的三道裂缝（推理、互操作、校验）在几十行里都回应一遍。
+用 owlready2 演示一遍：先声明 TBox 与一条推理规则，再放进 ABox 实例，让推理机自己补出隐含结论。
 
 ```python
-# 代码②：本体语义栈——建本体 + 推理 + SPARQL 查询（pip install owlready2）
-from owlready2 import *
+from owlready2 import (Thing, ObjectProperty, FunctionalProperty,
+                       get_ontology, sync_reasoner, default_world)
 
-onto = get_ontology("http://example.org/agent-onto#")
+onto = get_ontology("http://example.org/agent#")
 
 with onto:
-    # ---- TBox：概念层（类 + 公理）----
-    class Agent(Thing): pass
+    # ---------- TBox：概念与规则 ----------
     class Capability(Thing): pass
+    class CodeReview(Capability): pass
+    class StaticAnalysis(CodeReview): pass      # 静态分析是代码审查的一种
+    class Agent(Thing): pass
     class Task(Thing): pass
 
-    class hasCapability(Agent >> Capability): pass      # 定义域 Agent，值域 Capability
-    class requiresCapability(Task >> Capability): pass
+    class hasCapability(ObjectProperty):
+        domain, range = [Agent], [Capability]
 
-    class Researcher(Agent): pass          # 公理：Researcher ⊑ Agent（子类）
-    class Reviewer(Agent):   pass
+    class requiresCapability(ObjectProperty):
+        domain, range = [Task], [Capability]
 
-    # 公理：Agent 至少要有 1 个 Capability（基数约束）
-    Agent.is_a.append(hasCapability.min(1, Capability))
+    class assignedTo(ObjectProperty, FunctionalProperty):
+        # Functional = 一个任务最多一个负责人，这是公理不是注释
+        domain, range = [Task], [Agent]
 
-# ---- ABox：断言层（具体事实）----
-with onto:
-    code_review = Capability("code_review")
-    alice = Researcher("alice")            # 只声明 alice 是 Researcher
-    alice.hasCapability = [code_review]
+    # ---------- ABox：实例 ----------
+    bob = Agent("bob")
+    bob.hasCapability.append(StaticAnalysis("sa-1"))
 
-# ---- 推理：把 ABox 套进 TBox 公理，导出隐含事实 ----
-with onto:
-    sync_reasoner(infer_property_values=True)   # 调用 HermiT 推理机
+    t1 = Task("t1")
+    t1.requiresCapability.append(CodeReview("cr-1"))
 
-# alice 从未被显式声明为 Agent，但推理机基于 Researcher ⊑ Agent 自动推出：
-print(Agent in alice.INDIRECT_is_a)     # True —— 这就是"导出隐含事实"
+sync_reasoner(onto)   # 推理机检查一致性并补全隐含事实
 
-# ---- SPARQL：像查 SQL 一样查图 ----
-graph = default_world.as_rdflib_graph()
-rows = graph.query("""
-    PREFIX o: <http://example.org/agent-onto#>
-    SELECT ?agent WHERE { ?agent a o:Agent . }   # 能查出 alice，尽管她只被声明为 Researcher
-""")
-print([str(r[0]).split('#')[-1] for r in rows])   # ['alice']
+# 顺着类层次查询：要 CodeReview 的任务，能匹配到只会 StaticAnalysis 的 bob
+rows = list(default_world.sparql("""
+    SELECT ?agent WHERE {
+        ?agent <http://example.org/agent#hasCapability> ?cap .
+        ?cap a ?type .
+        ?type rdfs:subClassOf* <http://example.org/agent#CodeReview> .
+    }
+"""))
+print(rows)   # [[agent.bob]]
 ```
 
-注意`alice`从头到尾只被声明成`Researcher`，可推理之后，系统“知道”了她也是`Agent`、也满足“至少有一个能力”——**这就是第 3 章裂缝三（无法推理）的正面回应**。再看 SHACL 校验，它回应裂缝二（约束缺位）：
+注意最后那个 `subClassOf*`：查询写的是 CodeReview，命中的是 StaticAnalysis。这一步靠纯图是做不到的——它要求系统知道两者的上下位关系。
+
+推理管“能推出什么”，校验管“数据合不合规”，后者交给 SHACL：
 
 ```python
-# 代码②（续）：SHACL 约束校验（pip install pyshacl）
 from pyshacl import validate
 
-# 用 Turtle 定义一个"形状"：每个 Agent 必须至少有 1 个 hasCapability
-shapes = """
-@prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix o:  <http://example.org/agent-onto#> .
-o:AgentShape a sh:NodeShape ;
-    sh:targetClass o:Agent ;
-    sh:property [ sh:path o:hasCapability ; sh:minCount 1 ] .
+data = """
+@prefix ex: <http://example.org/agent#> .
+ex:t2 a ex:Task ; ex:assignedTo ex:alice, ex:bob .   # 违规：两个负责人
 """
 
-conforms, _, report = validate(
-    graph, shacl_graph=shapes, data_graph_format="xml", shacl_graph_format="turtle"
-)
-print("数据是否合法：", conforms)     # 违反 minCount 时给出精确的报错定位
+shapes = """
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <http://example.org/agent#> .
+ex:TaskShape a sh:NodeShape ;
+    sh:targetClass ex:Task ;
+    sh:property [
+        sh:path ex:assignedTo ;
+        sh:maxCount 1 ;
+        sh:message "一个任务最多只能有一个负责人" ;
+    ] .
+"""
+
+ok, _, text = validate(data, shacl_graph=shapes,
+                       data_graph_format="turtle", shacl_graph_format="turtle")
+print(ok)     # False
+print(text)   # 明确指出违反了 maxCount 约束
 ```
 
-一段本体，就把“推理导出隐含事实”、“形式化约束校验”、“可被 SPARQL 统一查询”三件事一次性解决了。更关键的是：因为它是**形式化、共享**的规范，两个系统只要引用同一个本体（或建立本体间的映射），`code_review`这个概念在双方眼里就是**同一个**东西——裂缝一（互操作）也有了着落。
-
-那么，把这套能力对准图工程的三大维度，会发生什么？这正是下一章要论证的“归宿”。
+对照第 3 章的四条裂缝：共享类层次解决互操作，OWL 公理 + SHACL 解决约束缺位，推理机解决能力匹配。第四条——演化不漂移，要等到第 7 章。
 
 ## 5. 为什么是“归宿”：从 Graph Engineering 到 Ontology Engineering
 
-现在把两条线接起来。第 2 章说图工程有三维加一条演化线，第 3 章说这三维都栽在同一个坑里——有结构没语义，第 4 章说本体工程恰好专治这个坑。本章要做的，是**逐维**把本体的能力叠上去，论证一个判断：**当图工程沿着自身“规模化、互操作、可推理、自演化”的诉求往前走，每一维都会自然收敛到本体。本体工程不是图工程的替代品，而是它的语义完成态——它的尽头。**
+图工程的三个维度，往深处走都会撞上同一件事：需要一层显式语义。
 
 ![原文配图 9](/images/graph-engineering-ontology/09-2026-09-03-20-03DrOko4PQAC89yxf.png)
 
-**图 9 GE 三维 + 演化 → OE 能力映射**
+**图 9 图工程三维与本体能力的对位**
 
-**任务组织 → 任务本体（可推理的任务图）。**图工程把任务拆成 DAG，但“任务是什么类型”、“这个依赖是数据依赖还是控制依赖”、“这个目标由哪些子目标构成”这些语义是隐式的。用本体给任务建模，节点就从“字符串标签”升级为“有类型、有公理约束的概念实例”：你可以声明“`CodeReviewTask`是`AnalysisTask`的子类”、“`AnalysisTask`必须产出`StructuredReport`”，于是推理机能自动校验一个任务图是否合法、能自动推断某个新任务应归入哪一类、该走哪条既有工作流。任务组织从“画对了图”进化到“图在语义上自洽且可推理”。
+**任务组织 → 任务本体。**要复用任务模板、判断两个任务是不是同一类、自动选择执行策略，就得先有任务类型的层次结构与前置条件声明，而不是一堆散装 DAG。
 
-**智能体协调 → 能力本体（Capability Ontology）。**这是最能体现“归宿”的一维，也和当前最热的 Agent 协议直接呼应。图工程里，Agent 的能力是一串字符串标签，协调靠“名字对上就派活”。可一旦到跨系统场景——正如 Google 主导、现属 Linux 基金会的**A2A（Agent2Agent）协议**所面对的——Agent 要通过**Agent Card**互相“发现能力（capability discovery）”、协商交互。A2A 已经把“能力描述”标准化成了结构化的 Agent Card，甚至规划了`QuerySkill()`来动态查询对方是否支持某技能。但请注意：**结构化 ≠ 语义化**。Agent Card 目前的能力字段仍是弱语义的 JSON，`code-review`和`static-analysis`在协议层面无法判断是否相关。要让能力真正做到可发现、可匹配、可组合，下一步必然是给能力一个**共享本体**：把能力组织成有层次、有关系的概念（`StaticAnalysis ⊑ CodeReview`），于是“我需要 code-review”的请求能自动匹配到“我会 static-analysis”的 Agent。**从字符串标签，到结构化 Agent Card，再到能力本体——这条路径已经在真实协议演进里发生了。**
+**智能体协调 → 能力本体。**要让请求方说“我要 code-review”、系统自动找到“会 static-analysis”的 Agent，能力必须组织成有上下位关系的概念，而不是扁平字符串。今天的 A2A Agent Card 已经把能力**结构化**了，但还没**语义化**——这一跳在 7.4 细说。
 
-**运行时状态管理 → 事件 / 溯源本体。**图工程把执行轨迹记成状态图，但“这个状态意味着什么”、“这次失败和上次是不是同一类”、“从哪个事件能推出根因”这些仍是隐式的。W3C 早有**PROV-O（溯源本体）**这样的成熟标准，专门用本体描述“实体—活动—代理”之间的生成、使用、派生关系。把运行时状态用溯源本体建模，故障定位就从“人工翻日志”升级为“用 SPARQL 查询 + 推理导出根因”：给定一个失败节点，推理机能沿着`wasDerivedFrom`、`wasGeneratedBy`关系链自动回溯到源头，甚至基于故障模式本体自动归类这次失败属于哪种已知类型。
+**运行时状态 → 溯源本体。**状态要能回答“这个结论是谁、基于什么、在什么时候产出的”。W3C 的 PROV-O 就是为这件事定的标准：Entity / Activity / Agent 三元组织，让审计和复盘有据可依。
 
-**系统演化 → 本体学习与演化（Ontology Learning / Evolution）。**这一维的收敛最耐人寻味。图工程说系统要能自演化，但演化的最大风险是第 3 章说的“语义漂移”。本体恰恰提供了演化所需的**稳定语义锚点**：结构可以变，但变化必须落在本体定义的语义框架内，且每次改写都能被 SHACL 校验、被推理机检查一致性。更进一步，“如何自动地扩展和演化本体本身”已经是一个活跃的研究方向——这正是下一章要展开的**LLMs4OL（用大语言模型做本体学习）**：让 LLM 从数据和执行反馈里自动抽取新概念、新关系，去扩展本体。于是演化闭环成型：**LLM 负责从非结构化世界“接地”出候选语义，本体的形式化约束负责把关，保证演化是收敛的、可校验的、不漂移的。**
+**自演化 → 本体学习。**系统要自己改图，就必须有护栏来判断“这次改动合不合法”。护栏只能是形式化的约束，不可能是自然语言注释。
 
-把这四条映射并排放进一张表，“归宿”的论证就完整了——它恰好是第 3 章表 2 里每一个 ❌ 的镜像修复：
+**表 3 图工程的需求与本体的对应能力**
 
-**表 3 Graph Engineering 三维 → Ontology Engineering 能力映射**
+| **图工程的需求** | **纯图的做法** | **本体提供的能力** |
+| --- | --- | --- |
+| 任务类型复用 | 复制粘贴 DAG 模板 | 任务类层次 + 前置条件公理 |
+| 能力发现与匹配 | 字符串精确匹配 | `subClassOf*` 语义匹配 |
+| 结果溯源与审计 | 自己设计日志格式 | PROV-O 标准溯源模型 |
+| 结构自动演化 | 无护栏，靠人审 | SHACL 校验 + 推理机一致性检查 |
 
-| **GE 维度** | **图工程的做法** | **语义缺口** | **本体工程的补位** | **关键技术 / 佐证** |
-| --- | --- | --- | --- | --- |
-| 任务组织 | 任务 DAG | 目标 / 依赖无形式语义 | 可推理的任务本体 | OWL / 描述逻辑 |
-| 智能体协调 | 角色图 + 消息通道 | 能力靠字符串匹配、跨系统失效 | 能力本体（Capability Ontology） | A2A Agent Card → 能力本体演进 |
-| 运行时状态 | 状态 / 轨迹图 | 事件语义不统一、故障靠翻日志 | 事件 / 溯源本体 | W3C PROV-O + SPARQL 推理 |
-| 系统演化 | 反馈改写拓扑 | 无锚点、语义漂移 | 本体学习 / 演化 | LLMs4OL / neurosymbolic |
-
-结论已经很清楚：图工程的每一维，只要往“更大规模、更强互操作、更可推理、更能自演化”推进一步，就会踩上本体的地基。这不是外部强加的方向，而是图工程内在诉求的自然延伸。所以说，**图工程的尽头是本体工程**——不是终点意义上的“死路”，而是登顶意义上的“必经之巅”。
-
-但工程师关心的不止是“为什么”，还有“怎么落地”。下一章给出一个融合两者的可实施架构。
+所以“归宿”不是修辞：这四条需求都不是外部强加的，而是图工程做深之后自己长出来的。
 
 ## 6. Ontology-Grounded Graph Engineering：融合架构
 
-“图工程的尽头是本体工程”，落到工程上不是“推翻图工程重来”，而是给图工程**加一层语义地基**。我把这个融合架构叫做**Ontology-Grounded Graph Engineering（本体接地的图工程）**，它分三层，自下而上：
+结论上不是二选一，而是分三层。
 
 ![原文配图 10](/images/graph-engineering-ontology/10-2026-09-03-20-036HhKB3Uidu3zvL8.png)
 
-**图 10 Ontology-Grounded Graph Engineering 融合分层架构**
+**图 10 三层融合架构：执行层 / 图结构层 / 语义层**
 
-- **执行层（Execution Layer）**：LLM Agents 本身——负责感知、推理、调用工具、产出结果。对应第 2 章的“个体智能”。
+- **语义层（本体）**：定义有哪些类、哪些关系、哪些约束——**是什么**。
+- **图结构层（图工程）**：把实例连成任务图与状态图——**怎么组织**。
+- **执行层（LLM + Harness）**：真正跑起来，调模型、用工具——**怎么做**。
 
-- **图结构层（Graph Structure Layer）**：任务图、智能体协调图、运行时状态图——图工程的主战场，负责“谁连着谁、按什么拓扑跑”。
-
-- **语义层（Semantic Layer）**：本体（TBox）+ 推理机 + 约束校验（SHACL）——给图结构层的每一个节点、每一条边赋予形式化语义，负责“这些东西是什么、合不合法、能推出什么”。
-
-三层之间的关系是：**语义层为图结构层提供类型、约束和推理服务；图结构层为执行层提供组织和调度；执行层的产出回流，经语义层校验后更新图结构层，并可反向驱动本体演化。**这样，图工程的动态性被保留，同时每一次动态变更都被语义层“守门”。
+关系很简单：语义层给图结构层提供类型和约束，图结构层给执行层提供调度顺序，执行结果再回写到图上、并受语义层校验。
 
 ![原文配图 11](/images/graph-engineering-ontology/11-2026-09-03-20-033LfdziQRuH9b8aY.png)
 
-**图 11 融合架构的运行时数据流闭环**
+**图 11 运行时闭环：执行结果回写图，语义层负责把关**
 
-运行时的数据流大致是这样一个闭环：**外部请求 → 语义层解析成本体概念 → 推理机确定需要哪类任务、匹配哪类能力的 Agent → 图结构层据此实例化 / 更新任务图与协调图 → 执行层跑 Agent → 产出经 SHACL 校验后回写状态图 → 反馈驱动本体与图的演化。**
-
-先看语义如何约束检索——这是 GraphRAG 类系统最直接的受益点。微软开源的**GraphRAG**用从文本抽取的知识图谱来增强 LLM 输出，相比传统向量 RAG 更能把握实体关系与全局语境。但它抽出的图多是“实体共现图”，缺形式化本体约束。给它叠一层本体，检索就能被语义收窄：
+第一个直接收益：检索可以按语义收窄。同样是 GraphRAG，加了本体之后不再全图盲搜。
 
 ```python
-# 代码③：知识图谱 + LLM——用本体类型约束 GraphRAG 的检索空间（示意）
-# 思路：先按本体类型过滤出相关子图，再把子图喂给 LLM 生成，避免"全图盲检索"
-from rdflib import Graph, Namespace
+from rdflib import Graph, Namespace, RDF, RDFS, Literal
 
-kg = Graph().parse("knowledge_graph.ttl", format="turtle")   # 已接入本体的知识图谱
-O = Namespace("http://example.org/agent-onto#")
+EX = Namespace("http://example.org/agent#")
+g = Graph()
 
-def semantic_subgraph(query_type: str, keyword: str) -> list[str]:
-    # 本体约束：只在 query_type 这个类（及其子类）的实例里检索，而非全图
-    q = f"""
-    PREFIX o: <http://example.org/agent-onto#>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    SELECT ?e ?label WHERE {{
-        ?cls rdfs:subClassOf* o:{query_type} .
-        ?e a ?cls ; rdfs:label ?label .
-        FILTER(CONTAINS(LCASE(?label), LCASE("{keyword}")))
-    }}"""
-    return [str(r.label) for r in kg.query(q)]
+# TBox：能力的类层次
+g.add((EX.CodeReview, RDFS.subClassOf, EX.Capability))
+g.add((EX.StaticAnalysis, RDFS.subClassOf, EX.CodeReview))
+g.add((EX.Translation, RDFS.subClassOf, EX.Capability))
 
-context = semantic_subgraph("Capability", "review")   # 只召回"能力"类下与 review 相关的实体
-prompt = f"已知相关能力：{context}\n请为下面的任务匹配合适的能力：……"
-# answer = llm(prompt)   # 交给 LLM 生成——检索空间已被本体语义收窄，噪声更少
+# ABox：三条知识片段
+g.add((EX.doc1, RDF.type, EX.StaticAnalysis))
+g.add((EX.doc1, RDFS.comment, Literal("Ruff 规则集与 CI 集成实践")))
+g.add((EX.doc2, RDF.type, EX.Translation))
+g.add((EX.doc2, RDFS.comment, Literal("术语表与译名统一方案")))
+g.add((EX.doc3, RDF.type, EX.CodeReview))
+g.add((EX.doc3, RDFS.comment, Literal("PR 评审清单")))
+
+# 检索 Capability 下的 CodeReview 子树，Translation 被语义排除
+q = """
+SELECT ?doc ?text WHERE {
+    ?doc a ?t ; rdfs:comment ?text .
+    ?t rdfs:subClassOf* ex:CodeReview .
+}
+"""
+for doc, text in g.query(q, initNs={"ex": EX, "rdfs": RDFS}):
+    print(doc.split("#")[-1], text)
+# doc1 Ruff 规则集与 CI 集成实践
+# doc3 PR 评审清单
 ```
 
-`rdfs:subClassOf*`那行是关键：它让检索**自动覆盖子类**——查`Capability`会连`CodeReview`、`StaticAnalysis`一起召回，这正是纯字符串检索做不到的语义扩展。
+关键在于 doc2 不是被向量相似度“排到后面”，而是被**语义规则明确排除**。少了噪声，也少了不确定性。
 
-再看融合的收口——把前面所有栈串起来的端到端小例子：**用本体（代码②）给 LangGraph 的 Agent 图（代码①）做语义路由**。调度前不再靠字符串比对，而是用本体推理判断“哪个 Agent 的能力在语义上覆盖了任务所需的能力”：
+第二个收益：调度可以按语义路由。
 
 ```python
-# 代码④：融合端到端——本体驱动的 Agent 语义路由（串起代码①②③）
-from owlready2 import *
+from owlready2 import Thing, ObjectProperty, get_ontology, sync_reasoner
 
-onto = get_ontology("http://example.org/agent-onto#")
+onto = get_ontology("http://example.org/route#")
+
 with onto:
-    class Agent(Thing): pass
     class Capability(Thing): pass
-    class hasCapability(Agent >> Capability): pass
     class CodeReview(Capability): pass
-    class StaticAnalysis(CodeReview): pass       # 公理：StaticAnalysis ⊑ CodeReview
+    class StaticAnalysis(CodeReview): pass
+    class Translation(Capability): pass
 
-with onto:
-    static = StaticAnalysis("static_analysis_cap")
-    bob = Agent("bob"); bob.hasCapability = [static]   # bob 只会 static analysis
-    sync_reasoner()                                     # 推理：static 也 is-a CodeReview
+    class Agent(Thing): pass
 
-def route(task_requires_cls) -> list[str]:
-    """把子任务路由给能力在语义上覆盖需求的 Agent（靠推理，而非字符串相等）"""
-    picked = []
-    for a in onto.Agent.instances():
-        caps = a.hasCapability
-        # 关键：用 is-a 判定"覆盖"，StaticAnalysis 自动满足 CodeReview 的需求
-        if any(task_requires_cls in c.INDIRECT_is_a or c.__class__ is task_requires_cls
-               or task_requires_cls in type(c).mro() for c in caps):
-            picked.append(a.name)
-    return picked
+    class hasCapability(ObjectProperty):
+        domain, range = [Agent], [Capability]
 
-# 任务需要 CodeReview 能力；bob 只声明了 StaticAnalysis，但推理判定他胜任
-print(route(onto.CodeReview))     # ['bob'] —— 语义路由，而非字符串 == 比对
-# 拿到 picked 后，即可用代码① 的 LangGraph 把该子任务的节点动态绑定给 bob
+    bob = Agent("bob")
+    bob.hasCapability.append(StaticAnalysis("sa"))
+    eve = Agent("eve")
+    eve.hasCapability.append(Translation("tr"))
+
+sync_reasoner(onto)
+
+
+def route(required_cls):
+    """按本体类层次找出能接活的 Agent，而不是比对字符串。"""
+    hits = []
+    for agent in onto.Agent.instances():
+        for cap in agent.hasCapability:
+            if required_cls in type(cap).ancestors():
+                hits.append(agent.name)
+                break
+    return hits
+
+
+print(route(onto.CodeReview))   # ['bob']  —— bob 只声明了 static-analysis
+print(route(onto.Translation))  # ['eve']
 ```
 
-对比一下：代码①的图工程里，路由是`if agent.capability == "code-review"`，`bob`声明的是`"static-analysis"`，字符串不等，直接漏掉。而代码④里，推理机知道`StaticAnalysis ⊑ CodeReview`，于是`bob`被正确选中。**同一个调度问题，图工程给出结构、本体工程给出语义，二者合起来才是完整的解。**这就是“本体接地的图工程”在最小粒度上的样子。
+同一个需求，字符串匹配返回空列表，语义路由返回 `['bob']`。差别就在那层 TBox。
 
-**代价与权衡，必须说清楚。**加一层语义层不是免费的午餐。第一是**推理开销**：OWL 完整推理（如 HermiT）在最坏情况下计算复杂度很高，本体一大、公理一多，一次`sync_reasoner`就可能成为调度热路径上的瓶颈。工程上的对策是分级——把需要实时判定的部分限制在 OWL 2 的可判定轻量子集（如 OWL 2 EL/RL），复杂推理放到离线或异步链路，运行时热路径尽量只做 SHACL 校验和预物化（materialization）好的查询。第二是**建模成本与治理**：本体是需要维护的资产，谁来改、怎么评审、版本怎么管、和旧数据怎么兼容，都是真实的工程负担；本体一旦失修，比没有本体更危险，因为大家会误信它。第三是**收益的非线性**：语义层的价值在小系统里几乎为零，在跨团队、大规模、强互操作场景里才急剧放大。所以正确的判断不是“要不要上本体”，而是“我的系统现在处在哪个规模档位、值不值得上到哪一级”——这正是第 8 章成熟度阶梯要回答的问题。
+**代价也要说清楚：**
 
-这套融合架构不是纸上蓝图。下一章我们看看，学术界和工业界最新的进展，正在如何把它一块块变成现实。
+- **推理开销。**完整 OWL 2 DL 推理最坏情况很贵，热路径上跑不动。实践做法是用轻量子集（EL / RL），或者离线把推理结果预物化（materialization），运行时只查不推。
+- **建模与治理成本。**本体是共享资产，要有人负责版本、评审、变更影响面。没有 owner 的本体一定腐化。
+- **收益非线性。**单团队小系统做本体基本是纯成本；跨团队、要互操作、要自动演化时，收益才陡然上升。所以关键是判断自己在曲线的哪一段。
 
 ## 7. 最新研究与实践图景
 
+这套思路不是我的一家之言，五个方向正在从不同起点往同一处走。
+
 ### 7.1 用 LLM 自动学习本体（LLMs4OL）：让本体自己长出来
 
-本体工程几十年来最大的拦路虎，是“手工构建成本高”——请领域专家和知识工程师坐在一起，一个概念一个概念地讨论、一条公理一条公理地敲定，慢且贵，这也是本体长期叫好不叫座的现实原因。而 LLM 的到来正好打在这个痛点上：它天生擅长从自然语言里抽概念、抽关系、做归类。**LLMs4OL（Large Language Models for Ontology Learning）**这一范式（奠基论文 arXiv 2307.16648，2023）的贡献，就是第一次系统地把“本体学习”这件事拆成 LLM 可执行的三类任务：
+本体几十年来最大的拦路虎是手工成本高：领域专家和知识工程师得一个概念一个概念地磨，慢且贵。LLM 恰好擅长从自然语言里抽概念、抽关系、做归类。**LLMs4OL**（奠基论文 arXiv 2307.16648）第一次把“本体学习”拆成 LLM 可执行的三类任务：
 
-1. **术语类型标注（Term Typing）**：给一个术语，判断它属于哪个类型（如“HermiT”→“推理机”）。
+1. **术语类型标注**：给定术语，判断它属于哪个类型（如「HermiT」→「推理机」）。
 
-2. **分类体系发现（Taxonomy Discovery）**：找出概念之间的上下位（is-a）关系，搭出类层次骨架。
+2. **分类体系发现**：找出概念间的上下位关系，搭出类层次骨架。
 
-3. **非分类关系抽取（Relation Extraction）**：抽取概念之间除 is-a 外的语义关系（如“依赖”、“隶属”）。
+3. **非分类关系抽取**：抽取 is-a 之外的语义关系（如「依赖」「隶属」）。
 
-此后，围绕 LLMs4OL 的研究逐渐形成社区（如与 ISWC 相关的 LLMs4OL 挑战赛），方法也在持续迭代：从早期的零样本提示，到后来结合检索增强、少样本示例，再到对 LLM 生成的候选三元组施加词表/形式约束过滤。这条脉络的方向越来越清晰——**从“让 LLM 自由生成”走向“生成之后再用形式约束把关”**。
-
-请特别留意 2026 年这个“**生成后用形式约束过滤**”的动作——它几乎就是第 6 章融合架构在数据生产环节的缩影：**LLM 负责从语料里“生成”候选本体，形式约束（词表、SHACL）负责“把关”，只有通过校验的三元组才进入最终本体。**生成的自由度与约束的严谨性各司其职，这正是“神经 + 符号”分工的雏形。
+此后方法一路迭代：从零样本提示，到检索增强与少样本，再到对 LLM 生成的候选三元组施加词表与形式约束过滤。方向越来越清楚——**先放开生成，再用形式约束把关**。这正是第 6 章融合架构在“内容生产”环节的缩影。
 
 ![原文配图 12](/images/graph-engineering-ontology/12-2026-09-03-20-03uNjRZwb9NERGbd3.png)
 
@@ -426,11 +427,9 @@ print(route(onto.CodeReview))     # ['bob'] —— 语义路由，而非字符�
 
 ### 7.2 神经符号（Neurosymbolic）：LLM 接地，符号层验证
 
-如果说本文有一个“学术同盟军”，那一定是神经符号方向——它和本文主张同构得惊人。神经符号的核心分工是：**让神经网络（LLM）负责“从模糊的自然语言接地到精确的符号表示”，让符号系统（求解器、逻辑引擎、约束）负责“一致性与可验证性”。**LLM 擅长理解与生成但会一本正经地胡说，符号系统擅长严谨推理但不懂自然语言——两者恰好互补。
+神经符号方向和本文主张几乎同构：**LLM 负责把模糊的自然语言接地为精确的符号表示，符号系统负责一致性与可验证性。**LLM 能理解会生成但爱胡说，符号系统严谨但不懂人话，正好互补。
 
-这个分工在近年的工程实践里越来越常见，形态大同小异：**用 LLM 把自然语言接地为结构化的候选（声明、逻辑公式、实体映射等），再交给一个确定性的符号层去校验。**符号层可以是 SMT 求解器（如 Z3）来检查数值/逻辑约束是否可满足，可以是概率逻辑引擎（如 ProbLog）来做带不确定性的推理，也可以是本体推理机 + SHACL 约束来检查一致性与合法性。共同点是：凡是 LLM 生成、又需要为之负责的结论，都要先过符号层这一关，通不过就打回。
-
-它们共享同一个信念：**LLM 的输出必须经过形式化符号层的检验，才算可信。**把这个信念放回本文的语境，就是：图工程产出的结构和 LLM 产出的内容，都需要本体这个“符号层”来做一致性与可满足性的最后校验。这正是“图 + 语义”在**可靠性**维度上的必然要求。
+工程形态大同小异：LLM 产出结构化候选（声明、逻辑公式、实体映射），再交给确定性的符号层校验——可以是 SMT 求解器（Z3）检查数值与逻辑约束是否可满足，可以是概率逻辑引擎（ProbLog）做带不确定性的推理，也可以是推理机加 SHACL 检查一致性。共同信念只有一句：**LLM 要负责的结论，必须过符号层这一关。**
 
 ![原文配图 13](/images/graph-engineering-ontology/13-2026-09-03-20-03AJn64098SRgRifc.png)
 
@@ -438,11 +437,11 @@ print(route(onto.CodeReview))     # ['bob'] —— 语义路由，而非字符�
 
 ### 7.3 GraphRAG 及其语义化演进：从实体图到本体图
 
-微软开源的**GraphRAG**（github.com/microsoft/graphrag，在 GitHub 上广受关注）是这两年最出圈的“图 + LLM”实践。它的核心洞察是：传统向量 RAG 把文档切成块、按向量相似度召回若干**孤立文本块**，天然丢失了实体之间的关系和全局语境；而 GraphRAG 先用 LLM 从语料里抽出知识图谱，再基于图结构去组织检索上下文，因此在需要“关系推理”、“全局归纳”的问答上明显更强。
+微软的 **GraphRAG** 是这两年最出圈的“图 + LLM”实践。它抓住了向量 RAG 的短板：把文档切块、按相似度召回一堆**孤立片段**，实体之间的关系和全局语境全丢了。GraphRAG 先用 LLM 抽出知识图谱，再基于图组织上下文，所以在关系推理和全局归纳类问题上明显更强。
 
-但 GraphRAG 也有清晰的边界：构建知识图谱索引是一项**成本较高**（token 消耗大）的操作，这一点被广泛讨论。更关键的是从本文视角看到的一个结构性局限：**它当前构建的“图”，多是从文本里抽取的“实体共现/关系图”，缺少形式化的本体约束。**也就是说，它有了图的结构，却还没有本体的语义——节点是什么类型、类型之间有无上下位、检索该被哪些语义边界收窄，都还比较松散。
+但它有两个已知边界：建索引的 token 成本不低；更关键的是，它构建的图多是从文本里抽的**实体共现图**，缺少形式化本体约束——节点是什么类型、类型之间有无上下位、检索该被哪些语义边界收窄，都还很松散。
 
-这恰恰指明了下一步的自然演进方向：**给 GraphRAG 的图叠加一层本体。**一旦有了本体，检索就能从“全图盲搜”变成“按类型精准定位”——查`Capability`能顺着`subClassOf*`自动覆盖`CodeReview`、`StaticAnalysis`（正如第 6 章代码③所示），检索空间被语义收窄，噪声更少、精度更高、也更可控。从“实体图”到“本体图”，是 GraphRAG 提升质量的顺理成章的一跳。
+下一步的演进方向因此很自然：**给 GraphRAG 的图叠一层本体。**检索就能从全图盲搜变成按类型定位，正如本章上面那段 `subClassOf*` 代码所示。从实体图到本体图，是顺理成章的一跳。
 
 ![原文配图 14](/images/graph-engineering-ontology/14-2026-09-03-20-03oayQZ4aIBohSbuE.png)
 
@@ -450,9 +449,9 @@ print(route(onto.CodeReview))     # ['bob'] —— 语义路由，而非字符�
 
 ### 7.4 Agent 协议的能力语义化（A2A / MCP）：从能力卡到能力本体
 
-多智能体协作要落地，绕不开一个基础设施问题：**一个 Agent 怎么知道另一个 Agent 会什么？**Google 主导、现属 Linux 基金会的**A2A（Agent2Agent）协议**（Apache 2.0）给出的答案是**Agent Card**——一张描述 Agent 能力与连接信息的“名片”，让 Agent 之间能“发现能力（capability discovery）”、协商交互模式，并在不暴露内部状态（preserve opacity）的前提下协作。A2A 甚至规划了`QuerySkill()`方法，用于动态查询对方是否支持某项技能。它与偏重“连接工具与资源”的**MCP**互补，专注于“连接 Agent 与 Agent”。这无疑是工程界朝“能力可描述、可发现”迈出的关键一步。
+多智能体协作绕不开一个基础问题：**一个 Agent 怎么知道另一个会什么？**A2A（Agent2Agent，现属 Linux 基金会）的答案是 **Agent Card**——一张描述能力与连接方式的名片，支持能力发现、交互协商，并且不要求暴露内部状态。它还规划了 `QuerySkill()` 用于动态查询对方技能。A2A 管「Agent 连 Agent」，MCP 管「Agent 连工具与资源」，两者互补。
 
-但从本文的视角看，Agent Card 目前还停在“**结构化**”，尚未到“**语义化**”。它的能力字段本质是弱语义的 JSON 字符串：当 A 系统声明它需要`code-review`、B 系统声明它会`static-analysis`时，协议层面无法判断这两者其实相关。要让“能力发现”从“字符串精确匹配”升级为“语义匹配、可组合”，下一跳几乎是注定的——**给能力一个共享本体（Capability Ontology）**：把能力组织成有层次、有关系的概念（`StaticAnalysis ⊑ CodeReview ⊑ Capability`），于是“我需要 code-review”的请求，能通过本体推理自动匹配到“我会 static-analysis”的 Agent。**从字符串标签，到结构化 Agent Card，再到能力本体——这条演进路径已经在真实协议里发生，只是还没走完最后一段。**
+这是关键一步，但目前只走到**结构化**，还没到**语义化**：能力字段本质是弱语义 JSON 字符串。A 说要 `code-review`、B 说会 `static-analysis`，协议层无法判断两者相关。下一跳是给能力一个共享本体：`StaticAnalysis ⊑ CodeReview ⊑ Capability`，于是匹配由推理完成。**从字符串标签，到 Agent Card，再到能力本体**——路径已经在真实协议里走了三分之二。
 
 ![原文配图 15](/images/graph-engineering-ontology/15-2026-09-03-20-036TeAerYLnnU33J0.png)
 
@@ -460,15 +459,13 @@ print(route(onto.CodeReview))     # ['bob'] —— 语义路由，而非字符�
 
 ### 7.5 工业界的“操作层本体”与本体自演化
 
-本体绝不只活在论文里。**Palantir Ontology**是一个有代表性的工业界实践：它把数据集与模型集成为组织的“操作层（operational layer）”，用本体统一对象、属性与动作（action）的语义，作为 AI 与 Agent 操作企业资产的语义底座（见其官方文档）。这背后是一个越来越清晰的趋势：**当 AI/Agent 要在真实企业环境里可靠地“动手做事”——查询、决策、触发动作——一个共享、一致、可治理的本体几乎是绕不开的地基。**没有它，Agent 面对的就是一堆语义不清的表和字段，“动手”的每一步都在赌。
+本体不只活在论文里。**Palantir Ontology** 把数据集与模型集成为组织的「操作层」，用本体统一对象、属性与动作的语义，作为 AI 和 Agent 操作企业资产的底座。趋势很清楚：当 Agent 要在真实企业里动手做事——查询、决策、触发动作——一个共享、一致、可治理的本体几乎是绕不开的地基。
 
-而把方向一（LLMs4OL）和系统演化的诉求接起来，就得到本文融合架构里最完整的一环：**本体自演化闭环。**系统在运行中会不断产生新数据、新反馈，其中蕴含着本体里还没有的概念和关系。让 LLM 从这些运行数据里**抽取候选**去扩展本体，同时用形式约束（SHACL 校验 + 推理机一致性检查）**为每一次扩展把关**，只有不破坏一致性的变更才被合并——于是本体既能与时俱进地生长，又不会发生第 3 章担心的“语义漂移”。这就把“图工程要自演化”这个诉求，落成了一个“生成不设限、演化受约束”的可控闭环。
+把 7.1 的生成能力和“系统要自演化”的诉求接起来，就是本文架构最完整的一环：**本体自演化闭环。**系统运行中不断产生新数据与新反馈，其中藏着本体里还没有的概念；让 LLM 从中抽取候选去扩展本体，同时用 SHACL 校验与推理机一致性检查为每次扩展把关，只有不破坏一致性的变更才被合并。于是第 3 章担心的语义漂移，被关进了一个「生成不设限、演化受约束」的闭环。
 
 ![原文配图 16](/images/graph-engineering-ontology/16-2026-09-03-20-03pU7pA8YEwP7B8Xt.png)
 
 **图 7-5 本体自演化闭环：生成不设限，演化受约束——防止语义漂移**
-
-把这些代表性工作汇总如下：
 
 **表 4 本体 × LLM/Agent 代表性研究与实践速览**
 
@@ -481,43 +478,41 @@ print(route(onto.CodeReview))     # ['bob'] —— 语义路由，而非字符�
 | A2A Protocol | Agent 能力语义化 | Agent Card 实现能力发现与交互协商（Linux 基金会） | github.com/a2aproject/A2A |
 | Palantir Ontology | 工业操作层本体 | 以本体统一企业对象/动作语义，作为 AI 操作底座 | palantir.com 官方文档 |
 
-一条清晰的合流正在发生：**做本体的在用 LLM 降低构建成本，做 Agent 的在给能力和状态加语义，做 RAG 的在往图和本体上靠。**五个方向、五拨人，正从不同起点走向同一个终点——一个既有图结构、又有形式语义的智能系统。这就是“图工程的尽头是本体工程”在真实世界里的注脚。
-
-最后一章，回到工程师视角：这条路，具体该怎么走。
+一句话总结这张表：**做本体的在用 LLM 降成本，做 Agent 的在给能力加语义，做 RAG 的在往图和本体上靠。**五拨人，同一个方向。
 
 ## 8. 落地建议与展望
 
-读到这里，一个务实的工程师大概会问：难道我搭个多智能体系统，一上来就得请个知识工程师、写一大堆 OWL 公理？**恰恰相反。**本体工程最容易翻车的地方，就是“过度工程化”——在需求还不清晰时，投入巨大成本去建一个“完备本体”，最后既笨重又没人维护。正确的姿势是**渐进式**：让语义随着系统对语义的真实需求一起长出来。我把它总结成一条“本体成熟度阶梯”，四级递进。
+务实的问题来了：搭个多智能体系统，是不是一上来就得写一堆 OWL 公理？**恰恰相反。**本体工程最常见的翻车方式就是过度工程化——需求还没稳定就建一个「完备本体」，最后又笨重又没人维护。正确姿势是渐进式，我把它整理成一条四级阶梯。
 
 ![原文配图 17](/images/graph-engineering-ontology/17-2026-09-03-20-03VyRQElyJqTzr0rZ.png)
 
 **图 12 本体成熟度阶梯（L0→L3）**
 
-**L0 字符串约定。**就是今天大多数系统的样子：节点名、能力标签、状态字段都是裸字符串，语义在开发者脑子里。**没有错**——系统小、单团队、需求稳定时，L0 完全够用，别为了本体而本体。识别信号：当你开始频繁遇到“这个字段到底啥意思”、“这两个标签是不是一回事”的争论时，该往上走了。
+**L0 字符串约定。**今天大多数系统的样子：节点名、能力标签、状态字段都是裸字符串。系统小、单团队、需求稳定时，这样完全够用，别为了本体而本体。该往上走的信号是：团队开始频繁争论「这个字段到底啥意思」「这两个标签是不是一回事」。
 
-**L1 轻量 Schema（受控词表 + 类型）。**第一步很轻：把散落的字符串收敛成一份**受控词表（controlled vocabulary）**，给关键节点和边定义**类型**。哪怕只是一份团队共享的枚举表 + 几条 JSON Schema / Pydantic 模型，也能消灭一大半“同名异义、异名同义”。这一级几乎零学习成本，收益立竿见影，是绝大多数团队最该先做的一步。
+**L1 轻量 Schema。**第一步很轻：把散落的字符串收敛成一份受控词表，给关键节点和边定义类型。哪怕只是一份共享枚举表加几个 Pydantic 模型，也能消灭大半「同名异义、异名同义」。几乎零学习成本，性价比最高，绝大多数团队该先做这一级。
 
-**L2 形式化本体（类层次 + 约束 + 推理）。**当系统要跨团队互操作、要做语义匹配、要自动校验合法性时，升级到 RDFS/OWL：定义类层次、属性的定义域值域、基数与不相交约束，引入 SHACL 做校验、引入推理机导出隐含事实（正如代码②、代码④）。这一级投入不小，但换来的是“可推理、可校验、可互操作”三项纯图结构给不了的能力。关键原则：**只形式化那些真正需要推理和互操作的部分**，其余保持 L1。
+**L2 形式化本体。**当需要跨团队互操作、语义匹配、自动校验合法性时，升级到 RDFS/OWL：类层次、定义域值域、基数与不相交约束，配 SHACL 校验、配推理机导出隐含事实。投入不小，换来「可推理、可校验、可互操作」三项纯图给不了的能力。原则是**只形式化真正需要推理和互操作的那部分**，其余留在 L1。
 
-**L3 自演化本体（Ontology Learning）。**最高一级：让系统用 LLM 从数据与执行反馈中自动扩展本体（LLMs4OL 路线），同时用形式约束（SHACL/推理机）为每次演化把关，保证不漂移。这是研究前沿，也是“图工程尽头”最完整的形态——系统的结构与语义都能自我生长，且生长受控。
+**L3 自演化本体。**让系统用 LLM 从数据与反馈中扩展本体，同时用形式约束为每次演化把关。这是前沿，也是「图工程尽头」最完整的形态。
 
-这条阶梯的价值在于：**它把“图工程 → 本体工程”从一句口号，变成了一条可以一步步走、每步都有回报的工程路径。**你不需要在 L0 和 L3 之间做非此即彼的豪赌；你只需要在系统对语义的需求真正出现时，往上迈一级。多数团队的甜蜜点在 L1～L2 之间。
+这条阶梯的价值在于：它把「图工程 → 本体工程」从口号变成一条每步都有回报的路径，不必在 L0 和 L3 之间豪赌。多数团队的甜蜜点在 L1 到 L2 之间。
 
 **给不同角色的一句话建议：**
 
-- **应用工程师**：先做 L1。给你的 Agent 能力、任务类型、状态字段定一份受控词表和类型，这是投入产出比最高的一步。
+- **应用工程师**：先做 L1。给能力、任务类型、状态字段定一份受控词表和类型，投入产出比最高。
 
-- **平台 / 架构师**：当你要支撑多团队、多系统对接时，投资 L2 的共享本体——它是互操作的地基，晚建不如早建，但要克制，只建真正共享的部分。
+- **平台 / 架构师**：要支撑多团队对接时投资 L2 的共享本体，早建比晚建好，但要克制，只建真正共享的那部分。
 
-- **前沿团队**：关注 L3，把 LLMs4OL 与 neurosymbolic 的“生成—约束—校验”闭环，接进你的系统演化回路。
+- **前沿团队**：盯 L3，把「生成—约束—校验」闭环接进系统的演化回路。
 
 ## 结语
 
-回到开头那场关于 Agent 工程范式的讨论。Graph Engineering 之所以击中人心，是因为它精准地命名了一个真问题：**智能正在从个体走向系统，而系统需要显式的组织结构。**这个判断是对的，图工程也确实是当下最重要的范式之一。
+回到开头那场争论。Graph Engineering 之所以击中人心，是因为它命名了一个真问题：**智能正从个体走向系统，而系统需要显式的组织结构。**这个判断是对的。
 
-但结构只是故事的一半。当我们把任务、智能体、状态都画成图之后，图上那些节点和边的**意义**从哪里来，就成了下一个绕不开的问题。规模越大、互操作越深、越要求可推理与自演化，这个问题就越尖锐。而回答它的学问，是一门已经沉淀了几十年、有 RDF/OWL/SPARQL/SHACL 完整标准栈的成熟工程——本体工程。今天，LLMs4OL、神经符号、GraphRAG、A2A、工业操作层本体，正从五个方向不约而同地朝这里合流。
+但结构只是一半。把任务、智能体、状态都画成图之后，图上节点和边的**意义**从哪来，就成了下一道关口——规模越大、互操作越深、越要求可推理与自演化，这道关口就越难绕。回答它的学问已经沉淀几十年，有 RDF / OWL / SPARQL / SHACL 完整标准栈。今天 LLMs4OL、神经符号、GraphRAG、A2A、工业操作层本体，正从五个方向朝这里合流。
 
-所以，当有人问“Graph Engineering 之后是什么”，我的回答是：**是给图一个语义地基，让它可组合、可推理、可互操作、可自我演化。图工程立起了骨架，本体工程注入了灵魂。图工程的尽头，是本体工程。**而对今天的工程师来说，好消息是——你不必等到“尽头”才动身，从给你的第一份受控词表开始，这条路就已经在脚下了。
+所以，「Graph Engineering 之后是什么」，我的答案是：**给图一个语义地基，让它可组合、可推理、可互操作、可自我演化。图工程立起了骨架，本体工程注入了灵魂。图工程的尽头，是本体工程。**好消息是你不必等到「尽头」才动身——从写下第一份受控词表开始，这条路就在脚下了。
 
 ## 参考文献
 

@@ -87,13 +87,13 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     ...["semantic", "relations", "query", "execution"].map((nodeId) =>
       page.locator(`#architecture-node-ontology-agent-platform-${nodeId}`),
     ),
-    openSource.getByRole("link", { name: "12,455 GitHub Stars" }),
+    openSource.getByRole("link", { name: "13,300 GitHub Stars" }),
     openSource.getByRole("link", { name: /#1 GitHub Trending 日榜/ }),
     openSource.getByRole("link", { name: /#3 Trendshift · Python 周榜/ }),
     ...[0, 1, 2].map((index) =>
       openSource.getByRole("link", { name: /^已合并 · PR #/ }).nth(index),
     ),
-    openSource.locator("summary", { hasText: "查看剩余 7 个已合并 PR" }),
+    openSource.locator("summary", { hasText: "查看剩余 13 个已合并 PR" }),
     openSource.getByRole("link", { name: "Semantica GitHub repository", exact: true }),
     openSource.getByRole("link", { name: "阅读相关技术文章", exact: true }),
     // 写作区每条目含两个链接（h3 标题链接在前，aria-label 的阅读全文在后），条目后为列表页入口。
