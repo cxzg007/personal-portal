@@ -154,7 +154,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
-  await expect(openSource.getByText(/截至 2026-09-20：16 个贡献已合并/)).toBeVisible();
+  await expect(openSource.getByText(/截至 2026-09-20：17 个贡献已合并/)).toBeVisible();
   await expect(openSource.getByRole("link", { name: "Semantica GitHub repository" })).toHaveAttribute(
     "href",
     "https://github.com/semantica-agi/semantica",
@@ -319,18 +319,20 @@ test("expanding any internship disclosure un-sticks the stack and keeps detail i
   }
 });
 
-test("open source showcase leads with featured PR links and a collapsed remainder", async ({ page }) => {
+test("open source showcase groups PRs by resume theme with a collapsed remainder", async ({ page }) => {
   await page.goto("/");
 
   const openSource = page.locator("main > section#open-source");
-  await expect(openSource.getByRole("list", { name: "Semantica 代表性贡献" })).toBeVisible();
+  const themeList = openSource.getByRole("list", { name: "Semantica 贡献主题" });
+  await expect(themeList).toBeVisible();
+  await expect(themeList.locator("> li.open-source-theme-item")).toHaveCount(4);
   const recognition = openSource.getByRole("region", { name: "项目影响力与荣誉" });
   await expect(recognition.getByRole("link", { name: "13,300 GitHub Stars" })).toHaveAttribute(
     "href", "https://github.com/semantica-agi/semantica",
   );
   await expect(recognition.getByRole("link", { name: /#1 GitHub Trending 日榜/ })).toBeVisible();
   await expect(recognition.getByRole("link", { name: /#3 Trendshift · Python 周榜/ })).toBeVisible();
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(3);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(6);
   await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(0);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(0);
   await expect(openSource.locator("button")).toHaveCount(0);
@@ -341,11 +343,11 @@ test("open source showcase leads with featured PR links and a collapsed remainde
   await expect(details).not.toHaveAttribute("open");
 
   await details.locator("summary").click();
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(16);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(17);
   const otherLinks = details.getByRole("link", { name: /^已合并 · PR #/ });
-  await expect(otherLinks).toHaveCount(13);
+  await expect(otherLinks).toHaveCount(11);
   for (const [index, number] of [
-    1544, 1364, 1360, 1243, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081,
+    1364, 1360, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081,
   ].entries()) {
     await expect(otherLinks.nth(index)).toHaveAttribute(
       "href",
@@ -355,7 +357,7 @@ test("open source showcase leads with featured PR links and a collapsed remainde
   await details.locator("summary").focus();
   await page.keyboard.press("Enter");
   await expect(details).not.toHaveAttribute("open");
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(3);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(6);
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {

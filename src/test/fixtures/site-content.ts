@@ -28,9 +28,9 @@ export const validSiteContent = {
     },
     {
       label: "已合并 PR",
-      value: 16,
+      value: 17,
       suffix: "个",
-      evidence: "十六个 PR 已合并入 main，快照核对于 2026-09-20。",
+      evidence: "十七个 PR 已合并入 main，快照核对于 2026-09-20。",
     },
   ],
   internships: [
@@ -99,6 +99,12 @@ export const validSiteContent = {
       ],
     },
     contributions: [
+      {
+        number: 1556,
+        title: "检索排序前置支撑校验",
+        url: "https://github.com/semantica-agi/semantica/pull/1556",
+        status: "merged",
+      },
       {
         number: 1544,
         title: "非递归规则独立支持与源级撤回",
@@ -194,6 +200,38 @@ export const validSiteContent = {
         title: "RETE alpha/beta Token 模型",
         url: "https://github.com/semantica-agi/semantica/pull/1077",
         status: "merged",
+      },
+    ],
+    contributionThemes: [
+      {
+        id: "rule-reasoning",
+        name: "规则推理能力",
+        summary: "完善 RETE 多条件匹配与规则动作机制，使推理模块扩展为支持副作用与溯源的生产规则系统。",
+        prNumbers: [1096, 1077],
+      },
+      {
+        id: "truth-maintenance",
+        name: "真值维护机制",
+        summary: "为非递归规则新增源级真值维护，并把支撑校验前置到检索排序。",
+        prNumbers: [1556, 1544],
+      },
+      {
+        id: "sparql-execution",
+        name: "SPARQL 查询执行",
+        summary: "按存储层能力自动选择委托执行或本地图回退，并以按查询缓存与写时复制保证结果隔离。",
+        prNumbers: [1243],
+      },
+      {
+        id: "pipeline-parallelism",
+        name: "流水线并行执行",
+        summary: "实现基于 DAG 层级的并行执行、任务数据隔离、写冲突检测与失败传播。",
+        prNumbers: [1226],
+      },
+      {
+        id: "other-contributions",
+        name: "其他贡献",
+        summary: "补充上下文到知识图谱的结构转换能力，并修复策略校验、序列化、合规与导出校验等问题。",
+        prNumbers: [1364, 1360, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081],
       },
     ],
     repositoryUrl: "https://github.com/semantica-agi/semantica",

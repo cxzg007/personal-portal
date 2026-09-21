@@ -1,5 +1,5 @@
 import { BrandMark } from "@/components/home/brand-mark";
-import type { OpenSourceProject } from "@/content/schema";
+import type { OpenSourceContributionTheme, OpenSourceProject } from "@/content/schema";
 
 type OpenSourceShowcaseProps = {
   project: OpenSourceProject;
@@ -7,32 +7,13 @@ type OpenSourceShowcaseProps = {
 
 type Contribution = OpenSourceProject["contributions"][number];
 
-const PREFERRED_FEATURED_PR_NUMBERS = [1077, 1226, 1096] as const;
-
-const FEATURED_TITLE_ALIASES: Record<number, string> = {
-  1077: "RETE 规则匹配与链式一致性",
-  1226: "按依赖分层并行执行",
-  1096: "规则驱动动作与执行溯源",
+export type ContributionThemeGroup = {
+  theme: OpenSourceContributionTheme;
+  contributions: Contribution[];
 };
 
-// Editorial summaries are grounded in the linked, merged PR descriptions.
-const FEATURED_SUMMARIES: Record<number, { category: string; summary: string; detail: string }> = {
-  1077: {
-    category: "推理内核",
-    summary: "实现 Alpha 条件匹配与 Beta Token 合并，修复多条件链式推理中的绑定丢失与错误触发，让规则匹配保持一致。",
-    detail: "条件统一 · Token 绑定 · 链式一致性",
-  },
-  1226: {
-    category: "并发调度",
-    summary: "让并行配置真正贯通构建、序列化与执行引擎；独立步骤按依赖层并发执行，同时保留安全回退。",
-    detail: "显式安全声明 · 输入隔离 · 确定性合并",
-  },
-  1096: {
-    category: "规则动作",
-    summary: "引入结构化 Action 层，将规则命中连接到事实增删、函数调用与事件发送，并支持可选的动作溯源记录。",
-    detail: "四类动作 · 可选溯源 · 兼容旧接口",
-  },
-};
+const OTHER_CONTRIBUTIONS_THEME_ID = "other-contributions";
+const DIAGRAM_THEME_ID = "rule-reasoning";
 
 function ReteMatchingDiagram() {
   return (
@@ -69,36 +50,21 @@ function ReteMatchingDiagram() {
   );
 }
 
-export function selectFeaturedContributions(project: OpenSourceProject): {
-  featured: Contribution[];
-  remaining: Contribution[];
-} {
-  const merged = project.contributions.filter(({ status }) => status === "merged");
-  const mergedByNumber = new Map(merged.map((contribution) => [contribution.number, contribution]));
-  const selected = new Set<number>();
-  const featured: Contribution[] = [];
+export function groupContributionsByTheme(project: OpenSourceProject): ContributionThemeGroup[] {
+  const mergedByNumber = new Map(
+    project.contributions
+      .filter(({ status }) => status === "merged")
+      .map((contribution) => [contribution.number, contribution] as const),
+  );
 
-  for (const number of PREFERRED_FEATURED_PR_NUMBERS) {
-    const contribution = mergedByNumber.get(number);
-    if (contribution && !selected.has(number)) {
-      selected.add(number);
-      featured.push(contribution);
-    }
-  }
-
-  for (const contribution of merged) {
-    if (featured.length >= PREFERRED_FEATURED_PR_NUMBERS.length) {
-      break;
-    }
-    if (selected.has(contribution.number)) {
-      continue;
-    }
-    selected.add(contribution.number);
-    featured.push(contribution);
-  }
-
-  const remaining = merged.filter(({ number }) => !selected.has(number));
-  return { featured, remaining };
+  return project.contributionThemes
+    .map((theme) => ({
+      theme,
+      contributions: theme.prNumbers
+        .map((number) => mergedByNumber.get(number))
+        .filter((contribution): contribution is Contribution => contribution !== undefined),
+    }))
+    .filter(({ contributions }) => contributions.length > 0);
 }
 
 function prLinkLabel(contribution: Contribution) {
@@ -107,7 +73,9 @@ function prLinkLabel(contribution: Contribution) {
 
 export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
   const merged = project.contributions.filter(({ status }) => status === "merged");
-  const { featured, remaining } = selectFeaturedContributions(project);
+  const groups = groupContributionsByTheme(project);
+  const themeGroups = groups.filter(({ theme }) => theme.id !== OTHER_CONTRIBUTIONS_THEME_ID);
+  const otherGroup = groups.find(({ theme }) => theme.id === OTHER_CONTRIBUTIONS_THEME_ID);
   const { recognition } = project;
 
   return (
@@ -158,42 +126,50 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
         </p>
       </div>
 
-      <ul aria-label="Semantica 代表性贡献" className="open-source-feature-grid">
-        {featured.map((contribution, index) => {
-          const alias = FEATURED_TITLE_ALIASES[contribution.number];
-          const editorial = FEATURED_SUMMARIES[contribution.number];
-          const isLead = index === 0;
-          return (
-            <li className={isLead ? "open-source-feature-lead" : undefined} key={contribution.number}>
-              <a
-                aria-label={prLinkLabel(contribution)}
-                className="open-source-feature-card"
-                href={contribution.url}
-                rel="noreferrer"
-                target="_blank"
-              >
-                <span className="open-source-feature-meta">
-                  <span className="open-source-feature-category">{isLead ? "核心贡献" : editorial?.category ?? "工程贡献"}</span>
-                  <span className="open-source-feature-status">{`已合并 · PR #${contribution.number}`}</span>
+      <ul aria-label="Semantica 贡献主题" className="open-source-theme-grid">
+        {themeGroups.map(({ theme, contributions }, index) => (
+          <li
+            className={`open-source-theme-item${index === 0 ? " open-source-theme-lead" : ""}`}
+            data-theme-id={theme.id}
+            key={theme.id}
+          >
+            <div className="open-source-theme-card">
+              <div className="open-source-theme-header">
+                <span aria-hidden="true" className="open-source-theme-index">
+                  {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="open-source-feature-title">{alias ?? contribution.title}</span>
-                <span className="open-source-feature-original">{editorial?.summary ?? contribution.title}</span>
-                {contribution.number === 1077 ? <ReteMatchingDiagram /> : null}
-                <span className="open-source-feature-footer">
-                  <span>{editorial?.detail ?? "查看完整改动与讨论"}</span>
-                  <span className="open-source-feature-arrow" aria-hidden="true">↗</span>
-                </span>
-              </a>
-            </li>
-          );
-        })}
+                <h5 className="open-source-theme-name">{theme.name}</h5>
+                <span className="open-source-theme-count">{`${contributions.length} 个已合并 PR`}</span>
+              </div>
+              <p className="open-source-theme-summary">{theme.summary}</p>
+              {theme.id === DIAGRAM_THEME_ID ? <ReteMatchingDiagram /> : null}
+              <ul aria-label={`${theme.name}相关 PR`} className="open-source-theme-prs">
+                {contributions.map((contribution) => (
+                  <li key={contribution.number}>
+                    <a
+                      aria-label={prLinkLabel(contribution)}
+                      className="open-source-pr-chip"
+                      href={contribution.url}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      <span>{`PR #${contribution.number}`}</span>
+                      <span aria-hidden="true" className="open-source-link-arrow">↗</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))}
       </ul>
 
-      {remaining.length > 0 ? (
+      {otherGroup ? (
         <details className="open-source-showcase-details">
-          <summary><span>{`查看剩余 ${remaining.length} 个已合并 PR`}</span><span className="open-source-disclosure-icon" aria-hidden="true">+</span></summary>
+          <summary><span>{`查看其他 ${otherGroup.contributions.length} 个已合并 PR`}</span><span className="open-source-disclosure-icon" aria-hidden="true">+</span></summary>
+          <p className="open-source-theme-summary open-source-other-summary">{otherGroup.theme.summary}</p>
           <ul aria-label="Semantica 其余已合并贡献" className="pr-list">
-            {remaining.map((contribution) => (
+            {otherGroup.contributions.map((contribution) => (
               <li key={contribution.number}>
                 <a
                   className="pr-link"

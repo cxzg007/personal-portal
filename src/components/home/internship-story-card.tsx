@@ -31,11 +31,19 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
       data-layout={index % 2 === 0 ? "copy-visual" : "visual-copy"}
     >
       <header className="internship-card-header">
+        <div className="internship-identity">
+          <span className="internship-brand-slot">
+            <BrandMark asset={internship.logo} />
+          </span>
+          <span className="internship-identity-text">
+            <span className="internship-company">{internship.company}</span>
+            <span className="internship-team">{internship.team}</span>
+          </span>
+        </div>
         <p className="internship-card-meta">
-          <span className="internship-company">{internship.company}</span>
-          <span className="internship-team">{internship.team}</span>
-          <span className="internship-role">{internship.role}</span>
-          <span className="internship-period">{internship.period}</span>
+          <span className="internship-chip internship-role">{internship.role}</span>
+          <span className="internship-chip internship-period">{internship.period}</span>
+          <span className="internship-chip internship-status">{internship.status}</span>
         </p>
       </header>
       <div className="internship-card-columns">
@@ -43,10 +51,21 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
           <h3 className="internship-value-headline">{internship.valueHeadline}</h3>
           <p className="internship-context">{internship.context}</p>
           <p className="internship-ownership">{internship.ownership}</p>
-          <p className="internship-stack">{internship.stack.join("、")}</p>
+          <ul aria-label={`${internship.company} 技术栈`} className="internship-stack">
+            {internship.stack.map((item) => (
+              <li className="internship-stack-chip" key={item}>
+                {item}
+              </li>
+            ))}
+          </ul>
           <ul aria-label={`${internship.company} 核心成果`} className="internship-outcomes">
-            {visibleOutcomes.map((result) => (
-              <li key={result}>{result}</li>
+            {visibleOutcomes.map((result, outcomeIndex) => (
+              <li key={result}>
+                <span aria-hidden="true" className="internship-outcome-index">
+                  {String(outcomeIndex + 1).padStart(2, "0")}
+                </span>
+                <span className="internship-outcome-text">{result}</span>
+              </li>
             ))}
           </ul>
           <details className="internship-details">
@@ -59,8 +78,6 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
           </details>
         </div>
         <div className="internship-visual-column">
-          <BrandMark asset={internship.logo} />
-          <p className="internship-status">{internship.status}</p>
           {engineeringKind ? (
             <InternshipEngineeringVisual
               kind={engineeringKind}

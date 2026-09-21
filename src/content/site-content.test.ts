@@ -18,21 +18,43 @@ describe("public resume content", () => {
   it("supports two evidence-backed homepage metrics", () => {
     expect(content.metrics.map(({ value, label }: { value: number; label: string }) => ({ value, label }))).toEqual([
       { value: 3, label: "实习经历" },
-      { value: 16, label: "已合并 PR" },
+      { value: 17, label: "已合并 PR" },
     ]);
   });
 
-  it("exposes all sixteen verified merged contributions without private fields", () => {
+  it("exposes all seventeen verified merged contributions without private fields", () => {
     expect(content.openSource.snapshotDate).toBe("2026-09-20");
     expect(content.openSource.recognition.stars).toBe(13300);
     const contributions = content.openSource.contributions;
     expect(contributions.map((pr: { number: number }) => pr.number)).toEqual([
-      1544, 1364, 1360, 1243, 1226, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1096, 1094, 1081, 1077,
+      1556, 1544, 1364, 1360, 1243, 1226, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1096, 1094,
+      1081, 1077,
     ]);
     for (const contribution of contributions) {
       expect(Object.keys(contribution).sort()).toEqual(["number", "status", "title", "url"]);
       expect(contribution.status).toBe("merged");
       expect(contribution.url).toBe(`https://github.com/semantica-agi/semantica/pull/${contribution.number}`);
+    }
+  });
+
+  it("groups every merged contribution into exactly one resume theme", () => {
+    const themes = content.openSource.contributionThemes;
+    expect(themes.map(({ id }: { id: string }) => id)).toEqual([
+      "rule-reasoning",
+      "truth-maintenance",
+      "sparql-execution",
+      "pipeline-parallelism",
+      "other-contributions",
+    ]);
+
+    const grouped = themes.flatMap(({ prNumbers }: { prNumbers: number[] }) => prNumbers);
+    const merged = content.openSource.contributions.map((pr: { number: number }) => pr.number);
+    expect(new Set(grouped).size).toBe(grouped.length);
+    expect([...grouped].sort((a: number, b: number) => b - a)).toEqual(merged);
+
+    for (const theme of themes) {
+      expect(Object.keys(theme).sort()).toEqual(["id", "name", "prNumbers", "summary"]);
+      expect(theme.prNumbers.length).toBeGreaterThan(0);
     }
   });
 

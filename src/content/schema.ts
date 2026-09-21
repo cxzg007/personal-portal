@@ -28,6 +28,13 @@ export type OpenSourceContribution = {
   status: "merged" | "open";
 };
 
+export type OpenSourceContributionTheme = {
+  id: string;
+  name: string;
+  summary: string;
+  prNumbers: number[];
+};
+
 export type OpenSourceProject = {
   name: string;
   logo: BrandAsset;
@@ -40,6 +47,7 @@ export type OpenSourceProject = {
     honors: Array<{ rank: number; platform: string; title: string; sourceUrl: string }>;
   };
   contributions: OpenSourceContribution[];
+  contributionThemes: OpenSourceContributionTheme[];
   repositoryUrl: string;
   articlePath: `/blog/${string}`;
 };
@@ -129,10 +137,13 @@ const OPEN_SOURCE_FIELDS = new Set([
   "snapshotDate",
   "recognition",
   "contributions",
+  "contributionThemes",
   "repositoryUrl",
   "articlePath",
 ]);
 const CONTRIBUTION_FIELDS = new Set(["number", "title", "url", "status"]);
+const CONTRIBUTION_THEME_FIELDS = new Set(["id", "name", "summary", "prNumbers"]);
+const MERGED_CONTRIBUTION_COUNT = 17;
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -347,8 +358,14 @@ export function validateSiteContent(input: unknown): ValidationResult {
         });
       }
     }
-    if (!Array.isArray(openSource.contributions) || openSource.contributions.length !== 16) {
-      errors.push("openSource.contributions must contain exactly 16 entries");
+    const mergedPrNumbers = new Set<number>();
+    if (
+      !Array.isArray(openSource.contributions) ||
+      openSource.contributions.length !== MERGED_CONTRIBUTION_COUNT
+    ) {
+      errors.push(
+        `openSource.contributions must contain exactly ${MERGED_CONTRIBUTION_COUNT} entries`,
+      );
     } else {
       let mergedCount = 0;
       const seenPrNumbers = new Set<number>();
@@ -379,6 +396,9 @@ export function validateSiteContent(input: unknown): ValidationResult {
           errors.push(`openSource.contributions[${index}].status must be merged or open`);
         } else if (value.status === "merged") {
           mergedCount += 1;
+          if (Number.isInteger(value.number)) {
+            mergedPrNumbers.add(value.number as number);
+          }
         }
         checkText(value.title, `openSource.contributions[${index}].title`);
         const url = checkText(value.url, `openSource.contributions[${index}].url`);
@@ -386,8 +406,58 @@ export function validateSiteContent(input: unknown): ValidationResult {
           errors.push(`openSource.contributions[${index}].url must be an HTTPS GitHub PR URL`);
         }
       });
-      if (mergedCount !== 16) {
-        errors.push("openSource.contributions must contain exactly 16 merged entries");
+      if (mergedCount !== MERGED_CONTRIBUTION_COUNT) {
+        errors.push(
+          `openSource.contributions must contain exactly ${MERGED_CONTRIBUTION_COUNT} merged entries`,
+        );
+      }
+    }
+    if (!Array.isArray(openSource.contributionThemes) || openSource.contributionThemes.length === 0) {
+      errors.push("openSource.contributionThemes must be a non-empty array");
+    } else {
+      const seenThemeIds = new Set<string>();
+      const themePrNumbers = new Set<number>();
+      openSource.contributionThemes.forEach((theme, index) => {
+        const path = `openSource.contributionThemes[${index}]`;
+        const value = checkRecord(theme, path);
+        if (!value) return;
+        Object.keys(value).forEach((field) => {
+          if (!CONTRIBUTION_THEME_FIELDS.has(field)) {
+            errors.push(`${path}.${field} is not an allowed field`);
+          }
+        });
+        const id = checkText(value.id, `${path}.id`);
+        if (id) {
+          if (seenThemeIds.has(id)) {
+            errors.push("openSource.contributionThemes must not contain duplicate ids");
+          } else {
+            seenThemeIds.add(id);
+          }
+        }
+        checkText(value.name, `${path}.name`);
+        checkText(value.summary, `${path}.summary`);
+        if (!Array.isArray(value.prNumbers) || value.prNumbers.length === 0) {
+          errors.push(`${path}.prNumbers must be a non-empty array`);
+          return;
+        }
+        value.prNumbers.forEach((prNumber, prIndex) => {
+          if (!Number.isInteger(prNumber) || (prNumber as number) <= 0) {
+            errors.push(`${path}.prNumbers[${prIndex}] must be a positive integer`);
+            return;
+          }
+          const number = prNumber as number;
+          if (themePrNumbers.has(number)) {
+            errors.push("openSource.contributionThemes must not reference duplicate PR numbers");
+          } else {
+            themePrNumbers.add(number);
+          }
+          if (!mergedPrNumbers.has(number)) {
+            errors.push(`${path}.prNumbers[${prIndex}] must reference a merged contribution`);
+          }
+        });
+      });
+      if (mergedPrNumbers.size > 0 && themePrNumbers.size !== mergedPrNumbers.size) {
+        errors.push("openSource.contributionThemes must cover every merged contribution exactly once");
       }
     }
     checkHttpsUrl(openSource.repositoryUrl, "openSource.repositoryUrl");

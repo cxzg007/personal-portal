@@ -27,5 +27,5 @@ test("server HTML keeps the Semantica credibility summary with collapsed remaini
   await expect(showcase.locator("button")).toHaveCount(0);
   await expect(showcase.getByRole("link", { name: "13,300 GitHub Stars" })).toBeVisible();
   await showcase.locator("summary").click();
-  await expect(showcase.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(16);
+  await expect(showcase.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(17);
 });
