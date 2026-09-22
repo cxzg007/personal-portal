@@ -373,28 +373,18 @@ test("writing stage renders the public articles with full-read destinations", as
   await page.goto("/");
 
   const writing = page.locator("main > section#writing");
-  await expect(writing.getByRole("article")).toHaveCount(3);
+  await expect(writing.getByRole("article")).toHaveCount(2);
   await expect(
-    writing.getByRole("heading", {
-      name: "从 Prompt 到 Graph：智能体工程五层演进的第一性原理",
-    }),
+    writing.getByRole("heading", { name: "图工程之后：多智能体系统缺的是一层语义" }),
   ).toBeVisible();
   await expect(
-    writing.getByRole("link", {
-      name: "阅读文章：从 Prompt 到 Graph：智能体工程五层演进的第一性原理",
-    }),
-  ).toHaveAttribute("href", "/blog/agent-engineering-five-layers");
-  await expect(
-    writing.getByRole("heading", { name: "Graph Engineering 的尽头：Ontology Engineering" }),
-  ).toBeVisible();
-  await expect(
-    writing.getByRole("link", { name: "阅读文章：Graph Engineering 的尽头：Ontology Engineering" }),
+    writing.getByRole("link", { name: "阅读文章：图工程之后：多智能体系统缺的是一层语义" }),
   ).toHaveAttribute("href", "/blog/graph-engineering-ontology");
   await expect(
-    writing.getByRole("heading", { name: "深入研究Palantir本体论" }),
+    writing.getByRole("heading", { name: "Palantir 本体论：把业务语义做成可执行的操作层" }),
   ).toBeVisible();
   await expect(
-    writing.getByRole("link", { name: "阅读文章：深入研究Palantir本体论" }),
+    writing.getByRole("link", { name: "阅读文章：Palantir 本体论：把业务语义做成可执行的操作层" }),
   ).toHaveAttribute("href", "/blog/palantir-ontology-notes");
 });
 

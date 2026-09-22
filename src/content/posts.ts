@@ -42,8 +42,6 @@ type PostLoaderMap = Record<string, () => Promise<PostModule>>;
 const postLoaders = {
   "palantir-ontology-notes": () => import("../../content/posts/palantir-ontology-notes.mdx"),
   "graph-engineering-ontology": () => import("../../content/posts/graph-engineering-ontology.mdx"),
-  "agent-engineering-five-layers": () =>
-    import("../../content/posts/agent-engineering-five-layers.mdx"),
 } satisfies PostLoaderMap;
 
 // 文件名约定：content/posts/<slug>.mdx。从加载器派生文件名映射，

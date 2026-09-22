@@ -181,7 +181,7 @@ for (const viewport of viewports) {
     await expectHorizontallyContained(page.getByRole("searchbox", { name: "搜索文章" }));
     await expectHorizontallyContained(page.getByRole("group", { name: "按标签筛选" }));
     await expectHorizontallyContained(page.locator(".blog-card").first());
-    await expectHorizontallyContained(page.getByRole("link", { name: "阅读文章：Graph Engineering 的尽头：Ontology Engineering" }));
+    await expectHorizontallyContained(page.getByRole("link", { name: "阅读文章：图工程之后：多智能体系统缺的是一层语义" }));
 
     if (viewport.width <= 760) {
       await expect(page.getByRole("button", { name: "打开导航菜单" })).toBeVisible();
@@ -202,7 +202,7 @@ for (const viewport of viewports) {
     await expectNoHorizontalOverflow(page);
     const articleHeading = page.getByRole("heading", {
       level: 1,
-      name: "Graph Engineering 的尽头：Ontology Engineering",
+      name: "图工程之后：多智能体系统缺的是一层语义",
     });
     await expectHorizontallyContained(articleHeading);
     await expectHorizontallyContained(page.locator(".article-header"));

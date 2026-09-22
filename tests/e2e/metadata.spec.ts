@@ -2,9 +2,10 @@ import { expect, test } from "@playwright/test";
 
 const siteOrigin = "https://portfolio.example.test";
 const articleSlug = "graph-engineering-ontology";
-const articleTitle = "Graph Engineering 的尽头：Ontology Engineering";
+const articleTitle = "图工程之后：多智能体系统缺的是一层语义";
+// 详情页 meta description 与 BlogPosting JSON-LD 均取 front-matter 的 seoDescription（非 description）。
 const articleDescription =
-  "从 Graph Engineering 综述出发，讨论图工程的语义缺口与本体工程的融合路径：图工程的尽头，是本体工程。";
+  "从图工程的语义缺口出发，讨论本体工程（RDF/OWL/SHACL）如何为多智能体系统提供可推理、可校验、可演化的语义层，并给出四级落地路径。";
 const blogDescription = "关于 AI Agent、后端系统、知识图谱与工程协作的公开技术文章。";
 
 test("homepage publishes canonical, share metadata, and validated ProfilePage JSON-LD", async ({ page }) => {
@@ -35,7 +36,7 @@ test("homepage publishes canonical, share metadata, and validated ProfilePage JS
     sameAs: ["https://github.com/cxzg007"],
   });
   expect(profile).toMatchObject({ url: siteOrigin, name: "江俊杰｜AI Agent / 后端开发" });
-  await expect(page.locator("#writing").getByRole("article")).toHaveCount(3);
+  await expect(page.locator("#writing").getByRole("article")).toHaveCount(2);
 });
 
 test("share card is a stable sanitized asset and the resume PDF is not exposed", async ({ request }) => {
@@ -131,7 +132,7 @@ test("article publishes its own metadata and BlogPosting JSON-LD", async ({ page
     headline: articleTitle,
     description: articleDescription,
     datePublished: "2026-09-03",
-    dateModified: "2026-09-14",
+    dateModified: "2026-09-21",
     url: `${siteOrigin}/blog/${articleSlug}`,
     author: { "@type": "Person", name: "江俊杰" },
   });

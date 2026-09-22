@@ -1,9 +1,8 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-const ontologyTitle = "深入研究Palantir本体论";
-const graphOntologyTitle = "Graph Engineering 的尽头：Ontology Engineering";
-const agentLayersTitle = "从 Prompt 到 Graph：智能体工程五层演进的第一性原理";
+const ontologyTitle = "Palantir 本体论：把业务语义做成可执行的操作层";
+const graphOntologyTitle = "图工程之后：多智能体系统缺的是一层语义";
 
 async function expectNoThreeScene(page: import("@playwright/test").Page) {
   await expect(page.locator("canvas")).toHaveCount(0);
@@ -51,7 +50,7 @@ for (const route of [
   "/",
   "/blog",
   "/blog/graph-engineering-ontology",
-  "/blog/agent-engineering-five-layers",
+  "/blog/palantir-ontology-notes",
 ] as const) {
   test(`${route} loaded script bodies exclude Three.js and React Three Fiber`, async ({ page }) => {
     await expectRouteBundlesWithoutThree(page, route);
@@ -73,7 +72,7 @@ test("server-renders the public blog and filters without losing the empty-state 
   await expectNoThreeScene(page);
 
   const search = page.getByRole("searchbox", { name: "搜索文章" });
-  await search.fill("Graph");
+  await search.fill("图工程");
   await expect(page.getByRole("link", { exact: true, name: graphOntologyTitle })).toBeVisible();
 
   await page.getByRole("button", { name: "本体工程" }).click();
@@ -117,13 +116,9 @@ test("blog index keeps the warm portfolio visual language with intact card conte
   expect(values.cardBackground).toBe("rgb(255, 250, 240)");
   expect(values.cardMetaFont).toMatch(/Mono|monospace/);
 
-  await expect(page.locator(".blog-card h2")).toHaveText([
-    agentLayersTitle,
-    graphOntologyTitle,
-    ontologyTitle,
-  ]);
+  await expect(page.locator(".blog-card h2")).toHaveText([graphOntologyTitle, ontologyTitle]);
   const originalCard = page.locator(".blog-card").filter({ hasText: ontologyTitle });
-  await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(3);
+  await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(4);
   await expect(page.getByRole("link", { exact: true, name: graphOntologyTitle })).toBeVisible();
   await expect(page.getByRole("link", { name: `阅读文章：${graphOntologyTitle}` })).toBeVisible();
 });
@@ -153,7 +148,9 @@ test("publishes the ontology article with working contents and adjacent navigati
   const rssText = await rss.text();
   expect(rssText).toContain("/blog/palantir-ontology-notes</link>");
   expect(rssText).not.toContain("ontology-to-agent-execution");
+  expect(rssText).not.toContain("agent-engineering-five-layers");
   expect((await request.get("/blog/ontology-to-agent-execution")).status()).toBe(404);
+  expect((await request.get("/blog/agent-engineering-five-layers")).status()).toBe(404);
 });
 
 test("publishes the Graph Engineering ontology article with formatted content", async ({ page }) => {
@@ -161,11 +158,12 @@ test("publishes the Graph Engineering ontology article with formatted content", 
   await page.getByRole("link", { name: graphOntologyTitle, exact: true }).click();
   await expect(page).toHaveURL(/\/blog\/graph-engineering-ontology$/);
   await expect(page.getByRole("heading", { level: 1, name: graphOntologyTitle })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "引言：一场关于 Agent 工程的范式之争" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "引言：图工程之后还缺什么" })).toBeVisible();
   await expect(page.locator(".article-prose pre")).toHaveCount(6);
   await expect(page.locator(".article-prose table")).toHaveCount(4);
-  await expect(page.locator(".article-prose img")).toHaveCount(17);
-  await expect(page.locator(".article-prose")).not.toContainText("**引言");
+  await expect(page.locator(".article-prose img")).toHaveCount(0);
+  await expect(page.locator(".article-prose")).not.toContainText("**");
+  await expect(page.locator(".article-prose")).not.toContainText("原文配图");
 });
 
 test("article keeps a readable warm editorial measure", async ({ page }) => {
@@ -247,7 +245,7 @@ test("opens the article with a table of contents and returns to the blog index",
   ).toBe(true);
   await expect(page.getByRole("navigation", { name: "文章目录" })).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "引言：一场关于 Agent 工程的范式之争" }),
+    page.getByRole("link", { name: "引言：图工程之后还缺什么" }),
   ).toBeVisible();
   await expect(page.getByText("arXiv 2608.21156", { exact: false }).first()).toBeVisible();
   await expect(page.locator("pre code").first()).toBeVisible();
