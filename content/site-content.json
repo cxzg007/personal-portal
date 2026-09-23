@@ -54,6 +54,17 @@
       "period": "2026-07 – 至今",
       "logo": { "src": "/brands/jd.png", "alt": "京东品牌标志", "theme": "jd" },
       "valueHeadline": "以本体建模与规则引擎支撑数据资产治理与 Agent 动作执行",
+      "presentation": {
+        "title": "本体建模与规则引擎",
+        "contribution": "负责本体建模、规则查询与动作执行。",
+        "outcome": "支持 13 个比较算子、11 个聚合算子，批量写回具备事务与行数校验。",
+        "technologies": ["Java", "Spring Boot", "MySQL"],
+        "details": [
+          "findata-platform：以实体、属性、关系建模业务语义；规则编译通过分组子查询回连避免一对多 JOIN 放大行数。",
+          "SQL 与参数同次构建；批量写回任一行影响数不为 1 即回滚，人工执行前预览计划并校验配置指纹。",
+          "AI 仅输出属性编码；服务端负责物理 SQL、授权与追踪，动作按规则 ID 绑定并接入 Skill 编排。"
+        ]
+      },
       "journey": [
         { "label": "本体建模", "detail": "以实体、属性、关系描述业务语义，属性编码在实体内唯一。" },
         { "label": "规则编译", "detail": "把结构化条件与语义描述编译为可复用的查询 SQL。" },
@@ -113,6 +124,17 @@
       "period": "2026-06 – 2026-07",
       "logo": { "src": "/brands/agibot.png", "alt": "智元机器人 AGIBOT 品牌标志", "theme": "agibot" },
       "valueHeadline": "用双通道流式回放把数百 MB 录制变成可控的在线调试体验",
+      "presentation": {
+        "title": "机器人数据流式回放",
+        "contribution": "负责双通道回放、会话控制与并发稳定性。",
+        "outcome": "50 并发下，已接纳请求 P99 时延由 810ms 降至 375ms。",
+        "technologies": ["Go", "HTTP", "WebSocket"],
+        "details": [
+          "clip-player：共用解析层提供 HTTP 与 WebSocket 双通道，虚拟时钟与世代标记保持播放、跳转和共享会话一致。",
+          "读取进度与播放时钟解耦，新客户端补齐消息；预签名凭证留在后端，缺索引时顺序扫描恢复读取。",
+          "分层缓存、读取器复用、并发接纳与慢消费者隔离，并修复并发写导致的数据流损坏。"
+        ]
+      },
       "journey": [
         { "label": "流式读取", "detail": "共用解析层，按时间与主题读取云端录制数据。" },
         { "label": "会话控制", "detail": "虚拟时钟与世代标记保障播放、跳转与共享会话一致。" },
@@ -173,6 +195,17 @@
       "period": "2025-07 – 2026-05",
       "logo": { "src": "/brands/cssc.png", "alt": "中国船舶集团 CSSC 品牌标志", "theme": "cssc" },
       "valueHeadline": "用 RAG 增强型多智能体支撑技术文档问答与通信任务方案生成",
+      "presentation": {
+        "title": "RAG 多智能体系统",
+        "contribution": "负责混合检索、任务分流与工具权限治理。",
+        "outcome": "默认评测集上 Recall@5 达 91.67%。",
+        "technologies": ["Python", "Elasticsearch", "RAG"],
+        "details": [
+          "UAV-pilot：关键词与向量混合检索，结合融合重排和父子分块；默认评测集 MRR@10 达 75.69%。",
+          "Supervisor 分流问答、确定性工具与任务规划；默认评测集任务规划完整率达 95.83%。",
+          "Skill、工具注册表与调用范围权限限定能力；Redis 管理会话，历史任务与工具记录落库并串联 trace_id。"
+        ]
+      },
       "journey": [
         { "label": "混合召回", "detail": "关键词与向量混合检索，配合融合重排与父子分块。" },
         { "label": "任务分流", "detail": "Supervisor 按问题类型分流到问答、工具或任务规划。" },

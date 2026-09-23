@@ -13,8 +13,18 @@ test("homepage uses the light warm paper tokens", async ({ page }) => {
     };
   });
   expect(tokens.ink).toBe("#30261f");
-  expect(tokens.bg).toBe("#faf7ef");
+  expect(tokens.bg).toBe("#faf9f6");
   expect(tokens.muted).toBe("#6f6257");
+});
+
+test("homepage paints a solid editorial surface without gradients or card shadows", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".profile-shell")).toHaveCSS("background-color", "rgb(250, 249, 246)");
+  await expect(page.locator("#internships article").first()).toHaveCSS("box-shadow", "none");
+  const font = await page
+    .locator("#profile h1")
+    .evaluate((node) => getComputedStyle(node).fontFamily);
+  expect(font).toContain("system-ui");
 });
 
 test("homepage keeps readable contrast on the light theme", async ({ page }) => {

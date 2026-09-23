@@ -54,6 +54,87 @@ describe("validateSiteContent", () => {
     },
   );
 
+  const basePresentation = {
+    title: "本体建模与规则引擎",
+    contribution: "负责本体建模、规则查询与动作执行。",
+    outcome: "支持 13 个比较算子、11 个聚合算子，批量写回具备事务与行数校验。",
+    technologies: ["Java", "Spring Boot", "MySQL"],
+    details: ["细节一。", "细节二。", "细节三。"],
+  };
+
+  it.each([
+    [
+      "missing presentation",
+      (internship: Record<string, unknown>) => {
+        delete internship.presentation;
+      },
+      "internships[0].presentation must be an object",
+    ],
+    [
+      "non-object presentation",
+      (internship: Record<string, unknown>) => {
+        internship.presentation = "摘要";
+      },
+      "internships[0].presentation must be an object",
+    ],
+    [
+      "empty presentation title",
+      (internship: Record<string, unknown>) => {
+        internship.presentation = { ...basePresentation, title: " " };
+      },
+      "internships[0].presentation.title must be a non-empty string",
+    ],
+    [
+      "empty contribution",
+      (internship: Record<string, unknown>) => {
+        internship.presentation = { ...basePresentation, contribution: "" };
+      },
+      "internships[0].presentation.contribution must be a non-empty string",
+    ],
+    [
+      "empty outcome",
+      (internship: Record<string, unknown>) => {
+        internship.presentation = { ...basePresentation, outcome: "" };
+      },
+      "internships[0].presentation.outcome must be a non-empty string",
+    ],
+    [
+      "empty technologies",
+      (internship: Record<string, unknown>) => {
+        internship.presentation = { ...basePresentation, technologies: [] };
+      },
+      "internships[0].presentation.technologies must contain between 1 and 3 entries",
+    ],
+    [
+      "four technologies",
+      (internship: Record<string, unknown>) => {
+        internship.presentation = { ...basePresentation, technologies: ["Java", "Spring Boot", "MySQL", "Redis"] };
+      },
+      "internships[0].presentation.technologies must contain between 1 and 3 entries",
+    ],
+    [
+      "two details",
+      (internship: Record<string, unknown>) => {
+        internship.presentation = { ...basePresentation, details: ["细节一。", "细节二。"] };
+      },
+      "internships[0].presentation.details must contain exactly 3 entries",
+    ],
+    [
+      "four details",
+      (internship: Record<string, unknown>) => {
+        internship.presentation = { ...basePresentation, details: ["细节一。", "细节二。", "细节三。", "细节四。"] };
+      },
+      "internships[0].presentation.details must contain exactly 3 entries",
+    ],
+  ])("rejects an internship with %s", (_label, mutate, expectedError) => {
+    const input = structuredClone(validSiteContent);
+    mutate(input.internships[0] as unknown as Record<string, unknown>);
+    expect(validateSiteContent(input)).toEqual({
+      ok: false,
+      errors: expect.arrayContaining([expectedError]),
+    });
+  });
+
   it.each(["constraints", "decisions", "tradeoffs", "stack"] as const)(
     "rejects a case study with an empty %s array",
     (field) => {

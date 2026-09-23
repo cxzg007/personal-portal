@@ -87,24 +87,21 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(internships.getByText("京东", { exact: true })).toBeVisible();
   await expect(internships.getByText("智元机器人", { exact: true })).toBeVisible();
   await expect(internships.getByText("中国船舶集团 722 研究所", { exact: true })).toBeVisible();
-  await expect(internships.getByLabel("京东 核心成果")).toBeVisible();
-  await expect(internships.getByLabel("智元机器人 核心成果")).toBeVisible();
-  await expect(internships.getByLabel("中国船舶集团 722 研究所 核心成果")).toBeVisible();
+  for (const outcome of [
+    "支持 13 个比较算子、11 个聚合算子，批量写回具备事务与行数校验。",
+    "50 并发下，已接纳请求 P99 时延由 810ms 降至 375ms。",
+    "默认评测集上 Recall@5 达 91.67%。",
+  ]) {
+    await expect(internships.getByText(outcome, { exact: true })).toBeVisible();
+  }
 
-  const internshipCards = internships.getByRole("article");
-  await expect(
-    internshipCards.nth(0).getByLabel("京东 核心成果").getByRole("listitem"),
-  ).toHaveCount(3);
-  await expect(
-    internshipCards.nth(1).getByLabel("智元机器人 核心成果").getByRole("listitem"),
-  ).toHaveCount(3);
-  await expect(
-    internshipCards.nth(2).getByLabel("中国船舶集团 722 研究所 核心成果").getByRole("listitem"),
-  ).toHaveCount(3);
-
-  const jdDetails = internshipCards.nth(0).locator("details.internship-details");
+  // 未展开的 details 内记录不可见但存在，保持渐进披露语义。
+  const jdDetails = internshipArticles.nth(0).locator("details.internship-details");
   await expect(jdDetails).not.toHaveAttribute("open");
-  await expect(internshipCards.nth(0).getByLabel("京东 能力建设记录")).toBeHidden();
+  await expect(internshipArticles.nth(0).getByLabel("京东 能力建设记录")).toBeHidden();
+  for (const index of [0, 1, 2]) {
+    await expect(internshipArticles.nth(index).locator("ul.capability-records li")).toHaveCount(3);
+  }
 
   for (let step = 0; step < 60; step += 1) {
     if (
@@ -116,16 +113,10 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(jdDetails.locator("summary")).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(jdDetails).toHaveAttribute("open", "");
-  await expect(internshipCards.nth(0).getByLabel("京东 能力建设记录")).toBeVisible();
+  await expect(internshipArticles.nth(0).getByLabel("京东 能力建设记录")).toBeVisible();
   await expect(
-    internshipCards.nth(0).getByLabel("京东 能力建设记录").getByRole("listitem"),
-  ).toHaveCount(7);
-  await expect(
-    internshipCards.nth(1).getByLabel("智元机器人 能力建设记录").locator("li"),
-  ).toHaveCount(6);
-  await expect(
-    internshipCards.nth(2).getByLabel("中国船舶集团 722 研究所 能力建设记录").locator("li"),
-  ).toHaveCount(5);
+    internshipArticles.nth(0).getByLabel("京东 能力建设记录").getByRole("listitem"),
+  ).toHaveCount(3);
 
   const systems = page.locator("main > section#systems");
   const tabs = systems.getByRole("tab");
@@ -228,34 +219,35 @@ test("homepage exposes the reference-style section order", async ({ page }) => {
   ]);
 });
 
-test("internship cards ship brand logos, alternating layouts, and desktop sticky stacking", async (
-  { page },
-  testInfo,
-) => {
-  test.skip(testInfo.project.name !== "chromium", "sticky stacking is a desktop-only layout");
+test("internship cards keep a static editorial layout without stacking or engineering figures", async ({
+  page,
+}) => {
   await page.goto("/");
 
   const internships = page.locator("main > section#internships");
   const logos = ["京东品牌标志", "智元机器人 AGIBOT 品牌标志", "中国船舶集团 CSSC 品牌标志"];
-  const layouts = ["copy-visual", "visual-copy", "copy-visual"];
+
+  const cards = internships.locator("article");
+  await expect(cards).toHaveCount(3);
+  for (const card of await cards.all()) {
+    await expect(card).toBeVisible();
+    await expect(card).toHaveCSS("position", "static");
+    await expect(card).not.toHaveAttribute("data-layout");
+    await expect(card).not.toHaveAttribute("data-stack-progress");
+  }
+  await expect(page.locator("#internships figure[data-engineering-kind]")).toHaveCount(0);
 
   for (let index = 0; index < 3; index += 1) {
     const card = internships.locator(`article[data-card-index="${index}"]`);
-    await expect(card).toBeVisible();
     await expect(card.getByRole("img", { name: logos[index] })).toBeVisible();
-    await expect(card).toHaveAttribute("data-layout", layouts[index]);
-    const position = await card.evaluate((element) => window.getComputedStyle(element).position);
-    expect(position).toBe("sticky");
   }
 
   await expect(internships.getByRole("button")).toHaveCount(0);
 });
 
-test("expanding any internship disclosure un-sticks the stack and keeps detail items unobstructed", async (
-  { page },
-  testInfo,
-) => {
-  test.skip(testInfo.project.name !== "chromium", "sticky stacking is a desktop-only layout");
+test("expanding any internship disclosure keeps detail items unobstructed and cards non-overlapping", async ({
+  page,
+}) => {
   await page.goto("/");
 
   const internships = page.locator("main > section#internships");
@@ -266,20 +258,6 @@ test("expanding any internship disclosure un-sticks the stack and keeps detail i
     "查看中国船舶集团 722 研究所工程细节",
   ];
   const recordLabels = ["京东 能力建设记录", "智元机器人 能力建设记录", "中国船舶集团 722 研究所 能力建设记录"];
-
-  // 未展开时堆叠保持 sticky。
-  const firstCard = internshipCards.nth(0);
-  expect(await firstCard.evaluate((element) => window.getComputedStyle(element).position)).toBe(
-    "sticky",
-  );
-
-  // 三张卡片各自渲染对应的品牌工程示意图（jd→ontology、agibot→streaming、cssc→communication）。
-  const engineeringKinds = ["ontology", "streaming", "communication"];
-  for (let index = 0; index < 3; index += 1) {
-    const figure = internshipCards.nth(index).locator(`figure[data-engineering-kind="${engineeringKinds[index]}"]`);
-    await expect(figure).toBeVisible();
-    await expect(figure.locator("svg")).toHaveAttribute("aria-hidden", "true");
-  }
 
   for (let index = 0; index < 3; index += 1) {
     const card = internshipCards.nth(index);
@@ -292,6 +270,17 @@ test("expanding any internship disclosure un-sticks the stack and keeps detail i
         .nth(check)
         .evaluate((element) => window.getComputedStyle(element).position);
       expect(position).toBe("static");
+    }
+
+    // 展开与关闭两种状态下相邻卡片都不允许垂直重叠。
+    const openBoxes = [];
+    for (let check = 0; check < 3; check += 1) {
+      openBoxes.push(await internshipCards.nth(check).boundingBox());
+    }
+    for (let check = 0; check < openBoxes.length - 1; check += 1) {
+      const current = openBoxes[check]!;
+      const next = openBoxes[check + 1]!;
+      expect(current.y + current.height).toBeLessThanOrEqual(next.y + 1);
     }
 
     // 滚动至该卡最后一条能力建设记录，几何级验证中心点不被页头/相邻卡遮挡。
@@ -311,11 +300,13 @@ test("expanding any internship disclosure un-sticks the stack and keeps detail i
     expect(hit.point.y).toBeGreaterThan(0);
     expect(hit.point.y).toBeLessThan(page.viewportSize()!.height);
 
-    // 关闭 details 后恢复 sticky 堆叠。
+    // 关闭 details 后布局保持 static。
     await card.getByText(disclosureLabels[index]).click();
     await expect(details).not.toHaveAttribute("open");
-    const restored = await firstCard.evaluate((element) => window.getComputedStyle(element).position);
-    expect(restored).toBe("sticky");
+    const restored = await internshipCards
+      .nth(0)
+      .evaluate((element) => window.getComputedStyle(element).position);
+    expect(restored).toBe("static");
   }
 });
 

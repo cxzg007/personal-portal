@@ -5,12 +5,6 @@ import { useEffect } from "react";
 import { getHeroProgress } from "@/lib/hero-network";
 import { createHeroNetworkDriver, type HeroNetworkDriver } from "@/lib/hero-network-driver";
 
-export function getStackProgress(top: number, stickyTop: number): 0 | 1 | 2 {
-  if (top > stickyTop + 120) return 0;
-  if (top > stickyTop) return 1;
-  return 2;
-}
-
 // 激活线取页头下方 240px：页面在窄视口（如 768×1024 tablet）缩短后，
 // 靠底部的 writing 分区顶部最多只能进入页头下方约 216px 处（更小的窗口
 // 会先触发页底兜底），160px 的旧阈值会使其永远无法被高亮。
@@ -26,7 +20,6 @@ export function selectActiveSection(
 }
 
 const DEFAULT_HEADER_HEIGHT = 72;
-const STICKY_TOP = 0;
 
 // 入场动画：约 360ms 展开静态链路，随后一次性微动收敛，总计不超过 4 秒。
 const INTRO_EXPAND_MS = 360;
@@ -65,9 +58,6 @@ function clampPointer(value: number): number {
 function clearMotionState() {
   document.querySelectorAll<HTMLElement>(".profile-reveal").forEach((element) => {
     element.removeAttribute("data-in-view");
-  });
-  document.querySelectorAll<HTMLElement>(".sticky-internship-card").forEach((element) => {
-    element.removeAttribute("data-stack-progress");
   });
   document.querySelectorAll<HTMLElement>("[data-nav-section]").forEach((element) => {
     element.removeAttribute("aria-current");
@@ -108,12 +98,6 @@ export function PageMotionController() {
           : selectActiveSection(entries, headerHeight);
       root.dataset.activeSection = activeSection;
       setNavigationState(activeSection);
-
-      document.querySelectorAll<HTMLElement>(".sticky-internship-card").forEach((card) => {
-        card.dataset.stackProgress = String(
-          getStackProgress(card.getBoundingClientRect().top, STICKY_TOP),
-        );
-      });
 
       if (pointer && hero) {
         const bounds = hero.getBoundingClientRect();

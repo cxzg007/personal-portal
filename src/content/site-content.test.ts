@@ -77,6 +77,31 @@ describe("public resume content", () => {
     ).toEqual(["findata-platform", "clip-player", "uav-pilot"]);
   });
 
+  it("presents every internship through a concise editorial summary", () => {
+    const internships = content.internships as Array<{
+      presentation: { outcome: string; details: string[]; technologies: string[] };
+    }>;
+
+    expect(internships.map(({ presentation }) => presentation.outcome)).toEqual([
+      "支持 13 个比较算子、11 个聚合算子，批量写回具备事务与行数校验。",
+      "50 并发下，已接纳请求 P99 时延由 810ms 降至 375ms。",
+      "默认评测集上 Recall@5 达 91.67%。",
+    ]);
+
+    for (const internship of internships) {
+      expect(internship.presentation.details).toHaveLength(3);
+      expect(internship.presentation.technologies.length).toBeGreaterThanOrEqual(1);
+      expect(internship.presentation.technologies.length).toBeLessThanOrEqual(3);
+    }
+
+    expect(internships[0].presentation.details.join("\n")).toContain("findata-platform");
+    expect(internships[1].presentation.details.join("\n")).toContain("clip-player");
+    const shipbuildingDetails = internships[2].presentation.details.join("\n");
+    expect(shipbuildingDetails).toContain("UAV-pilot");
+    expect(shipbuildingDetails).toContain("MRR@10 达 75.69%");
+    expect(shipbuildingDetails).toContain("任务规划完整率达 95.83%");
+  });
+
   it("replaces the knowledge-memory case with the RAG agent case", () => {
     expect(
       content.caseStudies.map(({ id, tabLabel }: { id: string; tabLabel: string }) => [id, tabLabel]),

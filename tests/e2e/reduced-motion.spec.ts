@@ -12,7 +12,7 @@ test("reduced motion preference keeps the layout static without hiding content",
 
   await expect(page.locator("html")).toHaveAttribute("data-profile-motion", "static");
   await expect(page.locator("[data-in-view]")).toHaveCount(0);
-  await expect(page.locator(".sticky-internship-card[data-stack-progress]")).toHaveCount(0);
+  await expect(page.locator("#internships [data-stack-progress]")).toHaveCount(0);
   await expect(page.locator("canvas")).toHaveCount(0);
 
   await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
@@ -77,9 +77,7 @@ test("enhanced motion marks one active navigation link after scrolling each sect
   }
 
   await scrollToSectionTop("writing");
-  await expect
-    .poll(async () => page.locator('.sticky-internship-card[data-stack-progress="2"]').count())
-    .toBeGreaterThan(0);
+  await expect.poll(async () => page.locator("#internships [data-stack-progress]").count()).toBe(0);
 });
 
 test("layout stays static at 390px and restores enhanced motion above the 760px breakpoint", async ({ page }) => {
@@ -88,7 +86,7 @@ test("layout stays static at 390px and restores enhanced motion above the 760px 
 
   await expect(page.locator("html")).toHaveAttribute("data-profile-motion", "static");
   await expect(page.locator("[data-in-view]")).toHaveCount(0);
-  await expect(page.locator(".sticky-internship-card[data-stack-progress]")).toHaveCount(0);
+  await expect(page.locator("#internships [data-stack-progress]")).toHaveCount(0);
 
   await page.setViewportSize({ width: 1024, height: 768 });
   await expect(page.locator("html")).toHaveAttribute("data-profile-motion", "enhanced");

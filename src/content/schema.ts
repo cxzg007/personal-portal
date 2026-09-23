@@ -52,6 +52,14 @@ export type OpenSourceProject = {
   articlePath: `/blog/${string}`;
 };
 
+export type InternshipPresentation = {
+  title: string;
+  contribution: string;
+  outcome: string;
+  technologies: [string, ...string[]];
+  details: [string, string, string];
+};
+
 export type Internship = {
   id: string;
   company: string;
@@ -65,6 +73,7 @@ export type Internship = {
   stack: string[];
   logo: BrandAsset;
   valueHeadline: string;
+  presentation: InternshipPresentation;
   journey: [JourneyNode, JourneyNode, JourneyNode];
   highlights: string[];
   projects?: InternshipProject[];
@@ -284,6 +293,22 @@ export function validateSiteContent(input: unknown): ValidationResult {
         }
       }
       checkText(value.valueHeadline, `internships[${index}].valueHeadline`);
+      const presentation = checkRecord(value.presentation, `internships[${index}].presentation`);
+      if (presentation) {
+        checkText(presentation.title, `internships[${index}].presentation.title`);
+        checkText(presentation.contribution, `internships[${index}].presentation.contribution`);
+        checkText(presentation.outcome, `internships[${index}].presentation.outcome`);
+        if (!Array.isArray(presentation.technologies) || presentation.technologies.length < 1 || presentation.technologies.length > 3) {
+          errors.push(`internships[${index}].presentation.technologies must contain between 1 and 3 entries`);
+        } else {
+          checkStringArray(presentation.technologies, `internships[${index}].presentation.technologies`, 1);
+        }
+        if (!Array.isArray(presentation.details) || presentation.details.length !== 3) {
+          errors.push(`internships[${index}].presentation.details must contain exactly 3 entries`);
+        } else {
+          checkStringArray(presentation.details, `internships[${index}].presentation.details`, 3);
+        }
+      }
       if (!Array.isArray(value.journey) || value.journey.length !== 3) {
         errors.push(`internships[${index}].journey must contain exactly 3 entries`);
       } else {

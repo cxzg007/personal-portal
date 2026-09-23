@@ -10,113 +10,68 @@ const { internships } = loadSiteContent();
 afterEach(cleanup);
 
 describe("internship story card", () => {
-  it("renders card at index 0 with copy-visual layout and condensed visible content", () => {
-    const internship = internships[0];
-    render(<InternshipStoryCard internship={internship} index={0} />);
+  it.each(internships.map((internship, index) => ({ internship, index })))(
+    "renders a static editorial entry for $internship.company",
+    ({ internship, index }) => {
+      const view = render(<InternshipStoryCard internship={internship} index={index} />);
+      const card = screen.getByRole("article");
 
-    const card = screen.getByRole("article");
-    expect(card).toHaveAttribute("data-card-index", "0");
-    expect(card).toHaveAttribute("data-layout", "copy-visual");
-    expect(card).toHaveAttribute("data-brand", internship.logo.theme);
-    expect(card.className).toContain("sticky-internship-card");
+      expect(card).toHaveAttribute("data-card-index", String(index));
+      expect(card).toHaveAttribute("data-brand", internship.logo.theme);
+      expect(card.className).toContain("sticky-internship-card");
+      expect(card).not.toHaveAttribute("data-layout");
+      expect(card.querySelector("figure[data-engineering-kind]")).toBeNull();
 
-    expect(within(card).getByRole("img", { name: internship.logo.alt })).toBeVisible();
-    expect(within(card).getByText(internship.company)).toBeVisible();
-    expect(within(card).getByText(internship.team)).toBeVisible();
-    expect(within(card).getByText(internship.role)).toBeVisible();
-    expect(within(card).getByText(internship.period)).toBeVisible();
-    expect(within(card).getByText(internship.valueHeadline)).toBeVisible();
-    expect(within(card).getByText(internship.context)).toBeVisible();
-    expect(within(card).getByText(internship.ownership)).toBeVisible();
-    expect(within(card).getByText(internship.status)).toBeVisible();
-    for (const item of internship.stack) {
-      expect(card.textContent).toContain(item);
-    }
+      expect(within(card).getByRole("img", { name: internship.logo.alt })).toBeVisible();
+      expect(within(card).getByText(internship.company)).toBeVisible();
+      expect(within(card).getByText(internship.role)).toBeVisible();
+      expect(within(card).getByText(internship.period)).toBeVisible();
 
-    const outcomes = within(card).getByRole("list", { name: `${internship.company} 核心成果` });
-    expect(within(outcomes).getAllByRole("listitem")).toHaveLength(
-      Math.min(3, internship.results.length),
-    );
-    for (const result of internship.results.slice(0, 3)) {
-      const matches = within(outcomes).getAllByText(result);
-      expect(matches.length).toBeGreaterThan(0);
-      expect(matches[0]).toBeVisible();
-    }
+      expect(within(card).queryByText(internship.context)).toBeNull();
+      expect(within(card).queryByText(internship.status)).toBeNull();
+      expect(within(card).queryByRole("list", { name: `${internship.company} 工程旅程` })).toBeNull();
 
-    const disclosure = within(card).getByText(`查看${internship.company}工程细节`);
-    expect(disclosure.closest("details")).not.toHaveAttribute("open");
-    expect(within(disclosure.closest("details")!).getAllByRole("listitem")).toHaveLength(
-      internship.highlights.length,
-    );
+      expect(within(card).getByText(internship.presentation.title)).toBeVisible();
+      expect(within(card).getByText(internship.presentation.contribution)).toBeVisible();
+      expect(within(card).getByText(internship.presentation.outcome)).toBeVisible();
 
-    const journey = within(card).getByRole("list", { name: `${internship.company} 工程旅程` });
-    expect(within(journey).getAllByRole("listitem")).toHaveLength(3);
-    for (const node of internship.journey) {
-      expect(within(journey).getByText(node.label)).toBeVisible();
-      expect(within(journey).getByText(node.detail)).toBeVisible();
-    }
+      const stack = within(card).getByRole("list", { name: `${internship.company} 技术栈` });
+      const stackItems = within(stack).getAllByRole("listitem");
+      expect(stackItems.length).toBeGreaterThanOrEqual(1);
+      expect(stackItems.length).toBeLessThanOrEqual(3);
+      for (const technology of internship.presentation.technologies) {
+        expect(within(stack).getByText(technology)).toBeVisible();
+      }
 
-    expect(within(card).queryByRole("button")).not.toBeInTheDocument();
-  });
+      const details = card.querySelector("details.internship-details");
+      expect(details).not.toBeNull();
+      expect(details).not.toHaveAttribute("open");
+      expect(within(details as HTMLElement).getByText(`查看${internship.company}工程细节`)).toBeVisible();
 
-  it("renders card at index 1 with visual-copy layout", () => {
-    const internship = internships[1];
-    render(<InternshipStoryCard internship={internship} index={1} />);
+      const records = within(details as HTMLElement).getByRole("list", {
+        name: `${internship.company} 能力建设记录`,
+      });
+      expect(within(records).getAllByRole("listitem")).toHaveLength(3);
+      for (const detail of internship.presentation.details) {
+        expect(within(records).getByText(detail)).toBeInTheDocument();
+      }
 
-    const card = screen.getByRole("article");
-    expect(card).toHaveAttribute("data-card-index", "1");
-    expect(card).toHaveAttribute("data-layout", "visual-copy");
-    expect(card).toHaveAttribute("data-brand", internship.logo.theme);
-    expect(card.className).toContain("sticky-internship-card");
+      expect(within(card).queryByRole("button")).not.toBeInTheDocument();
+      view.unmount();
+    },
+  );
 
-    expect(within(card).getByRole("img", { name: internship.logo.alt })).toBeVisible();
-    expect(within(card).getByRole("list", { name: `${internship.company} 核心成果` })).toBeVisible();
-    expect(within(card).getByText(`查看${internship.company}工程细节`)).toBeVisible();
-    expect(within(card).getByText(internship.valueHeadline)).toBeVisible();
-    expect(within(card).queryByRole("button")).not.toBeInTheDocument();
-  });
-
-  it("keeps all six agibot capability records including the clip-player project inside the disclosure", () => {
+  it("keeps the clip-player record inside the disclosure for agibot", () => {
     const internship = internships.find((item) => item.id === "agibot-agent");
     expect(internship).toBeDefined();
     render(<InternshipStoryCard internship={internship!} index={1} />);
 
     const card = screen.getByRole("article");
-    const disclosure = within(card).getByText(`查看${internship!.company}工程细节`);
-    const details = disclosure.closest("details");
+    const details = card.querySelector("details.internship-details") as HTMLElement;
     expect(details).not.toBeNull();
-    expect(details).not.toHaveAttribute("open");
-    const recordItems = within(details!).getAllByRole("listitem");
-    expect(recordItems).toHaveLength(internship!.highlights.length);
-    expect(internship!.highlights).toHaveLength(6);
-    internship!.highlights.forEach((highlight, index) => {
-      expect(recordItems[index]).toHaveTextContent(highlight);
-    });
-    expect(details!.textContent).toContain("clip-player");
-    expect(details!.textContent).not.toContain("agibot_retriever");
-    expect(details!.textContent).toContain("虚拟时钟");
-    expect(details!.textContent).toContain("慢消费者隔离");
-  });
-
-  it("maps each internship brand theme to its explicit engineering visual kind", () => {
-    const expectedKindsByTheme: Record<string, string> = {
-      jd: "ontology",
-      agibot: "streaming",
-      cssc: "communication",
-    };
-
-    internships.forEach((internship, index) => {
-      const expectedKind = expectedKindsByTheme[internship.logo.theme];
-      expect(expectedKind).toBeDefined();
-
-      const view = render(<InternshipStoryCard internship={internship} index={index} />);
-      const figure = view.container.querySelector(`figure[data-engineering-kind="${expectedKind}"]`);
-      expect(figure).not.toBeNull();
-      expect(figure!.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
-
-      const caption = within(figure as HTMLElement).getByText(`${internship.company} 工程示意`);
-      expect(caption).toBeVisible();
-      view.unmount();
-    });
+    expect(details.textContent).toContain("clip-player");
+    expect(details.textContent).toContain("虚拟时钟");
+    expect(details.textContent).toContain("慢消费者隔离");
+    expect(details.textContent).not.toContain("agibot_retriever");
   });
 });

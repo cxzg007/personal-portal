@@ -57,6 +57,17 @@ export const validSiteContent = {
         theme: "jd",
       },
       valueHeadline: "建设本体驱动的数据智能与 Agent 执行链路",
+      presentation: {
+        title: "本体建模与规则引擎",
+        contribution: "负责本体建模、规则查询与动作执行。",
+        outcome: "支持 13 个比较算子、11 个聚合算子，批量写回具备事务与行数校验。",
+        technologies: ["Java", "Spring Boot", "MySQL"],
+        details: [
+          "findata-platform：以实体、属性、关系建模业务语义；规则编译通过分组子查询回连避免一对多 JOIN 放大行数。",
+          "SQL 与参数同次构建；批量写回任一行影响数不为 1 即回滚，人工执行前预览计划并校验配置指纹。",
+          "AI 仅输出属性编码；服务端负责物理 SQL、授权与追踪，动作按规则 ID 绑定并接入 Skill 编排。",
+        ],
+      },
       journey: [
         { label: "语义治理", detail: "建立业务实体、关系与物理字段的可校验映射。" },
         { label: "查询推导", detail: "通过 OntologyGraph、BFS 与 TopK 生成受控语义查询。" },

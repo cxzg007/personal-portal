@@ -10,25 +10,21 @@ const { internships } = loadSiteContent();
 afterEach(cleanup);
 
 describe("sticky internship stack", () => {
-  it("renders three story cards with alternating layouts and no disclosure interaction", () => {
+  it("renders three static story cards without disclosure interaction", () => {
     const { container } = render(<StickyInternshipStack internships={internships} />);
 
     const cards = screen.getAllByRole("article");
     expect(cards).toHaveLength(3);
     expect(cards[0]).toHaveAttribute("data-card-index", "0");
+    expect(cards[0]).not.toHaveAttribute("data-layout");
     expect(within(cards[0]).getByRole("img", { name: internships[0].logo.alt })).toBeVisible();
-    expect(within(cards[0]).getByRole("list", { name: "京东 核心成果" })).toBeVisible();
+    expect(within(cards[0]).getByRole("list", { name: "京东 技术栈" })).toBeVisible();
     expect(within(cards[0]).getByText("查看京东工程细节")).toBeVisible();
     expect(within(cards[0]).queryByRole("button", { name: /技术细节/ })).not.toBeInTheDocument();
-
-    expect(cards[1]).toHaveAttribute("data-card-index", "1");
-    expect(cards[1]).toHaveAttribute("data-layout", "visual-copy");
-    expect(cards[2]).toHaveAttribute("data-card-index", "2");
-    expect(cards[2]).toHaveAttribute("data-layout", "copy-visual");
     expect(container.querySelector("section.sticky-internship-stack")).not.toBeNull();
   });
 
-  it("exposes every internship fully via static visible content", () => {
+  it("exposes every internship through the editorial summary and closed details", () => {
     render(<StickyInternshipStack internships={internships} />);
 
     const cards = screen.getAllByRole("article");
@@ -39,28 +35,26 @@ describe("sticky internship stack", () => {
 
       expect(within(card).getByRole("img", { name: internship.logo.alt })).toBeVisible();
       expect(within(card).getByText(internship.company)).toBeVisible();
-      expect(within(card).getByText(internship.team)).toBeVisible();
       expect(within(card).getByText(internship.role)).toBeVisible();
       expect(within(card).getByText(internship.period)).toBeVisible();
-      expect(within(card).getByText(internship.valueHeadline)).toBeVisible();
-      const resultMatches = within(card).getAllByText(internship.results[0]);
-      expect(resultMatches.length).toBeGreaterThan(0);
-      expect(resultMatches[0]).toBeVisible();
 
-      const journey = within(card).getByRole("list", { name: `${internship.company} 工程旅程` });
-      expect(within(journey).getAllByRole("listitem")).toHaveLength(3);
-      for (const node of internship.journey) {
-        expect(within(journey).getByText(node.label)).toBeVisible();
-      }
+      expect(within(card).getByText(internship.presentation.title)).toBeVisible();
+      expect(within(card).getByText(internship.presentation.contribution)).toBeVisible();
+      expect(within(card).getByText(internship.presentation.outcome)).toBeVisible();
 
-      const records = within(card).getByRole("list", {
+      const details = card.querySelector("details.internship-details") as HTMLElement;
+      expect(details).not.toBeNull();
+      expect(details).not.toHaveAttribute("open");
+      expect(within(details).getByText(internship.team)).toBeInTheDocument();
+
+      const records = within(details).getByRole("list", {
         name: `${internship.company} 能力建设记录`,
       });
       expect(records.className).toContain("capability-records");
       const recordItems = within(records).getAllByRole("listitem");
-      expect(recordItems).toHaveLength(internship.highlights.length);
-      internship.highlights.forEach((highlight, recordIndex) => {
-        expect(recordItems[recordIndex]).toHaveTextContent(highlight);
+      expect(recordItems).toHaveLength(3);
+      internship.presentation.details.forEach((detail, recordIndex) => {
+        expect(recordItems[recordIndex]).toHaveTextContent(detail);
       });
 
       expect(within(card).queryByRole("button")).not.toBeInTheDocument();

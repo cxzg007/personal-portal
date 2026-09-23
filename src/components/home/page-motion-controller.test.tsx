@@ -9,11 +9,7 @@ import {
   HERO_NETWORK_NODES,
 } from "@/lib/hero-network";
 import { Header } from "../shell/header";
-import {
-  getStackProgress,
-  PageMotionController,
-  selectActiveSection,
-} from "./page-motion-controller";
+import { PageMotionController, selectActiveSection } from "./page-motion-controller";
 
 vi.mock("next/link", () => ({
   default: (props: { href: string; children?: React.ReactNode } & Record<string, unknown>) => {
@@ -253,19 +249,6 @@ function expectMotionStateCleared() {
 }
 
 describe("page motion controller pure helpers", () => {
-  it("maps sticky geometry to the three stack progress stages", () => {
-    expect(getStackProgress(250, 100)).toBe(0);
-    expect(getStackProgress(221, 100)).toBe(0);
-    expect(getStackProgress(220, 100)).toBe(1);
-    expect(getStackProgress(150, 100)).toBe(1);
-    expect(getStackProgress(100, 100)).toBe(2);
-    expect(getStackProgress(90, 100)).toBe(2);
-    expect(getStackProgress(120, 0)).toBe(1);
-    expect(getStackProgress(121, 0)).toBe(0);
-    expect(getStackProgress(0, 0)).toBe(2);
-    expect(getStackProgress(-10, 0)).toBe(2);
-  });
-
   it("selects the last section within the header offset window", () => {
     const entries = [
       { id: "profile", top: 0 },
@@ -331,7 +314,7 @@ describe("page motion controller", () => {
     expect(document.querySelector(".profile-reveal")).not.toHaveAttribute("data-in-view");
   });
 
-  it("tracks the active section, stack progress and aria-current in enhanced mode", () => {
+  it("tracks the active section and aria-current without stack progress in enhanced mode", () => {
     stubMatchMedia({});
     mountEnhancedPage();
 
@@ -339,23 +322,10 @@ describe("page motion controller", () => {
     expect(document.querySelector('a[data-nav-section="internships"]')).not.toHaveAttribute(
       "aria-current",
     );
-    expect(document.querySelector(".sticky-internship-card")).toHaveAttribute(
-      "data-stack-progress",
-      "0",
-    );
-
-    mockRect(document.querySelector(".sticky-internship-card")!, { top: 50, bottom: 450 });
-    dispatchScroll();
-    expect(document.querySelector(".sticky-internship-card")).toHaveAttribute(
-      "data-stack-progress",
-      "1",
-    );
-
-    mockRect(document.querySelector(".sticky-internship-card")!, { top: -10, bottom: 390 });
-    dispatchScroll();
-    expect(document.querySelector(".sticky-internship-card")).toHaveAttribute(
-      "data-stack-progress",
-      "2",
+    // 静态编辑式条目不再携带滚动进度属性。
+    expect(document.querySelectorAll(".sticky-internship-card")).toHaveLength(1);
+    expect(document.querySelectorAll(".sticky-internship-card[data-stack-progress]")).toHaveLength(
+      0,
     );
 
     mockRect(document.querySelector("#internships")!, { top: 100, bottom: 300 });
@@ -367,6 +337,9 @@ describe("page motion controller", () => {
     );
     expect(document.querySelector('a[data-nav-section="contact"]')).not.toHaveAttribute(
       "aria-current",
+    );
+    expect(document.querySelectorAll(".sticky-internship-card[data-stack-progress]")).toHaveLength(
+      0,
     );
   });
 
