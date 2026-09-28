@@ -37,6 +37,7 @@ function prLinkLabel(contribution: Contribution) {
 
 export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
   const merged = project.contributions.filter(({ status }) => status === "merged");
+  const ongoing = project.contributions.filter(({ status }) => status === "open");
   const groups = groupContributionsByTheme(project);
   const themeGroups = groups.filter(({ theme }) => theme.id !== OTHER_CONTRIBUTIONS_THEME_ID);
   const otherGroup = groups.find(({ theme }) => theme.id === OTHER_CONTRIBUTIONS_THEME_ID);
@@ -75,7 +76,10 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
               </li>
             ))}
           </ul>
-          <p className="open-source-recognition-note">{`星数快照 / 项目榜单徽章 · 核验于 ${recognition.checkedAt}`}</p>
+          <p className="open-source-recognition-note">{`星数快照 · 核验于 ${recognition.checkedAt}`}</p>
+          {recognition.honors.length > 0 ? (
+            <p className="open-source-recognition-note">{`历史榜单记录 · 核验于 ${recognition.honorsCheckedAt}`}</p>
+          ) : null}
         </section>
       </div>
 
@@ -89,6 +93,8 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
           <span className="open-source-stat-label">已合并 PR</span>
         </p>
       </div>
+
+      <p className="open-source-role-summary">{project.roleSummary}</p>
 
       <ul aria-label="Semantica 贡献主题" className="open-source-theme-grid">
         {themeGroups.map(({ theme, contributions }, index) => (
@@ -140,6 +146,23 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
             ))}
           </ul>
         </details>
+      ) : null}
+
+      {ongoing.length > 0 ? (
+        <section aria-labelledby="open-source-ongoing-heading" className="open-source-ongoing">
+          <h4 id="open-source-ongoing-heading">正在推进</h4>
+          <p>{`${ongoing.length} 个开放 PR · 尚未合并`}</p>
+          <ul>
+            {ongoing.map((contribution) => (
+              <li key={contribution.number}>
+                <a aria-label={`进行中 · PR #${contribution.number} · ${contribution.title}`} href={contribution.url} rel="noreferrer" target="_blank">
+                  <span className="open-source-ongoing-status">{`进行中 · PR #${contribution.number} · `}</span>
+                  <span>{contribution.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : null}
 
       <footer className="open-source-showcase-footer">

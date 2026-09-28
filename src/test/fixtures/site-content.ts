@@ -28,9 +28,9 @@ export const validSiteContent = {
     },
     {
       label: "已合并 PR",
-      value: 17,
+      value: 18,
       suffix: "个",
-      evidence: "十七个 PR 已合并入 main，快照核对于 2026-09-20。",
+      evidence: "18 个 PR 已合并，1 个开放 PR 不计入指标，快照核对于 2026-09-28。",
     },
   ],
   internships: [
@@ -98,18 +98,32 @@ export const validSiteContent = {
       alt: "Semantica 项目标志",
       theme: "semantica",
     },
-    identity: "Open-source Contributor · cxzg007",
+    identity: "项目维护者 · Maintainer / Collaborator · cxzg007",
+    roleSummary: "持续维护规则推理与真值维护能力，完成问题复现、实现、回归测试与文档补充。",
     background: "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施，将分散的数据组织为知识图谱，为推理、检索与决策提供可追溯的上下文。",
-    snapshotDate: "2026-09-20",
+    snapshotDate: "2026-09-28",
     recognition: {
-      stars: 13300,
-      checkedAt: "2026-09-20",
+      stars: 13513,
+      checkedAt: "2026-09-28",
+      honorsCheckedAt: "2026-09-20",
       honors: [
         { rank: 1, platform: "GitHub Trending", title: "日榜", sourceUrl: "https://trendshift.io/api/badge/repositories/18986" },
         { rank: 3, platform: "Trendshift · Python", title: "周榜", sourceUrl: "https://trendshift.io/api/badge/trendshift/repositories/18986/weekly?language=Python" },
       ],
     },
     contributions: [
+      {
+        number: 1731,
+        title: "快照一致的本地 RAG 上下文组装",
+        url: "https://github.com/semantica-agi/semantica/pull/1731",
+        status: "open",
+      },
+      {
+        number: 1675,
+        title: "双时态图证据与真值维护会话适配",
+        url: "https://github.com/semantica-agi/semantica/pull/1675",
+        status: "merged",
+      },
       {
         number: 1556,
         title: "检索排序前置支撑校验",
@@ -222,9 +236,9 @@ export const validSiteContent = {
       },
       {
         id: "truth-maintenance",
-        name: "真值维护机制",
+        name: "真值维护与时态一致性",
         summary: "为非递归规则新增源级真值维护，并把支撑校验前置到检索排序。",
-        prNumbers: [1556, 1544],
+        prNumbers: [1675, 1556, 1544],
       },
       {
         id: "sparql-execution",
@@ -300,8 +314,8 @@ export const validSiteContent = {
       constraints: ["上游架构约束。"],
       decisions: ["从可验证的小型 PR 切入。"],
       tradeoffs: ["以深度阅读换取贡献质量。"],
-      contribution: "贡献十六个 PR,均已合并。",
-      result: "成为上游活跃贡献者。",
+      contribution: "以 Maintainer / Collaborator 身份维护推理与真值维护能力。",
+      result: "18 个 PR 已合并，1 个开放 PR 正在推进。",
       stack: ["Python"],
       links: [],
     },

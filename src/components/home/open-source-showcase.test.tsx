@@ -29,7 +29,7 @@ describe("groupContributionsByTheme", () => {
     ]);
     expect(groups.map(({ contributions }) => contributions.map(({ number }) => number))).toEqual([
       [1096, 1077],
-      [1556, 1544],
+      [1675, 1556, 1544],
       [1243],
       [1226],
       [1364, 1360, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081],
@@ -63,9 +63,10 @@ describe("OpenSourceShowcase", () => {
     renderShowcase();
 
     expect(screen.getByRole("img", { name: "Semantica 项目标志" })).toBeVisible();
-    expect(screen.getByText("Open-source Contributor · cxzg007")).toBeVisible();
+    expect(screen.getByText("项目维护者 · Maintainer / Collaborator · cxzg007")).toBeVisible();
     expect(screen.getByRole("heading", { name: "Semantica" })).toBeVisible();
     expect(screen.getByText(openSource.background)).toBeVisible();
+    expect(screen.getByText(openSource.roleSummary)).toBeVisible();
   });
 
   it("groups the personal merged PR count with the key contributions heading", () => {
@@ -73,7 +74,7 @@ describe("OpenSourceShowcase", () => {
 
     const statistic = screen.getByText("已合并 PR").closest("p");
     expect(statistic).not.toBeNull();
-    expect(statistic).toHaveTextContent("17");
+    expect(statistic).toHaveTextContent("18");
     expect(screen.getByRole("heading", { name: "我的关键贡献" })).toBeVisible();
   });
 
@@ -134,11 +135,13 @@ describe("OpenSourceShowcase", () => {
     }
   });
 
-  it("keeps open pull requests and retired wording out of the credibility summary", () => {
+  it("labels open pull requests as ongoing and keeps retired wording out", () => {
     const { container } = renderShowcase();
 
     for (const pullRequest of openPullRequests) {
-      expect(screen.queryByText(new RegExp(`PR #${pullRequest.number}\\b`))).toBeNull();
+      const ongoing = screen.getByRole("region", { name: "正在推进" });
+      expect(within(ongoing).getByRole("link", { name: `进行中 · PR #${pullRequest.number} · ${pullRequest.title}` })).toBeVisible();
+      expect(screen.queryByRole("link", { name: new RegExp(`^已合并 · PR #${pullRequest.number}`) })).toBeNull();
     }
     const text = container.textContent ?? "";
     expect(text).not.toMatch(/FEAT|FIX|MERGED/);
@@ -147,19 +150,35 @@ describe("OpenSourceShowcase", () => {
     expect(screen.queryByRole("button")).toBeNull();
   });
 
+  it("shows open work separately and excludes it from the merged count and themes", () => {
+    const project = structuredClone(openSource);
+    project.contributions.unshift({ number: 2000, title: "未合并的快照组装", status: "open", url: "https://github.com/semantica-agi/semantica/pull/2000" });
+    renderShowcase(project);
+    const ongoing = screen.getByRole("region", { name: "正在推进" });
+    expect(within(ongoing).getByRole("link", { name: "进行中 · PR #2000 · 未合并的快照组装" })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/2000");
+    expect(screen.getByText("已合并 PR").closest("p")).toHaveTextContent(String(merged.length));
+    expect(within(screen.getByRole("list", { name: "Semantica 贡献主题" })).queryByText(/PR #2000/)).toBeNull();
+  });
+
+  it("omits the ongoing section when there are no open PRs", () => {
+    renderShowcase({ ...openSource, contributions: merged });
+    expect(screen.queryByRole("region", { name: "正在推进" })).toBeNull();
+  });
+
   it("states the dated snapshot boundary computed from merged contributions", () => {
     renderShowcase();
 
-    expect(screen.getByText("截至 2026-09-20：17 个贡献已合并")).toBeVisible();
+    expect(screen.getByText("截至 2026-09-28：18 个贡献已合并")).toBeVisible();
   });
 
   it("separates sourced project recognition from the personal contribution count", () => {
     renderShowcase();
 
     const recognition = screen.getByRole("region", { name: "项目影响力与荣誉" });
-    const stars = within(recognition).getByRole("link", { name: /13,300 GitHub Stars/ });
+    const stars = within(recognition).getByRole("link", { name: /13,513 GitHub Stars/ });
     expect(stars).toHaveAttribute("href", openSource.repositoryUrl);
     expect(within(recognition).getByText(/2026-09-20/)).toBeVisible();
+    expect(within(recognition).getByText("星数快照 · 核验于 2026-09-28")).toBeVisible();
     expect(within(recognition).getByRole("link", { name: /#1 GitHub Trending 日榜/ }))
       .toHaveAttribute("href", "https://trendshift.io/api/badge/repositories/18986");
     expect(within(recognition).getByRole("link", { name: /#3 Trendshift · Python 周榜/ }))

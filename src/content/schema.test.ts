@@ -235,6 +235,35 @@ describe("validateSiteContent", () => {
     });
   });
 
+  it("accepts a new open PR without increasing the merged metric or theme membership", () => {
+    const input = structuredClone(validSiteContent);
+    input.openSource.contributions.unshift({ number: 2000, title: "进行中的工作", status: "open", url: "https://github.com/semantica-agi/semantica/pull/2000" });
+    expect(validateSiteContent(input)).toEqual({ ok: true });
+  });
+
+  it("accepts a growing merged snapshot when its metric and theme are updated together", () => {
+    const input = structuredClone(validSiteContent);
+    input.openSource.contributions.unshift({ number: 2000, title: "新增已合并工作", status: "merged", url: "https://github.com/semantica-agi/semantica/pull/2000" });
+    input.openSource.contributionThemes[0].prNumbers.unshift(2000);
+    input.metrics.find(({ label }) => label === "已合并 PR")!.value += 1;
+    expect(validateSiteContent(input)).toEqual({ ok: true });
+  });
+
+  it("rejects a merged metric that counts an unmerged PR", () => {
+    const input = structuredClone(validSiteContent);
+    input.metrics.find(({ label }) => label === "已合并 PR")!.value += 1;
+    expect(validateSiteContent(input)).toEqual({
+      ok: false,
+      errors: expect.arrayContaining(["metrics 已合并 PR must equal the merged contribution count"]),
+    });
+  });
+
+  it("rejects an open PR referenced by a merged contribution theme", () => {
+    const input = structuredClone(validSiteContent);
+    input.openSource.contributionThemes[0].prNumbers.unshift(1731);
+    expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
+  });
+
   it("rejects an invalid structured open-source contribution", () => {
     const input = structuredClone(validSiteContent);
     Object.assign(input.openSource.contributions[0], { status: "done" });
@@ -255,7 +284,7 @@ describe("validateSiteContent", () => {
     ["duplicate PR numbers", (copy: SiteContent) => { copy.openSource.contributions[1].number = copy.openSource.contributions[0].number; }],
     ["non-GitHub PR url", (copy: SiteContent) => { copy.openSource.contributions[0].url = "https://example.com/semantica/pull/1081"; }],
     ["non-positive PR number", (copy: SiteContent) => { copy.openSource.contributions[0].number = 0; }],
-    ["twelve contributions", (copy: SiteContent) => { copy.openSource.contributions.pop(); }],
+    ["a missing contribution still referenced by a theme", (copy: SiteContent) => { copy.openSource.contributions.pop(); }],
     ["contributions ordered ascending", (copy: SiteContent) => { copy.openSource.contributions.reverse(); }],
     ["unsupported visual kind", (copy: SiteContent) => { copy.caseStudies[0].visualKind = "timeline" as SiteContent["caseStudies"][number]["visualKind"]; }],
     ["duplicate tab labels", (copy: SiteContent) => { copy.caseStudies[1].tabLabel = copy.caseStudies[0].tabLabel; }],
@@ -303,6 +332,7 @@ describe("openSource strict schema closure", () => {
       recognition: {
         stars: 12455,
         checkedAt: "2026-09-09",
+        honorsCheckedAt: "2026-09-08",
         honors: [{ rank: 1, platform: "GitHub Trending", title: "日榜", sourceUrl: "https://trendshift.io/api/badge/repositories/18986" }],
       },
     });
@@ -316,9 +346,21 @@ describe("openSource strict schema closure", () => {
     { stars: 12455, checkedAt: "2026-09-09", honors: [{ rank: 1, platform: "GitHub", title: "日榜", sourceUrl: "javascript:alert(1)" }], error: "openSource.recognition.honors[0].sourceUrl" },
   ])("rejects invalid recognition data: $error", ({ error, ...recognition }) => {
     const input = structuredClone(validSiteContent);
-    Object.assign(input.openSource, { recognition });
+    Object.assign(input.openSource, { recognition: { honorsCheckedAt: "2026-09-08", ...recognition } });
     const result = validateSiteContent(input);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.errors.some((message) => message.startsWith(error))).toBe(true);
+  });
+
+  it.each(["today", "2026-02-30", ""])("rejects an invalid historical honors date: %s", (date) => {
+    const input = structuredClone(validSiteContent);
+    input.openSource.recognition.honorsCheckedAt = date;
+    expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
+  });
+
+  it("requires a description of the maintainer's work", () => {
+    const input = structuredClone(validSiteContent);
+    input.openSource.roleSummary = "";
+    expect(validateSiteContent(input)).toEqual(expect.objectContaining({ ok: false }));
   });
 });

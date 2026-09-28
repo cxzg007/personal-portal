@@ -39,11 +39,13 @@ export type OpenSourceProject = {
   name: string;
   logo: BrandAsset;
   identity: string;
+  roleSummary: string;
   background: string;
   snapshotDate: string;
   recognition: {
     stars: number;
     checkedAt: string;
+    honorsCheckedAt: string;
     honors: Array<{ rank: number; platform: string; title: string; sourceUrl: string }>;
   };
   contributions: OpenSourceContribution[];
@@ -142,6 +144,7 @@ const OPEN_SOURCE_FIELDS = new Set([
   "name",
   "logo",
   "identity",
+  "roleSummary",
   "background",
   "snapshotDate",
   "recognition",
@@ -152,7 +155,6 @@ const OPEN_SOURCE_FIELDS = new Set([
 ]);
 const CONTRIBUTION_FIELDS = new Set(["number", "title", "url", "status"]);
 const CONTRIBUTION_THEME_FIELDS = new Set(["id", "name", "summary", "prNumbers"]);
-const MERGED_CONTRIBUTION_COUNT = 17;
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -347,7 +349,7 @@ export function validateSiteContent(input: unknown): ValidationResult {
         errors.push(`openSource.${field} is not an allowed field`);
       }
     });
-    ["name", "identity", "background"].forEach((field) => checkText(openSource[field], `openSource.${field}`));
+    ["name", "identity", "roleSummary", "background"].forEach((field) => checkText(openSource[field], `openSource.${field}`));
     const logo = checkRecord(openSource.logo, "openSource.logo");
     if (logo) {
      const src = checkText(logo.src, "openSource.logo.src");
@@ -366,6 +368,11 @@ export function validateSiteContent(input: unknown): ValidationResult {
       if (checkedAt && (!/^\d{4}-\d{2}-\d{2}$/.test(checkedAt) ||
         !Number.isFinite(Date.parse(checkedAt)) || new Date(checkedAt).toISOString().slice(0, 10) !== checkedAt)) {
         errors.push("openSource.recognition.checkedAt must be a valid YYYY-MM-DD date");
+      }
+      const honorsCheckedAt = checkText(recognition.honorsCheckedAt, "openSource.recognition.honorsCheckedAt");
+      if (honorsCheckedAt && (!/^\d{4}-\d{2}-\d{2}$/.test(honorsCheckedAt) ||
+        !Number.isFinite(Date.parse(honorsCheckedAt)) || new Date(honorsCheckedAt).toISOString().slice(0, 10) !== honorsCheckedAt)) {
+        errors.push("openSource.recognition.honorsCheckedAt must be a valid YYYY-MM-DD date");
       }
       if (!Array.isArray(recognition.honors)) {
         errors.push("openSource.recognition.honors must be an array");
@@ -386,11 +393,9 @@ export function validateSiteContent(input: unknown): ValidationResult {
     const mergedPrNumbers = new Set<number>();
     if (
       !Array.isArray(openSource.contributions) ||
-      openSource.contributions.length !== MERGED_CONTRIBUTION_COUNT
+      openSource.contributions.length === 0
     ) {
-      errors.push(
-        `openSource.contributions must contain exactly ${MERGED_CONTRIBUTION_COUNT} entries`,
-      );
+      errors.push("openSource.contributions must be a non-empty array");
     } else {
       let mergedCount = 0;
       const seenPrNumbers = new Set<number>();
@@ -431,10 +436,14 @@ export function validateSiteContent(input: unknown): ValidationResult {
           errors.push(`openSource.contributions[${index}].url must be an HTTPS GitHub PR URL`);
         }
       });
-      if (mergedCount !== MERGED_CONTRIBUTION_COUNT) {
-        errors.push(
-          `openSource.contributions must contain exactly ${MERGED_CONTRIBUTION_COUNT} merged entries`,
-        );
+      if (mergedCount === 0) {
+        errors.push("openSource.contributions must contain at least one merged entry");
+      }
+      if (Array.isArray(siteContent.metrics)) {
+        const mergedMetrics = siteContent.metrics.filter((metric) => isRecord(metric) && metric.label === "已合并 PR");
+        if (mergedMetrics.length !== 1 || mergedMetrics[0].value !== mergedCount) {
+          errors.push("metrics 已合并 PR must equal the merged contribution count");
+        }
       }
     }
     if (!Array.isArray(openSource.contributionThemes) || openSource.contributionThemes.length === 0) {
@@ -541,4 +550,3 @@ export function validateSiteContent(input: unknown): ValidationResult {
 
   return errors.length === 0 ? { ok: true } : { ok: false, errors };
 }
-

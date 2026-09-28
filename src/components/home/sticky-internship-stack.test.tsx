@@ -52,8 +52,8 @@ describe("sticky internship stack", () => {
       });
       expect(records.className).toContain("capability-records");
       const recordItems = within(records).getAllByRole("listitem");
-      expect(recordItems).toHaveLength(3);
-      internship.presentation.details.forEach((detail, recordIndex) => {
+      expect(recordItems).toHaveLength(internship.highlights.length);
+      internship.highlights.forEach((detail, recordIndex) => {
         expect(recordItems[recordIndex]).toHaveTextContent(detail);
       });
 

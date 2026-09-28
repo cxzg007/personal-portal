@@ -186,12 +186,15 @@
       },
       {
         "id": "rules",
-        "label": "规则推理",
+        "label": "推理与真值维护",
         "column": 0,
         "row": 1,
         "details": [
           { "kind": "pr", "number": 1077 },
-          { "kind": "pr", "number": 1096 }
+          { "kind": "pr", "number": 1096 },
+          { "kind": "pr", "number": 1544 },
+          { "kind": "pr", "number": 1556 },
+          { "kind": "pr", "number": 1675 }
         ]
       },
       {

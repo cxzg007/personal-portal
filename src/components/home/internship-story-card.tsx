@@ -32,7 +32,13 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
       </header>
       <div className="internship-copy-column">
         <h3 className="internship-value-headline">{title}</h3>
+        <p className="internship-context">{internship.context}</p>
         <p className="internship-contribution">{contribution}</p>
+        <ul aria-label={`${internship.company} 主要工作`} className="internship-work">
+          {details.map((detail) => (
+            <li key={detail}>{detail}</li>
+          ))}
+        </ul>
         <p className="internship-outcome-text">{outcome}</p>
         <ul aria-label={`${internship.company} 技术栈`} className="internship-stack">
           {technologies.map((item) => (
@@ -45,7 +51,7 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
           <summary>查看{internship.company}工程细节</summary>
           <p className="internship-team">{internship.team}</p>
           <ul aria-label={`${internship.company} 能力建设记录`} className="capability-records">
-            {details.map((detail) => (
+            {internship.highlights.map((detail) => (
               <li key={detail}>{detail}</li>
             ))}
           </ul>

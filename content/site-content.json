@@ -40,9 +40,9 @@
     },
     {
       "label": "已合并 PR",
-      "value": 17,
+      "value": 18,
       "suffix": "个",
-      "evidence": "Semantica 仓库中十七个 PR 已合并入 main，快照核对于 2026-09-20。"
+      "evidence": "Semantica 仓库中 18 个 PR 已合并，另有 1 个开放 PR 不计入该指标，快照核对于 2026-09-28。"
     }
   ],
   "internships": [
@@ -56,13 +56,13 @@
       "valueHeadline": "以本体建模与规则引擎支撑数据资产治理与 Agent 动作执行",
       "presentation": {
         "title": "本体建模与规则引擎",
-        "contribution": "负责本体建模、规则查询与动作执行。",
+        "contribution": "负责本体建模、规则查询编译与动作执行链路，并参与 Agent Skill 编排和服务端授权改造，将业务规则组织为可校验、可追踪的执行过程。",
         "outcome": "支持 13 个比较算子、11 个聚合算子，批量写回具备事务与行数校验。",
         "technologies": ["Java", "Spring Boot", "MySQL"],
         "details": [
           "findata-platform：以实体、属性、关系建模业务语义；规则编译通过分组子查询回连避免一对多 JOIN 放大行数。",
           "SQL 与参数同次构建；批量写回任一行影响数不为 1 即回滚，人工执行前预览计划并校验配置指纹。",
-          "AI 仅输出属性编码；服务端负责物理 SQL、授权与追踪，动作按规则 ID 绑定并接入 Skill 编排。"
+          "AI 仅输出属性编码，服务端负责物理 SQL 与授权；将链路拆为 7 个原子步骤接入 Skill 编排，以 traceId 串联执行过程。"
         ]
       },
       "journey": [
@@ -126,7 +126,7 @@
       "valueHeadline": "用双通道流式回放把数百 MB 录制变成可控的在线调试体验",
       "presentation": {
         "title": "机器人数据流式回放",
-        "contribution": "负责双通道回放、会话控制与并发稳定性。",
+        "contribution": "负责流式回放后端的读取链路、会话状态与并发稳定性，围绕播放控制、共享会话和云端数据访问统一服务端实现。",
         "outcome": "50 并发下，已接纳请求 P99 时延由 810ms 降至 375ms。",
         "technologies": ["Go", "HTTP", "WebSocket"],
         "details": [
@@ -197,13 +197,13 @@
       "valueHeadline": "用 RAG 增强型多智能体支撑技术文档问答与通信任务方案生成",
       "presentation": {
         "title": "RAG 多智能体系统",
-        "contribution": "负责混合检索、任务分流与工具权限治理。",
-        "outcome": "默认评测集上 Recall@5 达 91.67%。",
+        "contribution": "负责检索链路、Supervisor 任务分流与工具权限治理，并参与会话状态和可观测设计，把文档问答与任务规划接入同一条可追踪链路。",
+        "outcome": "默认评测集上 Recall@5 达 91.67%，MRR@10 达 75.69%，任务规划完整率达 95.83%。",
         "technologies": ["Python", "Elasticsearch", "RAG"],
         "details": [
-          "UAV-pilot：关键词与向量混合检索，结合融合重排和父子分块；默认评测集 MRR@10 达 75.69%。",
-          "Supervisor 分流问答、确定性工具与任务规划；默认评测集任务规划完整率达 95.83%。",
-          "Skill、工具注册表与调用范围权限限定能力；Redis 管理会话，历史任务与工具记录落库并串联 trace_id。"
+          "UAV-pilot：搭建 Elasticsearch 关键词与向量混合召回链路，结合融合重排和父子分块，改善长文档检索的上下文完整性。",
+          "Supervisor 按请求类型分流到直接回答、知识库问答、确定性工具调用与任务规划四条路径，让不同任务使用对应的处理流程。",
+          "以 Skill、工具注册表与调用范围权限限定能力；Redis 管理短期会话，历史任务与工具记录落库，并通过 trace_id 串联全链路。"
         ]
       },
       "journey": [
@@ -257,12 +257,14 @@
   "openSource": {
     "name": "Semantica",
     "logo": { "src": "/brands/semantica.png", "alt": "Semantica 项目标志", "theme": "semantica" },
-    "identity": "Open-source Contributor · cxzg007",
+    "identity": "项目维护者 · Maintainer / Collaborator · cxzg007",
+    "roleSummary": "作为项目维护者，持续建设规则推理、真值维护与 RAG 可靠性能力，围绕公开 issue 完成问题复现、方案设计、代码实现、回归测试与文档补充。",
     "background": "Semantica 是面向 AI Agent 的图原生上下文与可审计基础设施，将分散的数据组织为知识图谱，为推理、检索与决策提供可追溯的上下文。",
-    "snapshotDate": "2026-09-20",
+    "snapshotDate": "2026-09-28",
     "recognition": {
-      "stars": 13300,
-      "checkedAt": "2026-09-20",
+      "stars": 13513,
+      "checkedAt": "2026-09-28",
+      "honorsCheckedAt": "2026-09-20",
       "honors": [
         {
           "rank": 1,
@@ -279,6 +281,18 @@
       ]
     },
     "contributions": [
+      {
+        "number": 1731,
+        "title": "快照一致的本地 RAG 上下文组装：显式管理摘要与引用依赖，统一过滤、预算和引用输出。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1731",
+        "status": "open"
+      },
+      {
+        "number": 1675,
+        "title": "双时态真值维护：独立查询事实有效时间与系统获知时间，保留更正历史且不修改实时会话。",
+        "url": "https://github.com/semantica-agi/semantica/pull/1675",
+        "status": "merged"
+      },
       {
         "number": 1556,
         "title": "检索排序前置支撑校验：让失去支撑的结论不再进入模型上下文。",
@@ -391,9 +405,9 @@
       },
       {
         "id": "truth-maintenance",
-        "name": "真值维护机制",
-        "summary": "为非递归规则新增源级真值维护，按独立支持记录派生依赖，来源撤回时仅失效失去全部支持的结论，支持原子更新与推导解释；并把支撑校验前置到检索排序。",
-        "prNumbers": [1556, 1544]
+        "name": "真值维护与时态一致性",
+        "summary": "按独立支持记录派生依赖，来源撤回时仅失效失去全部支持的结论，并在检索排序前校验支撑；新增双时态证据适配，区分事实有效时间与系统获知时间，支持过期、更正与历史查询。",
+        "prNumbers": [1675, 1556, 1544]
       },
       {
         "id": "sparql-execution",
@@ -524,22 +538,23 @@
       "tabLabel": "Semantica",
       "visualKind": "graph",
       "title": "Semantica 开源贡献与工程复盘",
-      "problem": "知识图谱与推理基础设施需要可验证的工程加固，而作品集需要以可核查的方式呈现开源贡献。",
+      "problem": "图原生 AI 上下文需要处理事实变化、来源撤回与历史更正，确保推理结论和检索上下文始终具有可追溯的证据支撑。",
       "constraints": [
         "上游架构与既有实现约束",
-        "PR 状态需如实区分",
+        "事实有效时间与系统获知时间需要独立表达",
         "改动需可测试、可复核"
       ],
       "decisions": [
-        "从 ContextGraph 标准适配器与 SHACL 真实约束解释切入。",
-        "以带回归测试的小型 PR 表达修改边界。",
-        "公开记录仓库、PR、快照日期与状态。"
+        "以独立支持记录派生依赖，让源级撤回与规则批量更新保持原子性。",
+        "在检索排序前检查支撑状态，避免失效结论进入模型上下文。",
+        "将双时态图证据投影到真值维护会话，历史查询使用独立会话与冻结快照，避免修改实时状态。",
+        "通过回归测试与文档说明兼容边界，持续从公开 issue 推进问题复现与功能完善。"
       ],
       "tradeoffs": [
-        "以贡献粒度换取可验证性与沟通清晰度。"
+        "以显式依赖和可选适配层增加实现复杂度，换取可解释的失效传播、历史查询与接口兼容性。"
       ],
-      "contribution": "围绕图数据适配、规则推理、序列化与执行链路提交公开 PR，并通过回归测试说明修改边界。",
-      "result": "贡献覆盖图数据适配、SHACL 解释、时间稳定性、规则推理、决策模型契约、序列化往返与执行链路并行化。",
+      "contribution": "以 Maintainer / Collaborator 身份持续维护规则推理、真值维护与检索可靠性能力，完成实现、回归测试和文档补充。",
+      "result": "截至 2026-09-28，18 个 PR 已合并；正在通过开放 PR #1731 推进快照一致的本地 RAG 上下文组装。",
       "stack": [
         "Python",
         "RDF",

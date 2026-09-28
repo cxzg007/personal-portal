@@ -90,7 +90,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   for (const outcome of [
     "支持 13 个比较算子、11 个聚合算子，批量写回具备事务与行数校验。",
     "50 并发下，已接纳请求 P99 时延由 810ms 降至 375ms。",
-    "默认评测集上 Recall@5 达 91.67%。",
+    "默认评测集上 Recall@5 达 91.67%，MRR@10 达 75.69%，任务规划完整率达 95.83%。",
   ]) {
     await expect(internships.getByText(outcome, { exact: true })).toBeVisible();
   }
@@ -100,7 +100,9 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(jdDetails).not.toHaveAttribute("open");
   await expect(internshipArticles.nth(0).getByLabel("京东 能力建设记录")).toBeHidden();
   for (const index of [0, 1, 2]) {
-    await expect(internshipArticles.nth(index).locator("ul.capability-records li")).toHaveCount(3);
+    await expect(internshipArticles.nth(index).locator("ul.capability-records li")).toHaveCount([7, 6, 5][index]);
+    await expect(internshipArticles.nth(index).locator("ul.internship-work li")).toHaveCount(3);
+    await expect(internshipArticles.nth(index).locator(".internship-context")).toBeVisible();
   }
 
   for (let step = 0; step < 60; step += 1) {
@@ -116,7 +118,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   await expect(internshipArticles.nth(0).getByLabel("京东 能力建设记录")).toBeVisible();
   await expect(
     internshipArticles.nth(0).getByLabel("京东 能力建设记录").getByRole("listitem"),
-  ).toHaveCount(3);
+  ).toHaveCount(7);
 
   const systems = page.locator("main > section#systems");
   const tabs = systems.getByRole("tab");
@@ -145,7 +147,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
-  await expect(openSource.getByText(/截至 2026-09-20：17 个贡献已合并/)).toBeVisible();
+  await expect(openSource.getByText(/截至 2026-09-28：18 个贡献已合并/)).toBeVisible();
   await expect(openSource.getByRole("link", { name: "Semantica GitHub repository" })).toHaveAttribute(
     "href",
     "https://github.com/semantica-agi/semantica",
@@ -318,23 +320,27 @@ test("open source showcase groups PRs by resume theme with a collapsed remainder
   await expect(themeList).toBeVisible();
   await expect(themeList.locator("> li.open-source-theme-item")).toHaveCount(4);
   const recognition = openSource.getByRole("region", { name: "项目影响力与荣誉" });
-  await expect(recognition.getByRole("link", { name: "13,300 GitHub Stars" })).toHaveAttribute(
+  await expect(recognition.getByRole("link", { name: "13,513 GitHub Stars" })).toHaveAttribute(
     "href", "https://github.com/semantica-agi/semantica",
   );
   await expect(recognition.getByRole("link", { name: /#1 GitHub Trending 日榜/ })).toBeVisible();
   await expect(recognition.getByRole("link", { name: /#3 Trendshift · Python 周榜/ })).toBeVisible();
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(6);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(7);
   await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(0);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(0);
   await expect(openSource.locator("button")).toHaveCount(0);
   await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
+  await expect(openSource.getByText("项目维护者 · Maintainer / Collaborator · cxzg007")).toBeVisible();
+  const ongoing = openSource.getByRole("region", { name: "正在推进" });
+  await expect(ongoing.getByText("1 个开放 PR · 尚未合并")).toBeVisible();
+  await expect(ongoing.getByRole("link", { name: /^进行中 · PR #1731/ })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/1731");
 
   const details = openSource.locator("details.open-source-showcase-details");
   await expect(details).toBeVisible();
   await expect(details).not.toHaveAttribute("open");
 
   await details.locator("summary").click();
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(17);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(18);
   const otherLinks = details.getByRole("link", { name: /^已合并 · PR #/ });
   await expect(otherLinks).toHaveCount(11);
   for (const [index, number] of [
@@ -348,7 +354,7 @@ test("open source showcase groups PRs by resume theme with a collapsed remainder
   await details.locator("summary").focus();
   await page.keyboard.press("Enter");
   await expect(details).not.toHaveAttribute("open");
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(6);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(7);
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {

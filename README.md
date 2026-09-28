@@ -47,8 +47,10 @@ pnpm start
 
 几个关键板块的编辑位置：
 
-- **技术 ID（technicalId）**：顶层 `profile.technicalId`，渲染于首页身份区，用于标识开源身份。修改时应与 GitHub 用户名保持一致，并同步核对 `openSource.identity` 与 `openSource.graphNodes` 中的引用。
-- **结构化贡献**：`openSource.contributions` 数组，每个条目含 `number`（PR 号）、`status`（限定 `merged`、`open` 或 `review`）、`summary` 和 `url`。状态必须如实反映 PR 当前状态，校验器会拒绝合并状态但缺少有效链接等不一致的条目。配套的开源荣誉在 `openSource.honors` 数组（`platform`、`rank`、`period`、`evidence`）。
+- **实习内容**：`internships[].context` 展示背景；`presentation` 的 `contribution`、三条 `details`、`outcome` 分别展示职责、主要工作和成果；完整 `highlights` 放在原生折叠详情中。量化成果需保留并发量、评测集等条件。
+- **开源身份**：`profile.technicalId` 与 GitHub 用户名保持一致；`openSource.identity` 写明角色，`roleSummary` 描述实际参与的维护工作。
+- **结构化贡献**：`openSource.contributions` 按 PR 号降序排列，条目包含 `number`、`status`（`merged` 或 `open`）、`title` 与 `url`。`contributionThemes` 恰好覆盖全部已合并 PR；开放 PR 单列“正在推进”。`metrics` 中“已合并 PR”必须等于实际 merged 数量，更新时同步 `snapshotDate`。
+- **项目影响力**：`openSource.recognition.stars` 与 `checkedAt` 记录星数快照；`honors` 记录榜单名称、名次与来源，`honorsCheckedAt` 保留历史榜单核验日期，不随星数日期自动更新。
 - **四个系统案例**：顶层 `caseStudies` 数组，即首页系统设计 Tab 的数据源。每个案例含 `id`、`tabLabel`（Tab 标签文案）、`visualKind`（限定 `ontology`、`streaming`、`memory` 或 `graph`，决定示意图类型）、`title`、`problem`、`constraints`、`decisions`、`tradeoffs`、`contribution`、`result`、`stack` 与 `links`。增删或改写案例会同时影响 Tab 数量与快照基线，需重新运行视觉测试。
 - **MDX 文章**：见下文「发布 MDX 文章」一节。
 

@@ -27,7 +27,7 @@ describe("internship story card", () => {
       expect(within(card).getByText(internship.role)).toBeVisible();
       expect(within(card).getByText(internship.period)).toBeVisible();
 
-      expect(within(card).queryByText(internship.context)).toBeNull();
+      expect(within(card).getByText(internship.context)).toBeVisible();
       expect(within(card).queryByText(internship.status)).toBeNull();
       expect(within(card).queryByRole("list", { name: `${internship.company} 工程旅程` })).toBeNull();
 
@@ -43,6 +43,12 @@ describe("internship story card", () => {
         expect(within(stack).getByText(technology)).toBeVisible();
       }
 
+      const work = within(card).getByRole("list", { name: `${internship.company} 主要工作` });
+      expect(within(work).getAllByRole("listitem")).toHaveLength(3);
+      for (const detail of internship.presentation.details) {
+        expect(within(work).getByText(detail)).toBeVisible();
+      }
+
       const details = card.querySelector("details.internship-details");
       expect(details).not.toBeNull();
       expect(details).not.toHaveAttribute("open");
@@ -51,8 +57,8 @@ describe("internship story card", () => {
       const records = within(details as HTMLElement).getByRole("list", {
         name: `${internship.company} 能力建设记录`,
       });
-      expect(within(records).getAllByRole("listitem")).toHaveLength(3);
-      for (const detail of internship.presentation.details) {
+      expect(within(records).getAllByRole("listitem")).toHaveLength(internship.highlights.length);
+      for (const detail of internship.highlights) {
         expect(within(records).getByText(detail)).toBeInTheDocument();
       }
 

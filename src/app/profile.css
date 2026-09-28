@@ -530,7 +530,33 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
   line-height: 1.7;
 }
 
-.internship-outcome-text {
+.profile-shell .internship-contribution {
+  margin-block: 0.9rem;
+  color: var(--profile-ink);
+  font-weight: 500;
+}
+
+.profile-shell .internship-work {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0 0 1.1rem;
+  padding-left: 1.2rem;
+  color: var(--profile-muted);
+  font-size: 1rem;
+  line-height: 1.8;
+  list-style: disc;
+  overflow-wrap: anywhere;
+}
+
+.profile-shell .internship-work li::marker {
+  color: var(--profile-accent);
+}
+
+.profile-shell .internship-outcome-text {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 2px solid var(--profile-accent);
+  background: rgb(241 223 191 / 30%);
   color: var(--profile-ink);
   font-weight: 500;
 }
@@ -855,11 +881,19 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 
 .open-source-showcase-identity {
   margin: 0 0 0.4rem;
-  color: var(--profile-muted);
+  color: var(--profile-accent-hover);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
+}
+
+.profile-shell .open-source-role-summary {
+  margin: -0.65rem 0 0;
+  max-width: 65ch;
+  color: var(--profile-muted);
+  font-size: 1rem;
+  line-height: 1.8;
 }
 
 .open-source-contributions-heading h4 {
@@ -889,6 +923,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 .open-source-theme-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: 0.85rem;
   margin: -0.35rem 0 0;
   padding: 0;
@@ -1019,6 +1054,72 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 }
 .pr-link:hover { color: var(--profile-accent); text-decoration: underline; text-underline-offset: 4px; }
 
+.profile-shell .open-source-ongoing {
+  padding: 1.25rem 1.4rem;
+  border-left: 2px solid var(--profile-accent);
+  background: rgb(241 223 191 / 25%);
+}
+
+.profile-shell .open-source-ongoing h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.profile-shell .open-source-ongoing > p {
+  margin: 0.35rem 0 0.65rem;
+  color: var(--profile-muted);
+  font-size: 0.8125rem;
+}
+
+.profile-shell .open-source-ongoing ul {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.profile-shell .open-source-ongoing a {
+  display: block;
+  padding-block: 0.35rem;
+  color: var(--profile-ink);
+  font-size: 1rem;
+  line-height: 1.8;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.profile-shell .open-source-ongoing-status {
+  color: var(--profile-accent-hover);
+  font-weight: 600;
+}
+
+.profile-shell .open-source-ongoing a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.profile-shell .open-source-showcase-background,
+.profile-shell .open-source-theme-summary,
+.profile-shell .pr-link {
+  font-size: 1rem;
+}
+
+.profile-shell .open-source-recognition-note,
+.profile-shell .open-source-showcase-boundary,
+.profile-shell .open-source-theme-count,
+.profile-shell .open-source-pr-chip,
+.profile-shell .open-source-eyebrow,
+.profile-shell .open-source-honors a,
+.profile-shell .open-source-stat-label,
+.profile-shell .open-source-theme-index,
+.profile-shell .open-source-showcase-links a,
+.profile-shell .open-source-stars > span:not(.open-source-star-icon),
+.profile-shell .internship-chip {
+  font-size: 0.8125rem;
+}
+
 .open-source-showcase-footer {
   display: flex;
   flex-wrap: wrap;
@@ -1040,7 +1141,7 @@ html[data-profile-motion="enhanced"] .profile-hero-copy {
 @media (max-width: 920px) {
   .open-source-project-overview { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .open-source-recognition { padding: 1.25rem 0 0; border-left: none; border-top: 1px solid var(--profile-line); }
-  .open-source-theme-grid { grid-template-columns: minmax(0, 1fr); }
+  .open-source-theme-grid { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
 }
 
 @media (max-width: 480px) {

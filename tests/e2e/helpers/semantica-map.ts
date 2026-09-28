@@ -3,7 +3,7 @@ import { expect, type Locator } from "@playwright/test";
 /**
  * Asserts the Semantica open-source credibility summary: four resume-aligned
  * contribution themes with their merged PR chips, the collapsed details holding
- * the remaining merged PRs (open contributions are intentionally not rendered),
+ * the remaining merged PRs, the separate ongoing contribution,
  * and the snapshot footer.
  */
 export async function expectSemanticaMapComplete(showcase: Locator): Promise<void> {
@@ -20,8 +20,8 @@ export async function expectSemanticaMapComplete(showcase: Locator): Promise<voi
   }
 
   const themeLinks = themeList.getByRole("link", { name: /^已合并 · PR #/ });
-  await expect(themeLinks).toHaveCount(6);
-  for (const [index, number] of [1096, 1077, 1556, 1544, 1243, 1226].entries()) {
+  await expect(themeLinks).toHaveCount(7);
+  for (const [index, number] of [1096, 1077, 1675, 1556, 1544, 1243, 1226].entries()) {
     await expect(themeLinks.nth(index)).toHaveAttribute(
       "href",
       `https://github.com/semantica-agi/semantica/pull/${number}`,
@@ -36,8 +36,9 @@ export async function expectSemanticaMapComplete(showcase: Locator): Promise<voi
   const details = showcase.locator("details.open-source-showcase-details");
   await expect(details).toBeVisible();
   await expect(details).not.toHaveAttribute("open");
+  await expect(showcase.getByRole("region", { name: "正在推进" }).getByRole("link", { name: /^进行中 · PR #1731/ })).toBeVisible();
 
   await expect(
-    showcase.getByText("截至 2026-09-20：17 个贡献已合并"),
+    showcase.getByText("截至 2026-09-28：18 个贡献已合并"),
   ).toBeVisible();
 }

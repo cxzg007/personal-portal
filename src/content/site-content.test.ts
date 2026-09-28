@@ -18,21 +18,23 @@ describe("public resume content", () => {
   it("supports two evidence-backed homepage metrics", () => {
     expect(content.metrics.map(({ value, label }: { value: number; label: string }) => ({ value, label }))).toEqual([
       { value: 3, label: "实习经历" },
-      { value: 17, label: "已合并 PR" },
+      { value: 18, label: "已合并 PR" },
     ]);
   });
 
-  it("exposes all seventeen verified merged contributions without private fields", () => {
-    expect(content.openSource.snapshotDate).toBe("2026-09-20");
-    expect(content.openSource.recognition.stars).toBe(13300);
+  it("exposes eighteen merged contributions and one open PR without private fields", () => {
+    expect(content.openSource.snapshotDate).toBe("2026-09-28");
+    expect(content.openSource.recognition.stars).toBe(13513);
+    expect(content.openSource.recognition.honorsCheckedAt).toBe("2026-09-20");
+    expect(content.openSource.identity).toBe("项目维护者 · Maintainer / Collaborator · cxzg007");
     const contributions = content.openSource.contributions;
     expect(contributions.map((pr: { number: number }) => pr.number)).toEqual([
-      1556, 1544, 1364, 1360, 1243, 1226, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1096, 1094,
+      1731, 1675, 1556, 1544, 1364, 1360, 1243, 1226, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1096, 1094,
       1081, 1077,
     ]);
     for (const contribution of contributions) {
       expect(Object.keys(contribution).sort()).toEqual(["number", "status", "title", "url"]);
-      expect(contribution.status).toBe("merged");
+      expect(contribution.status).toBe(contribution.number === 1731 ? "open" : "merged");
       expect(contribution.url).toBe(`https://github.com/semantica-agi/semantica/pull/${contribution.number}`);
     }
   });
@@ -48,7 +50,9 @@ describe("public resume content", () => {
     ]);
 
     const grouped = themes.flatMap(({ prNumbers }: { prNumbers: number[] }) => prNumbers);
-    const merged = content.openSource.contributions.map((pr: { number: number }) => pr.number);
+    const merged = content.openSource.contributions
+      .filter((pr: { status: string }) => pr.status === "merged")
+      .map((pr: { number: number }) => pr.number);
     expect(new Set(grouped).size).toBe(grouped.length);
     expect([...grouped].sort((a: number, b: number) => b - a)).toEqual(merged);
 
@@ -77,7 +81,7 @@ describe("public resume content", () => {
     ).toEqual(["findata-platform", "clip-player", "uav-pilot"]);
   });
 
-  it("presents every internship through a concise editorial summary", () => {
+  it("presents every internship with three main work items and the measured outcomes", () => {
     const internships = content.internships as Array<{
       presentation: { outcome: string; details: string[]; technologies: string[] };
     }>;
@@ -85,7 +89,7 @@ describe("public resume content", () => {
     expect(internships.map(({ presentation }) => presentation.outcome)).toEqual([
       "支持 13 个比较算子、11 个聚合算子，批量写回具备事务与行数校验。",
       "50 并发下，已接纳请求 P99 时延由 810ms 降至 375ms。",
-      "默认评测集上 Recall@5 达 91.67%。",
+      "默认评测集上 Recall@5 达 91.67%，MRR@10 达 75.69%，任务规划完整率达 95.83%。",
     ]);
 
     for (const internship of internships) {
@@ -98,8 +102,8 @@ describe("public resume content", () => {
     expect(internships[1].presentation.details.join("\n")).toContain("clip-player");
     const shipbuildingDetails = internships[2].presentation.details.join("\n");
     expect(shipbuildingDetails).toContain("UAV-pilot");
-    expect(shipbuildingDetails).toContain("MRR@10 达 75.69%");
-    expect(shipbuildingDetails).toContain("任务规划完整率达 95.83%");
+    expect(shipbuildingDetails).toContain("四条路径");
+    expect(shipbuildingDetails).toContain("trace_id");
   });
 
   it("replaces the knowledge-memory case with the RAG agent case", () => {
