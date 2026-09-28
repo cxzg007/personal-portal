@@ -13,7 +13,9 @@
 }
 
 .canvasFigure {
+  min-width: 0;
   margin: 0;
+  container: architecture / inline-size;
 }
 
 .canvas {
@@ -39,6 +41,9 @@
 
 .node {
   position: absolute;
+  left: var(--node-left);
+  top: var(--node-top);
+  width: var(--node-width);
   z-index: 1;
   transform: translate(-50%, -50%);
   display: inline-flex;
@@ -51,8 +56,8 @@
   background: var(--profile-panel);
   color: var(--profile-ink);
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
   line-height: 1.4;
   text-align: center;
   cursor: pointer;
@@ -81,8 +86,8 @@
   margin: 0.5rem 0 0;
   color: var(--profile-muted);
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
+  font-size: 0.8125rem;
+  line-height: 1.6;
   text-align: center;
   text-transform: uppercase;
 }
@@ -112,8 +117,7 @@
   margin: 0 0 0.65rem;
   color: var(--profile-accent);
   font-family: var(--font-mono);
-  font-size: 0.82rem;
-  letter-spacing: 0.14em;
+  font-size: 0.9375rem;
   text-transform: uppercase;
 }
 
@@ -131,15 +135,15 @@
 .detailLabel {
   color: var(--profile-muted);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
+  font-size: 0.8125rem;
 }
 
 .detailText {
   margin: 0;
   color: var(--profile-ink);
-  font-size: 0.88rem;
+  font-size: 1rem;
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
 .prLink {
@@ -161,8 +165,7 @@
   border-radius: 999px;
   color: var(--profile-sage);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
+  font-size: 0.8125rem;
   text-transform: uppercase;
   vertical-align: middle;
 }
@@ -179,11 +182,32 @@
 
   .node {
     min-height: 3rem;
-    font-size: 0.72rem;
   }
 
   .explanation {
     min-height: 0;
+  }
+}
+
+/* Narrow containers and enlarged text use natural rows, so node labels never
+   overlap. DOM order and the adjacent node explanations stay the same. */
+@container architecture (max-width: 18rem) {
+  .canvas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  .canvasSvg {
+    display: none;
+  }
+
+  .node {
+    position: static;
+    width: 100%;
+    transform: none;
   }
 }
 

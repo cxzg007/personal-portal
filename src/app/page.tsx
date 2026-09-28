@@ -55,26 +55,26 @@ export default async function HomePage() {
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
           type="application/ld+json"
         />
-        <ProfileHero profile={content.profile} />
-        <section aria-labelledby="internships-heading" className="profile-stage profile-stage--sage" id="internships">
+        <ProfileHero internships={content.internships} profile={content.profile} />
+        <section aria-labelledby="internships-heading" className="profile-stage" id="internships">
           <h2 className="profile-reveal" id="internships-heading">实习经历</h2>
           <StickyInternshipStack internships={content.internships} />
         </section>
-        <section aria-labelledby="systems-heading" className="profile-stage profile-stage--cream" id="systems">
+        <section aria-labelledby="systems-heading" className="profile-stage" id="systems">
           <h2 className="profile-reveal" id="systems-heading">系统设计</h2>
           <SystemProjectTabs architectures={loadSystemArchitectures(content)} projects={content.caseStudies} />
         </section>
-        <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--terracotta profile-stage--open-source" id="open-source">
+        <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--open-source" id="open-source">
           <h2 className="profile-reveal" id="open-source-heading">开源贡献</h2>
           <OpenSourceShowcase project={content.openSource} />
         </section>
         {featuredPosts.length > 0 ? (
-          <section aria-labelledby="writing-heading" className="profile-stage profile-stage--sage" id="writing">
+          <section aria-labelledby="writing-heading" className="profile-stage" id="writing">
             <h2 className="profile-reveal" id="writing-heading">技术博客</h2>
             <WritingStage posts={featuredPosts} />
           </section>
         ) : null}
-        <section aria-labelledby="contact-heading" className="profile-stage profile-stage--terracotta" id="contact">
+        <section aria-labelledby="contact-heading" className="profile-stage profile-stage--contact" id="contact">
           <h2 className="profile-reveal" id="contact-heading">一起构建可靠的 AI 系统。</h2>
           <ContactStage profile={content.profile} />
         </section>

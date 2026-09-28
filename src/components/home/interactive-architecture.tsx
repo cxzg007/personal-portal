@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 
 import type {
   ResolvedArchitectureNode,
@@ -91,10 +91,10 @@ export function InteractiveArchitecture({
                 id={`architecture-node-${architecture.projectId}-${node.id}`}
                 className={styles.node}
                 style={{
-                  left: `${(center.cx / VIEW_WIDTH) * 100}%`,
-                  top: `${(center.cy / VIEW_HEIGHT) * 100}%`,
-                  width: `calc(${100 / columnCount}% - ${NODE_GAP}px)`,
-                }}
+                  "--node-left": `${(center.cx / VIEW_WIDTH) * 100}%`,
+                  "--node-top": `${(center.cy / VIEW_HEIGHT) * 100}%`,
+                  "--node-width": `calc(${100 / columnCount}% - ${NODE_GAP}px)`,
+                } as CSSProperties}
                 aria-pressed={node.id === activeNode.id}
                 aria-controls={regionId}
                 onClick={() => setActiveNodeId(node.id)}

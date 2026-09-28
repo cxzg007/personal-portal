@@ -15,6 +15,8 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
       className="sticky-internship-card"
       data-brand={internship.logo.theme}
       data-card-index={index}
+      id={`internship-${internship.id}`}
+      tabIndex={-1}
     >
       <header className="internship-card-header">
         <div className="internship-identity">

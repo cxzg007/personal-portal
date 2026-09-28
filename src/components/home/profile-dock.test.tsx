@@ -10,13 +10,6 @@ const { profile } = loadSiteContent();
 afterEach(cleanup);
 
 describe("profile dock", () => {
-  it("renders the real name and the merged recruiting identity line", () => {
-    render(<ProfileDock profile={profile} />);
-
-    expect(screen.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
-    expect(screen.getByText(`2027 届校招 · ${profile.targetRole}`)).toBeVisible();
-  });
-
   it("renders exactly two education rows with the badge block layout", () => {
     render(<ProfileDock profile={profile} />);
 

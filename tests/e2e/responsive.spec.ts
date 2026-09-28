@@ -103,6 +103,37 @@ async function expectNoHiddenOffscreenContent(page: Page) {
   expect(offenders).toEqual([]);
 }
 
+for (const width of [320, 390, 768, 1440]) {
+  test(`homepage reflows at 200% text size in a ${width}px viewport`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+    await expect(page.locator("html")).toHaveCSS("font-size", "32px");
+
+    for (const tab of await page.getByRole("tab").all()) {
+      await tab.click();
+      await expect(tab).toHaveAttribute("aria-selected", "true");
+      const overlaps = await page.locator('[id^="architecture-node-"]').evaluateAll((nodes) => {
+        const boxes = nodes.map((node) => ({ label: node.textContent, rect: node.getBoundingClientRect() }));
+        return boxes.flatMap((a, index) => boxes.slice(index + 1).flatMap((b) =>
+          a.rect.left < b.rect.right && a.rect.right > b.rect.left &&
+          a.rect.top < b.rect.bottom && a.rect.bottom > b.rect.top
+            ? [`${a.label} overlaps ${b.label}`] : [],
+        ));
+      });
+      expect(overlaps).toEqual([]);
+      await expectNoHiddenOffscreenContent(page);
+    }
+
+    for (const summary of await page.locator("main details summary").all()) {
+      await summary.click();
+    }
+    await expectNoHiddenOffscreenContent(page);
+    await expectNoHorizontalOverflow(page);
+  });
+}
+
 for (const viewport of viewports) {
   test(`homepage remains complete at ${viewport.label} ${viewport.width}x${viewport.height}`, async ({
     page,

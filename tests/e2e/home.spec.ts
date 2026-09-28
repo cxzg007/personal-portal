@@ -389,7 +389,7 @@ test("brand marks load eagerly and never shift page height after load", async ({
   await page.goto("/");
 
   const marks = page.locator("main .brand-mark img");
-  await expect(marks).toHaveCount(4);
+  await expect(marks).toHaveCount(7);
 
   // `page.goto` waits for the load event, so every brand mark (including the
   // below-the-fold Semantica logo) must already be decoded at this point.

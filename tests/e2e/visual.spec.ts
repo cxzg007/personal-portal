@@ -49,14 +49,16 @@ test("internship story stack visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 
   await prepareStablePage(page, "/");
-  await expect(page.locator("main > section#internships")).toHaveScreenshot("sticky-internships-1440.png");
+  const clip = await combinedRegion(page, [page.locator("main > section#internships")]);
+  await expect(page).toHaveScreenshot("sticky-internships-1440.png", { fullPage: true, clip });
 });
 
 test("system project tabs visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 
   await prepareStablePage(page, "/");
-  await expect(page.locator("main > section#systems")).toHaveScreenshot("system-tabs-1440.png");
+  const clip = await combinedRegion(page, [page.locator("main > section#systems")]);
+  await expect(page).toHaveScreenshot("system-tabs-1440.png", { fullPage: true, clip });
 });
 
 test("open source showcase visual at 1440", async ({ page }, testInfo) => {

@@ -2,9 +2,6 @@
 
 import { useEffect } from "react";
 
-import { getHeroProgress } from "@/lib/hero-network";
-import { createHeroNetworkDriver, type HeroNetworkDriver } from "@/lib/hero-network-driver";
-
 // 激活线取页头下方 240px：页面在窄视口（如 768×1024 tablet）缩短后，
 // 靠底部的 writing 分区顶部最多只能进入页头下方约 216px 处（更小的窗口
 // 会先触发页底兜底），160px 的旧阈值会使其永远无法被高亮。
@@ -20,10 +17,6 @@ export function selectActiveSection(
 }
 
 const DEFAULT_HEADER_HEIGHT = 72;
-
-// 入场动画：约 360ms 展开静态链路，随后一次性微动收敛，总计不超过 4 秒。
-const INTRO_EXPAND_MS = 360;
-const INTRO_SETTLE_MS = 3_640;
 
 function getHeaderHeight(): number {
   const header = document.querySelector<HTMLElement>(".site-header");
@@ -51,10 +44,6 @@ function setNavigationState(activeId: string) {
   });
 }
 
-function clampPointer(value: number): number {
-  return Math.max(-1, Math.min(1, value));
-}
-
 function clearMotionState() {
   document.querySelectorAll<HTMLElement>(".profile-reveal").forEach((element) => {
     element.removeAttribute("data-in-view");
@@ -62,8 +51,6 @@ function clearMotionState() {
   document.querySelectorAll<HTMLElement>("[data-nav-section]").forEach((element) => {
     element.removeAttribute("aria-current");
   });
-  document.documentElement.style.removeProperty("--profile-pointer-x");
-  document.documentElement.style.removeProperty("--profile-pointer-y");
   document.documentElement.removeAttribute("data-active-section");
 }
 
@@ -74,17 +61,7 @@ export function PageMotionController() {
     const viewportPreference = window.matchMedia("(max-width: 760px)");
     let frameId: number | null = null;
     let observer: IntersectionObserver | null = null;
-    let heroObserver: IntersectionObserver | null = null;
     let listening = false;
-    let hero: HTMLElement | null = null;
-    let pointer: { x: number; y: number } | null = null;
-    let driver: HeroNetworkDriver | null = null;
-    let heroVisible = true;
-    let introPlayed = false;
-    let introPhase: "expand" | "settle" | "off" = "off";
-    let introStart = 0;
-    let introLastFrame = -1;
-
     const update = () => {
       frameId = null;
       const headerHeight = getHeaderHeight();
@@ -98,51 +75,6 @@ export function PageMotionController() {
           : selectActiveSection(entries, headerHeight);
       root.dataset.activeSection = activeSection;
       setNavigationState(activeSection);
-
-      if (pointer && hero) {
-        const bounds = hero.getBoundingClientRect();
-        if (bounds.width > 0 && bounds.height > 0) {
-          root.style.setProperty(
-            "--profile-pointer-x",
-            String(clampPointer((pointer.x / bounds.width) * 2 - 1)),
-          );
-          root.style.setProperty(
-            "--profile-pointer-y",
-            String(clampPointer((pointer.y / bounds.height) * 2 - 1)),
-          );
-        }
-      }
-
-      if (driver && hero && heroVisible && !document.hidden) {
-        const now = performance.now();
-        let networkProgress: number;
-        if (introPhase === "expand") {
-          networkProgress = Math.min(1, (now - introStart) / INTRO_EXPAND_MS);
-          if (networkProgress >= 1) {
-            introPhase = "settle";
-            introStart = now;
-          }
-        } else if (introPhase === "settle") {
-          const settleT = (now - introStart) / INTRO_SETTLE_MS;
-          if (settleT >= 1) {
-            introPhase = "off";
-            networkProgress = 1;
-          } else {
-            const decay = 1 - settleT;
-            networkProgress = 1 - 0.04 * Math.sin(settleT * Math.PI * 2) * decay;
-          }
-        } else {
-          const bounds = hero.getBoundingClientRect();
-          networkProgress = getHeroProgress(bounds.top, bounds.height);
-        }
-        driver.update(networkProgress, pointer);
-        // 入场阶段共用同一个 RAF 队列逐帧推进；结束后不再自行续帧。
-        // 同步 RAF stub（jsdom 测试）中时间戳不推进，用该守卫避免无限递归。
-        if (introPhase !== "off" && now !== introLastFrame) {
-          introLastFrame = now;
-          scheduleUpdate();
-        }
-      }
     };
 
     const scheduleUpdate = () => {
@@ -152,63 +84,20 @@ export function PageMotionController() {
       if (frameId === -1) frameId = handle;
     };
 
-    const handlePointerMove = (event: PointerEvent) => {
-      pointer = { x: event.clientX, y: event.clientY };
-      scheduleUpdate();
-    };
-
-    const handlePointerLeave = () => {
-      pointer = null;
-      scheduleUpdate();
-    };
-
-    // 用户一旦滚动立即结束入场动画，直接衔接滚动目标进度。
-    const handleScroll = () => {
-      if (introPhase !== "off") {
-        introPhase = "off";
-      }
-      scheduleUpdate();
-    };
-
-    const handleVisibilityChange = () => {
-      const running = !document.hidden;
-      driver?.setRunning(running);
-      if (running) {
-        scheduleUpdate();
-      }
-    };
-
     const stopEnhanced = () => {
       if (observer) {
         observer.disconnect();
         observer = null;
       }
-      if (heroObserver) {
-        heroObserver.disconnect();
-        heroObserver = null;
-      }
-      if (driver) {
-        driver.destroy();
-        driver = null;
-      }
-      heroVisible = true;
-      introPhase = "off";
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (frameId !== null) {
         window.cancelAnimationFrame(frameId);
         frameId = null;
       }
       if (listening) {
-        window.removeEventListener("scroll", handleScroll);
+        window.removeEventListener("scroll", scheduleUpdate);
         window.removeEventListener("resize", scheduleUpdate);
         listening = false;
       }
-      if (hero) {
-        hero.removeEventListener("pointermove", handlePointerMove);
-        hero.removeEventListener("pointerleave", handlePointerLeave);
-        hero = null;
-      }
-      pointer = null;
     };
 
     const applyPreference = () => {
@@ -237,40 +126,9 @@ export function PageMotionController() {
         observer = revealObserver;
       }
       if (!listening) {
-        window.addEventListener("scroll", handleScroll, { passive: true });
+        window.addEventListener("scroll", scheduleUpdate, { passive: true });
         window.addEventListener("resize", scheduleUpdate, { passive: true });
         listening = true;
-      }
-      hero = document.getElementById("profile");
-      hero?.addEventListener("pointermove", handlePointerMove, { passive: true });
-      hero?.addEventListener("pointerleave", handlePointerLeave, { passive: true });
-      if (!driver) {
-        const networkSvg = document.querySelector<SVGSVGElement>("[data-hero-network]");
-        if (networkSvg) {
-          driver = createHeroNetworkDriver(networkSvg);
-          driver.setRunning(!document.hidden);
-          heroVisible = !document.hidden;
-          document.addEventListener("visibilitychange", handleVisibilityChange);
-          const networkVisibilityObserver = new IntersectionObserver((entries) => {
-            const visible =
-              entries.some((entry) => entry.isIntersecting) && !document.hidden;
-            heroVisible = visible;
-            driver?.setRunning(visible);
-            if (visible) {
-              scheduleUpdate();
-            }
-          });
-          networkVisibilityObserver.observe(networkSvg);
-          heroObserver = networkVisibilityObserver;
-          // 仅首次挂载且当前在页面顶部时播放入场动画；
-          // preference 往返切换或恢复到中间滚动位置时直接使用当前进度，不闪回。
-          if (!introPlayed && window.scrollY <= 4) {
-            introPlayed = true;
-            introPhase = "expand";
-            introStart = performance.now();
-            introLastFrame = -1;
-          }
-        }
       }
       update();
     };

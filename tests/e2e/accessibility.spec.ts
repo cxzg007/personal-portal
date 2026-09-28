@@ -72,6 +72,9 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
     hero.getByRole("link", { name: "查看实习", exact: true }),
     hero.getByRole("link", { name: "GitHub ↗", exact: true }),
+    ...["京东", "智元机器人", "中国船舶集团 722 研究所"].map((company) =>
+      hero.getByRole("link", { name: `查看${company}实习经历`, exact: true }),
+    ),
     hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com", exact: true }),
     hero.getByRole("link", { name: "GitHub", exact: true }),
     page.locator("main > section#internships").getByText("查看京东工程细节"),

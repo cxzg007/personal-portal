@@ -49,7 +49,6 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
         <header className="open-source-showcase-header">
           <div className="open-source-project-heading">
             <div>
-              <p className="open-source-eyebrow">OPEN SOURCE / 开源共建</p>
               <h3 id="open-source-showcase-heading">{project.name}</h3>
             </div>
             <BrandMark asset={project.logo} />
@@ -97,13 +96,10 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
       <p className="open-source-role-summary">{project.roleSummary}</p>
 
       <ul aria-label="Semantica 贡献主题" className="open-source-theme-grid">
-        {themeGroups.map(({ theme, contributions }, index) => (
+        {themeGroups.map(({ theme, contributions }) => (
           <li className="open-source-theme-item" data-theme-id={theme.id} key={theme.id}>
             <div className="open-source-theme-card">
               <div className="open-source-theme-header">
-                <span aria-hidden="true" className="open-source-theme-index">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
                 <h5 className="open-source-theme-name">{theme.name}</h5>
                 <span className="open-source-theme-count">{`${contributions.length} 个已合并 PR`}</span>
               </div>
@@ -131,7 +127,7 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
 
       {otherGroup ? (
         <details className="open-source-showcase-details">
-          <summary><span>{`查看其他 ${otherGroup.contributions.length} 个已合并 PR`}</span><span className="open-source-disclosure-icon" aria-hidden="true">+</span></summary>
+          <summary><span>{`查看其他 ${otherGroup.contributions.length} 个已合并 PR`}</span><span className="open-source-disclosure-icon" aria-hidden="true" /></summary>
           <p className="open-source-theme-summary open-source-other-summary">{otherGroup.theme.summary}</p>
           <ul aria-label="Semantica 其余已合并贡献" className="pr-list">
             {otherGroup.contributions.map((contribution) => (

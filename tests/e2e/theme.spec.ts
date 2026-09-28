@@ -1,7 +1,7 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-test("homepage uses the light warm paper tokens", async ({ page }) => {
+test("homepage uses the cool white and blue design tokens", async ({ page }) => {
   await page.goto("/");
   const tokens = await page.evaluate(() => {
     const shell = document.querySelector<HTMLElement>(".profile-shell");
@@ -12,14 +12,14 @@ test("homepage uses the light warm paper tokens", async ({ page }) => {
       muted: styles.getPropertyValue("--profile-muted").trim(),
     };
   });
-  expect(tokens.ink).toBe("#30261f");
-  expect(tokens.bg).toBe("#faf9f6");
-  expect(tokens.muted).toBe("#6f6257");
+  expect(tokens.ink).toBe("#172b45");
+  expect(tokens.bg).toBe("#f4f7fb");
+  expect(tokens.muted).toBe("#53657d");
 });
 
 test("homepage paints a solid editorial surface without gradients or card shadows", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".profile-shell")).toHaveCSS("background-color", "rgb(250, 249, 246)");
+  await expect(page.locator(".profile-shell")).toHaveCSS("background-color", "rgb(244, 247, 251)");
   await expect(page.locator("#internships article").first()).toHaveCSS("box-shadow", "none");
   const font = await page
     .locator("#profile h1")
@@ -34,7 +34,7 @@ test("homepage keeps readable contrast on the light theme", async ({ page }) => 
   expect(contrast).toEqual([]);
 });
 
-test("site exposes the warm portfolio token and type system", async ({ page }) => {
+test("homepage separates its blue type system from the existing blog palette", async ({ page }) => {
   await page.goto("/");
   const values = await page.evaluate(() => {
     const root = getComputedStyle(document.documentElement);
@@ -49,8 +49,8 @@ test("site exposes the warm portfolio token and type system", async ({ page }) =
     };
   });
   expect(values).toMatchObject({ page: "#f8efdc", terracotta: "#b85f3f", sage: "#7d9270" });
-  expect(values.heading).toContain("Noto Serif SC");
-  expect(values.meta).toMatch(/Mono|monospace/);
+  expect(values.heading).toContain("system-ui");
+  expect(values.meta).toContain("system-ui");
 });
 
 test("root document background is light, not dark", async ({ page }) => {
@@ -101,7 +101,7 @@ test("sticky navigation uses a translucent cream panel with a soft shadow", asyn
   expect(nav.shadow).not.toBe("none");
 });
 
-test("focused navigation and call-to-action links show a terracotta ring of at least 2px", async ({ page }) => {
+test("focused navigation and call-to-action links show a blue ring of at least 2px", async ({ page }) => {
   await page.goto("/");
   // 移动视口（<=760px）下桌面主导航被隐藏，链接只存在于汉堡菜单抽屉中，
   // 需先打开菜单并改用「移动导航」定位，否则 Tab 无法聚焦到目标链接。
@@ -134,15 +134,16 @@ test("focused navigation and call-to-action links show a terracotta ring of at l
   for (const ring of [navRing, ctaRing]) {
     expect(ring.style).not.toBe("none");
     expect(Number.parseFloat(ring.width)).toBeGreaterThanOrEqual(2);
-    expect(ring.color).toBe("rgb(182, 83, 53)");
+    expect(ring.color).toBe("rgb(36, 88, 166)");
   }
 });
 
-test("homepage alternates warm portfolio section themes", async ({ page }) => {
+test("homepage sections use the same undecorated reading surface", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#internships")).toHaveClass(/profile-stage--sage/);
-  await expect(page.locator("#systems")).toHaveClass(/profile-stage--cream/);
-  await expect(page.locator("#open-source")).toHaveClass(/profile-stage--terracotta/);
-  await expect(page.locator("#writing")).toHaveClass(/profile-stage--sage/);
-  await expect(page.locator("#contact")).toHaveClass(/profile-stage--terracotta/);
+  for (const id of ["internships", "systems", "open-source", "writing", "contact"]) {
+    const section = page.locator(`#${id}`);
+    await expect(section).toBeVisible();
+    const decoration = await section.evaluate((element) => getComputedStyle(element, "::before").content);
+    expect(decoration).toBe("none");
+  }
 });

@@ -5,13 +5,13 @@ import { loadSiteContent } from "@/content/load-site-content";
 
 import { ProfileHero } from "./profile-hero";
 
-const { profile } = loadSiteContent();
+const { profile, internships } = loadSiteContent();
 
 afterEach(cleanup);
 
 describe("profile hero", () => {
   it("renders the identity headline, real name, primary actions, and the merged dock identity", () => {
-    render(<ProfileHero profile={profile} />);
+    render(<ProfileHero internships={internships} profile={profile} />);
 
     expect(screen.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
     expect(screen.queryByText("cxzg007 Profile")).not.toBeInTheDocument();
@@ -25,10 +25,15 @@ describe("profile hero", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders the kicker, the lead, and the positioning statement", () => {
-    render(<ProfileHero profile={profile} />);
+  it("renders the lead, positioning statement, and verified internship index", () => {
+    render(<ProfileHero internships={internships} profile={profile} />);
 
-    expect(screen.getByText("RELIABLE AGENT · BACKEND SYSTEMS")).toBeVisible();
+    const index = screen.getByRole("navigation", { name: "经历索引" });
+    expect(index).toBeVisible();
+    for (const internship of internships) {
+      expect(screen.getByRole("link", { name: `查看${internship.company}实习经历` })).toHaveAttribute("href", `#internship-${internship.id}`);
+      expect(screen.getByText(internship.presentation.title)).toBeVisible();
+    }
     expect(screen.getByText("构建可靠的 Agent 系统")).toBeVisible();
     expect(
       screen.getByText("从语义建模到执行约束，关注 AI 应用与后端系统的可靠落地。"),
