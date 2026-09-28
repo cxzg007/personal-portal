@@ -40,10 +40,10 @@ export default function BlogPage() {
           <Link className="blog-back-link" href="/#top">
             <span aria-hidden="true">←</span> 返回首页
           </Link>
-          <p className="eyebrow">ENGINEERING NOTES / {posts.length.toString().padStart(2, "0")}</p>
+          <p className="eyebrow">ENGINEERING NOTES</p>
           <h1>技术博客</h1>
           <p>
-            记录 Agent 工程、后端系统与开源协作中的问题边界、技术取舍和可验证结论。
+            关于 Agent、业务语义与系统设计。记录一个问题的来由、推敲过程与工程取舍。
           </p>
         </header>
         <BlogFilter posts={posts} />

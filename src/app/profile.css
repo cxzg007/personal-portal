@@ -1,5 +1,5 @@
-/* Personal Portal — reviewed UI UX Pro Max design system.
-   Homepage scope keeps the blog's existing presentation independent. */
+/* Personal Portal — UI UX Pro Max design system, homepage scope.
+   Blog reading layouts use the same palette in blog.css. */
 .profile-shell {
   --font-body: system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
   --profile-bg: #f4f7fb;

@@ -5,7 +5,7 @@ const articleSlug = "graph-engineering-ontology";
 const articleTitle = "图工程之后：多智能体系统缺的是一层语义";
 // 详情页 meta description 与 BlogPosting JSON-LD 均取 front-matter 的 seoDescription（非 description）。
 const articleDescription =
-  "从图工程的语义缺口出发，讨论本体工程（RDF/OWL/SHACL）如何为多智能体系统提供可推理、可校验、可演化的语义层，并给出四级落地路径。";
+  "以多智能体代码审查为例，讨论图结构与共享语义的关系，区分 OWL 推理、SHACL 数据校验和运行时调度，并分析语义层的落地边界。";
 const blogDescription = "关于 AI Agent、后端系统、知识图谱与工程协作的公开技术文章。";
 
 test("homepage publishes canonical, share metadata, and validated ProfilePage JSON-LD", async ({ page }) => {
@@ -132,7 +132,7 @@ test("article publishes its own metadata and BlogPosting JSON-LD", async ({ page
     headline: articleTitle,
     description: articleDescription,
     datePublished: "2026-09-03",
-    dateModified: "2026-09-21",
+    dateModified: "2026-09-28",
     url: `${siteOrigin}/blog/${articleSlug}`,
     author: { "@type": "Person", name: "江俊杰" },
   });

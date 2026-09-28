@@ -18,7 +18,7 @@ export const blogMdxComponents = {
   pre: ({ children, ...props }) => (
     <div className="code-frame">
       <span aria-hidden="true" className="code-frame-label">
-        PSEUDOCODE
+        代码示例
       </span>
       <pre {...props} tabIndex={0}>{children}</pre>
     </div>

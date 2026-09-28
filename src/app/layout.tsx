@@ -5,6 +5,7 @@ import { getSiteUrl } from "@/lib/site-url";
 import "@fontsource/noto-serif-sc/600.css";
 import "./globals.css";
 import "./profile.css";
+import "./blog.css";
 
 const content = loadSiteContent();
 const siteUrl = getSiteUrl();

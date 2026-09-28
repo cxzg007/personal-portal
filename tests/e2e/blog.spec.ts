@@ -4,6 +4,103 @@ import type { Page } from "@playwright/test";
 const ontologyTitle = "Palantir 本体论：把业务语义做成可执行的操作层";
 const graphOntologyTitle = "图工程之后：多智能体系统缺的是一层语义";
 
+test("mobile contents can be expanded and followed without JavaScript", async ({ browser }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "one no-JavaScript check at a mobile viewport");
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 390, height: 844 },
+    reducedMotion: "reduce",
+  });
+  const page = await context.newPage();
+  try {
+    for (const slug of ["graph-engineering-ontology", "palantir-ontology-notes"]) {
+      await page.goto(`${testInfo.project.use.baseURL}/blog/${slug}`);
+      const summary = page.locator(".article-toc-mobile summary");
+      const toc = page.getByRole("navigation", { name: "文章目录" });
+      await expect(summary).toBeVisible();
+      await expect(toc.getByRole("link")).toHaveCount(0);
+      await summary.focus();
+      await page.keyboard.press("Enter");
+      const lastSection = toc.getByRole("link", { name: "参考资料", exact: true });
+      await expect(lastSection).toBeVisible();
+      await lastSection.click();
+      await expect(page.getByRole("heading", { name: "参考资料", exact: true })).toBeInViewport();
+    }
+  } finally {
+    await context.close();
+  }
+});
+
+test("both articles remain readable with 200 percent text at narrow and wide widths", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "explicit viewport matrix");
+  for (const slug of ["graph-engineering-ontology", "palantir-ontology-notes"]) {
+    await page.goto(`/blog/${slug}`);
+    await expect(page.locator(".article-prose")).toBeVisible();
+    await page.addStyleTag({ content: "html { font-size: 200%; }" });
+    for (const width of [320, 390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const geometry = await page.evaluate(() => {
+        const elements = document.querySelectorAll<HTMLElement>(
+          ".article-header, .article-toc, .article-prose, .article-prose p, .article-prose h2, .code-frame, .header-inner, .site-mark, .desktop-navigation, .navigation-list a",
+        );
+        return {
+          overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+          outside: [...elements].filter((node) => {
+            const rect = node.getBoundingClientRect();
+            return rect.left < 0 || rect.right > window.innerWidth + 1;
+          }).map((node) => node.className || node.tagName),
+          proseSize: parseFloat(getComputedStyle(document.querySelector(".article-prose")!).fontSize),
+          navOverlap: (() => {
+            const mark = document.querySelector(".site-mark")!.getBoundingClientRect();
+            const nav = document.querySelector(".desktop-navigation")!.getBoundingClientRect();
+            return nav.width > 0 && mark.right > nav.left && mark.bottom > nav.top;
+          })(),
+          splitNavigation: [...document.querySelectorAll(".desktop-navigation a")].some((link) => {
+            const range = document.createRange();
+            range.selectNodeContents(link);
+            return new Set([...range.getClientRects()].map((rect) => rect.top)).size > 1;
+          }),
+        };
+      });
+      expect(geometry.overflow, `${slug} at ${width}px`).toBe(false);
+      expect(geometry.outside, `${slug} at ${width}px`).toEqual([]);
+      expect(geometry.navOverlap, `${slug} at ${width}px`).toBe(false);
+      expect(geometry.splitNavigation, `${slug} at ${width}px`).toBe(false);
+      expect(geometry.proseSize).toBeGreaterThanOrEqual(34);
+    }
+  }
+});
+
+test("expanded mobile navigation fits and scrolls at 200 percent text", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "explicit enlarged mobile viewport checks");
+  for (const route of ["/blog", "/blog/graph-engineering-ontology"]) {
+    await page.goto(route);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.addStyleTag({ content: "html { font-size: 200%; }" });
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 568 });
+      await page.getByRole("button", { name: "打开导航菜单" }).click();
+      const menu = page.locator(".mobile-menu-shell");
+      const bounds = (await menu.boundingBox())!;
+      expect(bounds.y + bounds.height).toBeLessThanOrEqual(568);
+      for (const link of await menu.getByRole("link").all()) {
+        await link.focus();
+        await expect(link).toBeInViewport();
+        const fits = await link.evaluate((node) => {
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          const text = range.getBoundingClientRect();
+          const box = node.getBoundingClientRect();
+          return text.left >= box.left && text.right <= box.right + 1;
+        });
+        expect(fits, (await link.textContent()) ?? "navigation link").toBe(true);
+      }
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("button", { name: "打开导航菜单" })).toBeFocused();
+    }
+  }
+});
+
 async function expectNoThreeScene(page: import("@playwright/test").Page) {
   await expect(page.locator("canvas")).toHaveCount(0);
   await expect(page.locator('script[src*="three"], script[src*="react-three"]')).toHaveCount(0);
@@ -85,7 +182,7 @@ test("server-renders the public blog and filters without losing the empty-state 
   await expect(page.getByRole("link", { exact: true, name: graphOntologyTitle })).toBeVisible();
 });
 
-test("blog index keeps the warm portfolio visual language with intact card content", async ({
+test("blog index uses the blue portfolio palette with readable article rows", async ({
   page,
 }) => {
   await page.goto("/blog");
@@ -110,11 +207,11 @@ test("blog index keeps the warm portfolio visual language with intact card conte
   });
 
   expect(values.heroFont).toContain("Noto Serif SC");
-  expect(["rgb(184, 95, 63)", "rgb(136, 68, 47)"]).toContain(values.activeTagBackground);
-  expect(values.filterPanelBackground).toBe("rgb(220, 227, 207)");
-  expect(values.searchFieldFont).toMatch(/Mono|monospace/);
-  expect(values.cardBackground).toBe("rgb(255, 250, 240)");
-  expect(values.cardMetaFont).toMatch(/Mono|monospace/);
+  expect(values.activeTagBackground).toBe("rgb(36, 88, 166)");
+  expect(values.filterPanelBackground).toBe("rgba(0, 0, 0, 0)");
+  expect(values.searchFieldFont).toContain("system-ui");
+  expect(values.cardBackground).toBe("rgba(0, 0, 0, 0)");
+  expect(values.cardMetaFont).toContain("system-ui");
 
   await expect(page.locator(".blog-card h2")).toHaveText([graphOntologyTitle, ontologyTitle]);
   const originalCard = page.locator(".blog-card").filter({ hasText: ontologyTitle });
@@ -129,10 +226,12 @@ test("publishes the ontology article with working contents and adjacent navigati
   await page.getByRole("link", { name: ontologyTitle, exact: true }).click();
   await expect(page).toHaveURL(/\/blog\/palantir-ontology-notes$/);
   await expect(page.getByRole("heading", { level: 1, name: ontologyTitle })).toBeVisible();
+  const disclosure = page.locator(".article-toc-mobile summary");
+  if (await disclosure.isVisible()) await disclosure.click();
   const tocLink = page.getByRole("navigation", { name: "文章目录" })
-    .getByRole("link", { name: "第三维：全场景可执行业务行动统一编码" });
+    .getByRole("link", { name: "动作连接了建议与执行" });
   await tocLink.click();
-  await expect(page.getByRole("heading", { name: "第三维：全场景可执行业务行动统一编码" })).toBeInViewport();
+  await expect(page.getByRole("heading", { name: "动作连接了建议与执行" })).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.getByRole("link", { name: new RegExp(graphOntologyTitle) }).click();
   await expect(page).toHaveURL(/\/blog\/graph-engineering-ontology$/);
@@ -141,7 +240,8 @@ test("publishes the ontology article with working contents and adjacent navigati
     .filter({ hasText: ontologyTitle });
   // Route navigation scrolls this long article to the top before the next interaction.
   await expect(page.locator(".article-prose")).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page.getByRole("heading", { level: 1, name: graphOntologyTitle })).toBeInViewport();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(4);
   await ontologyNeighbor.click();
   await expect(page).toHaveURL(/\/blog\/palantir-ontology-notes$/);
   const rss = await request.get("/rss.xml");
@@ -158,20 +258,19 @@ test("publishes the Graph Engineering ontology article with formatted content", 
   await page.getByRole("link", { name: graphOntologyTitle, exact: true }).click();
   await expect(page).toHaveURL(/\/blog\/graph-engineering-ontology$/);
   await expect(page.getByRole("heading", { level: 1, name: graphOntologyTitle })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "引言：图工程之后还缺什么" })).toBeVisible();
-  await expect(page.locator(".article-prose pre")).toHaveCount(6);
-  await expect(page.locator(".article-prose table")).toHaveCount(4);
+  await expect(page.getByRole("heading", { name: "一张图能说明什么" })).toBeVisible();
+  await expect(page.locator(".article-prose pre")).toContainText("sh:minCount 1");
   await expect(page.locator(".article-prose img")).toHaveCount(0);
   await expect(page.locator(".article-prose")).not.toContainText("**");
   await expect(page.locator(".article-prose")).not.toContainText("原文配图");
 });
 
-test("article keeps a readable warm editorial measure", async ({ page }) => {
+test("article keeps a comfortable reading measure and type size", async ({ page }) => {
   await page.goto("/blog/graph-engineering-ontology");
   const prose = page.locator(".article-prose");
   await expect(prose).toBeVisible();
   await expect(prose).toHaveCSS("font-family", /Inter|PingFang|Microsoft YaHei/);
-  expect((await prose.boundingBox())!.width).toBeLessThanOrEqual(820);
+  expect((await prose.boundingBox())!.width).toBeLessThanOrEqual(720);
   await expect(page.locator(".article-header h1")).toHaveCSS("font-family", /Noto Serif SC/);
 
   const reading = await page.evaluate(() => {
@@ -184,16 +283,18 @@ test("article keeps a readable warm editorial measure", async ({ page }) => {
       proseRatio: parseFloat(proseStyle.lineHeight) / parseFloat(proseStyle.fontSize),
       proseMaxWidth: proseStyle.maxWidth,
       headerBackground: getComputedStyle(header).backgroundColor,
+      fontSize: parseFloat(proseStyle.fontSize),
       tocBackground: getComputedStyle(toc).backgroundColor,
       metaFont: getComputedStyle(meta).fontFamily,
     };
   });
 
-  expect(reading.proseRatio).toBeCloseTo(1.8, 2);
-  expect(reading.proseMaxWidth).toMatch(/^min\(100%, (48rem|768px)\)$/);
-  expect(reading.headerBackground).toBe("rgb(255, 250, 240)");
-  expect(reading.tocBackground).toBe("rgb(220, 227, 207)");
-  expect(reading.metaFont).toMatch(/Mono|monospace/);
+  expect(reading.proseRatio).toBeCloseTo(1.85, 2);
+  expect(reading.fontSize).toBeGreaterThanOrEqual(17);
+  expect(reading.proseMaxWidth).toBe("720px");
+  expect(reading.headerBackground).toBe("rgba(0, 0, 0, 0)");
+  expect(reading.tocBackground).toBe("rgba(0, 0, 0, 0)");
+  expect(reading.metaFont).toContain("system-ui");
 });
 
 test("navigates back to home sections from the blog index", async ({ page }, testInfo) => {
@@ -244,10 +345,12 @@ test("opens the article with a table of contents and returns to the blog index",
     ),
   ).toBe(true);
   await expect(page.getByRole("navigation", { name: "文章目录" })).toBeVisible();
+  const disclosure = page.locator(".article-toc-mobile summary");
+  if (await disclosure.isVisible()) await disclosure.click();
   await expect(
-    page.getByRole("link", { name: "引言：图工程之后还缺什么" }),
+    page.getByRole("link", { name: "一张图能说明什么" }),
   ).toBeVisible();
-  await expect(page.getByText("arXiv 2608.21156", { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "W3C · Shapes Constraint Language（SHACL）", exact: true })).toHaveAttribute("href", "https://www.w3.org/TR/shacl/");
   await expect(page.locator("pre code").first()).toBeVisible();
   await expectNoThreeScene(page);
 

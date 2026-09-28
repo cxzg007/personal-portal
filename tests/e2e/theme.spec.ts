@@ -34,7 +34,7 @@ test("homepage keeps readable contrast on the light theme", async ({ page }) => 
   expect(contrast).toEqual([]);
 });
 
-test("homepage separates its blue type system from the existing blog palette", async ({ page }) => {
+test("homepage keeps its scoped blue type system", async ({ page }) => {
   await page.goto("/");
   const values = await page.evaluate(() => {
     const root = getComputedStyle(document.documentElement);
@@ -77,7 +77,7 @@ test("page canvas paints the warm paper token as a solid background", async ({ p
   expect(colors.bodyBackground).toBe(colors.tokenColor);
 });
 
-test("sticky navigation uses a translucent cream panel with a soft shadow", async ({ page }) => {
+test("blog navigation uses the same white and blue surface as the homepage", async ({ page }) => {
   await page.goto("/blog");
   const nav = await page.evaluate(() => {
     const header = document.querySelector<HTMLElement>(".site-header");
@@ -93,12 +93,12 @@ test("sticky navigation uses a translucent cream panel with a soft shadow", asyn
       shadow: style.boxShadow,
     };
   });
-  expect(nav.background).toBe("rgba(255, 250, 240, 0.82)");
+  expect(nav.background).toBe("rgba(255, 255, 255, 0.94)");
   expect(nav.alpha).toBeGreaterThan(0.5);
   expect(nav.red).toBe(255);
-  expect(nav.green).toBe(250);
-  expect(nav.blue).toBe(240);
-  expect(nav.shadow).not.toBe("none");
+  expect(nav.green).toBe(255);
+  expect(nav.blue).toBe(255);
+  expect(nav.shadow).toBe("none");
 });
 
 test("focused navigation and call-to-action links show a blue ring of at least 2px", async ({ page }) => {
