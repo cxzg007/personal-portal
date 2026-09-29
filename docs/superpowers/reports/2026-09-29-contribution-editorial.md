@@ -20,4 +20,13 @@
 - 新增 PR / #1731 状态变化的内容校验测试先复现失败，再修复通过。独立审查复核后无阻塞问题。
 - 主 checkout 的既有 diff SHA256 保持 `afd747c811249dc85d7bd15a19b0f092f4b404a26a0da7b96f28f0a22b5317a7`。
 
-部署核验将在正式站更新后补充。
+## 正式站部署
+
+- 代码提交：`5d92c9f`，已推送 `origin/design/contribution-editorial`。
+- Vercel Production：`dpl_ATQ7ccx16egCkYF1jzivW7oRmJDQ`，状态 READY。
+- 正式站：https://jiangjunjie-personal-portal.vercel.app/
+- 部署地址：https://jiangjunjie-personal-portal-enl7srlp2-junjie1467-6343s-projects.vercel.app
+- 正式域名真实浏览器核验：HTTP 200；六节点、八个图内 PR、十一项可展开记录；十九个 PR 链接各出现一次。
+- 五个中英栏目标题、Noto Serif SC 字体和官方项目图标正常；canonical 指向正式域名；无 pageerror。
+
+部署记录补充提交仅修改文档，无需重新部署页面代码。

@@ -17,4 +17,4 @@
 - [x] `profile.css`、图 CSS、主页栏目标题和 hero 标注统一字体层级，保留可访问名称与键盘行为。
 - [x] 单元与端到端验证全部 19 个 PR 恰好出现一次，包含不在主题配置中的新增 PR；检查窄屏、无 JS、颜色对比及视觉截图。
 - [x] lint / typecheck / content / build、独立审查。
-- [ ] 提交推送与正式站验证。
+- [x] 提交推送与正式站验证（代码 `5d92c9f`，Vercel Production READY）。
