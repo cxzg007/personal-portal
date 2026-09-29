@@ -15,4 +15,14 @@
 - 检查 1440/768/390 宽度；桌面截图保存在 `assets/2026-09-29-contribution-map/contribution-map-1440.png`。
 - 独立只读复核无阻塞问题。按建议让列数跟随实际方向数，浏览器模拟仅剩一个方向时，根节点和分组的中心均为 x=720。
 
-部署信息在完成线上核验后补充。
+部署完成（2026-09-29）：
+
+- 代码提交：`55fd4a7`，已推送 `origin/design/contribution-map`。
+- Vercel Production：`dpl_32Uux2z1fhcgpVVg2QAmdh9FAL3K`，状态 READY。
+- 正式站：https://jiangjunjie-personal-portal.vercel.app/
+- 部署地址：https://jiangjunjie-personal-portal-degimu6v3-junjie1467-6343s-projects.vercel.app
+- 正式域名真实浏览器核验：HTTP 200、6 节点、5 已合并 / 1 进行中、13 链接、官方 logo 可见、无 pageerror。
+- canonical 指向正式域名。第一次检查因严格要求末尾 `/` 而误报，使用 URL 规范化比较后通过；无需修改页面。
+- 主 checkout 原有 diff SHA256 保持 `afd747c811249dc85d7bd15a19b0f092f4b404a26a0da7b96f28f0a22b5317a7`。
+
+本次记录补充提交只更新文档，不改变已部署的页面代码。
