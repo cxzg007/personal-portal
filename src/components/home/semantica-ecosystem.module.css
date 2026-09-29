@@ -1,0 +1,65 @@
+.figure {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  padding-top: 0.75rem;
+  color: var(--muted, #5b6c70);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+}
+
+.description {
+  flex: 1 1 30rem;
+  margin: 0;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  align-items: center;
+}
+
+.link,
+.source {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.4rem;
+  text-underline-offset: 0.25em;
+}
+
+.link {
+  color: var(--teal, #126b70);
+  font-weight: 600;
+}
+
+.source {
+  color: var(--muted, #5b6c70);
+}
+
+.link:hover,
+.source:hover {
+  text-decoration: underline;
+}
+
+.link:focus-visible,
+.source:focus-visible {
+  border-radius: 0.25rem;
+  outline: 2px solid var(--teal, #126b70);
+  outline-offset: 3px;
+}
