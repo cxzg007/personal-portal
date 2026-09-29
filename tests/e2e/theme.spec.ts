@@ -49,7 +49,7 @@ test("homepage keeps its scoped blue type system", async ({ page }) => {
     };
   });
   expect(values).toMatchObject({ page: "#f8efdc", terracotta: "#b85f3f", sage: "#7d9270" });
-  expect(values.heading).toContain("system-ui");
+  expect(values.heading).toContain("Noto Serif SC");
   expect(values.meta).toContain("system-ui");
 });
 

@@ -183,7 +183,7 @@ for (const viewport of viewports) {
     const showcase = openSource.locator(".open-source-showcase");
     await expectHorizontallyContained(showcase);
     await expectSemanticaMapComplete(showcase);
-    await expectHorizontallyContained(openSource.getByRole("list", { name: "Semantica 贡献主题" }));
+    await expectHorizontallyContained(openSource.getByRole("figure", { name: "贡献落点图" }));
 
     await expectHorizontallyContained(openSource.getByLabel("Semantica 公开资料"));
 

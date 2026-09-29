@@ -7,7 +7,7 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
   const hero = page.locator("#profile");
 
   await expect(hero.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
-  await expect(hero.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
+  await expect(hero.locator(".profile-dock-name")).toHaveText("江俊杰/Jiang Junjie");
   await expect(hero.getByText("2027 届校招 · AI Agent / 后端开发", { exact: true })).toBeVisible();
   await expect(hero.getByText("电子信息", { exact: true })).toBeVisible();
   await expect(hero.getByText("通信工程", { exact: true })).toBeVisible();
@@ -312,13 +312,13 @@ test("expanding any internship disclosure keeps detail items unobstructed and ca
   }
 });
 
-test("open source showcase groups PRs by resume theme with a collapsed remainder", async ({ page }) => {
+test("open source showcase consolidates PRs into the map with a collapsed remainder", async ({ page }) => {
   await page.goto("/");
 
   const openSource = page.locator("main > section#open-source");
-  const themeList = openSource.getByRole("list", { name: "Semantica 贡献主题" });
-  await expect(themeList).toBeVisible();
-  await expect(themeList.locator("> li.open-source-theme-item")).toHaveCount(4);
+  const map = openSource.getByRole("figure", { name: "贡献落点图" });
+  await expect(map).toBeVisible();
+  await expect(map.locator("li[data-status]")).toHaveCount(6);
   const recognition = openSource.getByRole("region", { name: "项目影响力与荣誉" });
   await expect(recognition.getByRole("link", { name: "13,513 GitHub Stars" })).toHaveAttribute(
     "href", "https://github.com/semantica-agi/semantica",
@@ -331,9 +331,8 @@ test("open source showcase groups PRs by resume theme with a collapsed remainder
   await expect(openSource.locator("button")).toHaveCount(0);
   await expect(openSource.getByLabel("Semantica 公开资料")).toBeVisible();
   await expect(openSource.getByText("项目维护者 · Maintainer / Collaborator · cxzg007")).toBeVisible();
-  const ongoing = openSource.getByRole("region", { name: "正在推进" });
-  await expect(ongoing.getByText("1 个开放 PR · 尚未合并")).toBeVisible();
-  await expect(ongoing.getByRole("link", { name: /^进行中 · PR #1731/ })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/1731");
+  await expect(map.getByRole("link", { name: /^进行中 · PR #1731/ })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/1731");
+  await expect(openSource.getByRole("region", { name: "正在推进" })).toHaveCount(0);
 
   const details = openSource.locator("details.open-source-showcase-details");
   await expect(details).toBeVisible();
@@ -343,6 +342,9 @@ test("open source showcase groups PRs by resume theme with a collapsed remainder
   await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(18);
   const otherLinks = details.getByRole("link", { name: /^已合并 · PR #/ });
   await expect(otherLinks).toHaveCount(11);
+  const allPrHrefs = await openSource.locator('a[href*="/pull/"]').evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+  expect(allPrHrefs).toHaveLength(19);
+  expect(new Set(allPrHrefs).size).toBe(19);
   for (const [index, number] of [
     1364, 1360, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081,
   ].entries()) {

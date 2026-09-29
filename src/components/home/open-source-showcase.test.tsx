@@ -4,59 +4,15 @@ import { afterEach, describe, expect, it } from "vitest";
 import { loadSiteContent } from "@/content/load-site-content";
 import type { OpenSourceProject } from "@/content/schema";
 
-import { groupContributionsByTheme, OpenSourceShowcase } from "./open-source-showcase";
+import { OpenSourceShowcase } from "./open-source-showcase";
 
 const { openSource } = loadSiteContent();
-const merged = openSource.contributions.filter(({ status }) => status === "merged");
-const openPullRequests = openSource.contributions.filter(({ status }) => status === "open");
 
 afterEach(cleanup);
 
 function renderShowcase(project: OpenSourceProject = openSource) {
   return render(<OpenSourceShowcase project={project} />);
 }
-
-describe("groupContributionsByTheme", () => {
-  it("maps every resume theme to its merged PRs in content order", () => {
-    const groups = groupContributionsByTheme(openSource);
-
-    expect(groups.map(({ theme }) => theme.id)).toEqual([
-      "rule-reasoning",
-      "truth-maintenance",
-      "sparql-execution",
-      "pipeline-parallelism",
-      "other-contributions",
-    ]);
-    expect(groups.map(({ contributions }) => contributions.map(({ number }) => number))).toEqual([
-      [1096, 1077],
-      [1675, 1556, 1544],
-      [1243],
-      [1226],
-      [1364, 1360, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081],
-    ]);
-  });
-
-  it("covers all merged contributions exactly once", () => {
-    const grouped = groupContributionsByTheme(openSource).flatMap(({ contributions }) =>
-      contributions.map(({ number }) => number),
-    );
-
-    expect(grouped).toHaveLength(merged.length);
-    expect(new Set(grouped).size).toBe(merged.length);
-    expect([...grouped].sort((a, b) => b - a)).toEqual(merged.map(({ number }) => number));
-  });
-
-  it("drops themes whose PRs are no longer merged", () => {
-    const withoutSparql = {
-      ...openSource,
-      contributions: openSource.contributions.filter(({ number }) => number !== 1243),
-    };
-
-    const groups = groupContributionsByTheme(withoutSparql);
-    expect(groups.map(({ theme }) => theme.id)).not.toContain("sparql-execution");
-    expect(groups).toHaveLength(openSource.contributionThemes.length - 1);
-  });
-});
 
 describe("OpenSourceShowcase", () => {
   it("presents the official Semantica logo, identity and background", () => {
@@ -75,93 +31,59 @@ describe("OpenSourceShowcase", () => {
     const statistic = screen.getByText("已合并 PR").closest("p");
     expect(statistic).not.toBeNull();
     expect(statistic).toHaveTextContent("18");
-    expect(screen.getByRole("heading", { name: "我的关键贡献" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /我的关键贡献/ })).toBeVisible();
   });
 
-  it("renders the four highlighted themes with their summaries and PR chips", () => {
-    renderShowcase();
-
-    const list = screen.getByRole("list", { name: "Semantica 贡献主题" });
-    const items = within(list)
-      .getAllByRole("listitem")
-      .filter((item) => item.classList.contains("open-source-theme-item"));
-    expect(items).toHaveLength(4);
-
-    const expected = openSource.contributionThemes.filter(
-      ({ id }) => id !== "other-contributions",
-    );
-    expected.forEach((theme, index) => {
-      const item = items[index];
-      expect(item).toHaveAttribute("data-theme-id", theme.id);
-      expect(within(item).getByRole("heading", { name: theme.name })).toBeVisible();
-      expect(within(item).getByText(theme.summary)).toBeVisible();
-      expect(within(item).getByText(`${theme.prNumbers.length} 个已合并 PR`)).toBeVisible();
-
-      theme.prNumbers.forEach((number) => {
-        const contribution = merged.find((entry) => entry.number === number);
-        const link = within(item).getByRole("link", { name: `已合并 · PR #${number} · ${contribution?.title}` });
-        expect(link).toHaveAttribute("href", contribution?.url);
-        expect(link).toHaveAttribute("target", "_blank");
-        expect(link).toHaveAttribute("rel", "noreferrer");
-        expect(within(link).getByText(`PR #${number}`)).toBeVisible();
-      });
-    });
-  });
-
-  it("folds the remaining merged PRs into a closed details disclosure", () => {
+  it("renders every contribution exactly once across the map and remaining records", () => {
     const { container } = renderShowcase();
-
-    const otherTheme = openSource.contributionThemes.find(({ id }) => id === "other-contributions");
-    if (!otherTheme) {
-      throw new Error("other-contributions theme is required by the showcase disclosure");
-    }
-    const details = container.querySelector("details");
-    expect(details).not.toBeNull();
-    expect(details?.open).toBe(false);
-    expect(
-      within(details as HTMLElement).getByText(
-        `查看其他 ${otherTheme.prNumbers.length} 个已合并 PR`,
-      ),
-    ).toBeVisible();
-    expect(within(details as HTMLElement).getByText(otherTheme.summary)).toBeInTheDocument();
-
-    const remainingLinks = within(details as HTMLElement).getAllByRole("link", {
-      name: /^已合并 · PR #/,
-    });
-    expect(remainingLinks).toHaveLength(otherTheme.prNumbers.length);
-    for (const link of remainingLinks) {
-      const number = Number(link.textContent?.match(/PR #(\d+)/)?.[1]);
-      expect(merged.some((contribution) => contribution.number === number)).toBe(true);
+    const map = screen.getByRole("figure", { name: "贡献落点图" });
+    expect(within(map).getAllByRole("link", { name: /^已合并 · PR #/ })).toHaveLength(7);
+    expect(within(map).getByRole("link", { name: /^进行中 · PR #1731/ })).toBeVisible();
+    expect(screen.queryByRole("list", { name: "Semantica 贡献主题" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "正在推进" })).toBeNull();
+    for (const pr of openSource.contributions) {
+      expect(container.querySelectorAll(`a[href="${pr.url}"]`)).toHaveLength(1);
     }
   });
 
-  it("labels open pull requests as ongoing and keeps retired wording out", () => {
+  it("keeps the eleven remaining merged PRs in a closed disclosure", () => {
     const { container } = renderShowcase();
-
-    for (const pullRequest of openPullRequests) {
-      const ongoing = screen.getByRole("region", { name: "正在推进" });
-      expect(within(ongoing).getByRole("link", { name: `进行中 · PR #${pullRequest.number} · ${pullRequest.title}` })).toBeVisible();
-      expect(screen.queryByRole("link", { name: new RegExp(`^已合并 · PR #${pullRequest.number}`) })).toBeNull();
-    }
-    const text = container.textContent ?? "";
-    expect(text).not.toMatch(/FEAT|FIX|MERGED/);
-    expect(text).not.toContain("架构支柱");
-    expect(text).not.toContain("点击");
-    expect(screen.queryByRole("button")).toBeNull();
+    const details = container.querySelector("details")!;
+    expect(details.open).toBe(false);
+    expect(within(details).getByText("查看其他 11 个已合并 PR")).toBeVisible();
+    expect(within(details).getAllByRole("link", { name: /^已合并 · PR #/ })).toHaveLength(11);
+    expect(within(details).queryByRole("link", { name: /PR #1096/ })).toBeNull();
+    expect(within(details).queryByRole("link", { name: /PR #1544/ })).toBeNull();
   });
 
-  it("shows open work separately and excludes it from the merged count and themes", () => {
+  it("retains new unmapped contributions even when the old theme configuration omits them", () => {
     const project = structuredClone(openSource);
-    project.contributions.unshift({ number: 2000, title: "未合并的快照组装", status: "open", url: "https://github.com/semantica-agi/semantica/pull/2000" });
-    renderShowcase(project);
+    project.contributions.unshift(
+      { number: 2000, title: "未合并的快照组装", status: "open", url: "https://github.com/semantica-agi/semantica/pull/2000" },
+      { number: 2001, title: "新增修复", status: "merged", url: "https://github.com/semantica-agi/semantica/pull/2001" },
+    );
+    const { container } = renderShowcase(project);
     const ongoing = screen.getByRole("region", { name: "正在推进" });
-    expect(within(ongoing).getByRole("link", { name: "进行中 · PR #2000 · 未合并的快照组装" })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/2000");
-    expect(screen.getByText("已合并 PR").closest("p")).toHaveTextContent(String(merged.length));
-    expect(within(screen.getByRole("list", { name: "Semantica 贡献主题" })).queryByText(/PR #2000/)).toBeNull();
+    expect(within(ongoing).getByRole("link", { name: /^进行中 · PR #2000/ })).toBeVisible();
+    expect(within(ongoing).queryByRole("link", { name: /PR #1731/ })).toBeNull();
+    expect(screen.getByText("已合并 PR").closest("p")).toHaveTextContent("19");
+    expect(screen.getByText("查看其他 12 个已合并 PR")).toBeVisible();
+    for (const pr of project.contributions) expect(container.querySelectorAll(`a[href="${pr.url}"]`)).toHaveLength(1);
   });
 
-  it("omits the ongoing section when there are no open PRs", () => {
-    renderShowcase({ ...openSource, contributions: merged });
+  it("keeps a changed PR status in its existing node without duplicating it", () => {
+    const project = structuredClone(openSource);
+    project.contributions.find(({ number }) => number === 1731)!.status = "merged";
+    const { container } = renderShowcase(project);
+    expect(screen.getByRole("link", { name: /^已合并 · PR #1731/ })).toBeVisible();
+    expect(screen.queryByRole("link", { name: /^进行中/ })).toBeNull();
+    expect(screen.getByText("已合并 PR").closest("p")).toHaveTextContent("19");
+    expect(container.querySelectorAll('a[href$="/pull/1731"]')).toHaveLength(1);
+  });
+
+  it("omits empty supplementary records and ongoing sections", () => {
+    renderShowcase({ ...openSource, contributions: openSource.contributions.filter(({ number }) => number === 1226) });
+    expect(screen.queryByText(/查看其他/)).toBeNull();
     expect(screen.queryByRole("region", { name: "正在推进" })).toBeNull();
   });
 
@@ -184,17 +106,6 @@ describe("OpenSourceShowcase", () => {
     expect(within(recognition).getByRole("link", { name: /#3 Trendshift · Python 周榜/ }))
       .toHaveAttribute("href", "https://trendshift.io/api/badge/trendshift/repositories/18986/weekly?language=Python");
     expect(within(recognition).queryByText("已合并 PR")).toBeNull();
-  });
-
-  it("renders every theme card with the same structure and no featured variant", () => {
-    const { container } = renderShowcase();
-
-    const themeItems = Array.from(container.querySelectorAll(".open-source-theme-item"));
-    expect(themeItems).toHaveLength(4);
-    for (const item of themeItems) {
-      expect(item.className).toBe("open-source-theme-item");
-      expect(within(item as HTMLElement).queryByRole("img")).toBeNull();
-    }
   });
 
   it("links to the external repository and the internal article", () => {

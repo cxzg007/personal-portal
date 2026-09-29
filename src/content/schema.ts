@@ -490,9 +490,8 @@ export function validateSiteContent(input: unknown): ValidationResult {
           }
         });
       });
-      if (mergedPrNumbers.size > 0 && themePrNumbers.size !== mergedPrNumbers.size) {
-        errors.push("openSource.contributionThemes must cover every merged contribution exactly once");
-      }
+      // Legacy themes may cover a subset; the contribution map partitions the
+      // complete snapshot and presents every remaining PR automatically.
     }
     checkHttpsUrl(openSource.repositoryUrl, "openSource.repositoryUrl");
     const articlePath = checkText(openSource.articlePath, "openSource.articlePath");

@@ -5,7 +5,7 @@ import { BrandMark } from "./brand-mark";
 export function HeroExperienceIndex({ internships }: { internships: Internship[] }) {
   return (
     <nav aria-label="经历索引" className="hero-experience-index">
-      <p className="hero-experience-heading">经历索引</p>
+      <p className="hero-experience-heading">经历索引 <span lang="en">EXPERIENCE</span></p>
       <ol>
         {internships.map((internship) => (
           <li key={internship.id}>

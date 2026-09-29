@@ -57,25 +57,40 @@ export default async function HomePage() {
         />
         <ProfileHero internships={content.internships} profile={content.profile} />
         <section aria-labelledby="internships-heading" className="profile-stage" id="internships">
-          <h2 className="profile-reveal" id="internships-heading">实习经历</h2>
+          <header className="profile-section-heading profile-reveal">
+            <h2 id="internships-heading">实习经历</h2>
+            <p lang="en">ENGINEERING EXPERIENCE</p>
+          </header>
           <StickyInternshipStack internships={content.internships} />
         </section>
         <section aria-labelledby="systems-heading" className="profile-stage" id="systems">
-          <h2 className="profile-reveal" id="systems-heading">系统设计</h2>
+          <header className="profile-section-heading profile-reveal">
+            <h2 id="systems-heading">系统设计</h2>
+            <p lang="en">SELECTED SYSTEMS</p>
+          </header>
           <SystemProjectTabs architectures={loadSystemArchitectures(content)} projects={content.caseStudies} />
         </section>
         <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--open-source" id="open-source">
-          <h2 className="profile-reveal" id="open-source-heading">开源贡献</h2>
+          <header className="profile-section-heading profile-reveal">
+            <h2 id="open-source-heading">开源贡献</h2>
+            <p lang="en">OPEN SOURCE</p>
+          </header>
           <OpenSourceShowcase project={content.openSource} />
         </section>
         {featuredPosts.length > 0 ? (
           <section aria-labelledby="writing-heading" className="profile-stage" id="writing">
-            <h2 className="profile-reveal" id="writing-heading">技术博客</h2>
+            <header className="profile-section-heading profile-reveal">
+              <h2 id="writing-heading">技术博客</h2>
+              <p lang="en">WRITING & NOTES</p>
+            </header>
             <WritingStage posts={featuredPosts} />
           </section>
         ) : null}
         <section aria-labelledby="contact-heading" className="profile-stage profile-stage--contact" id="contact">
-          <h2 className="profile-reveal" id="contact-heading">一起构建可靠的 AI 系统。</h2>
+          <header className="profile-section-heading profile-reveal">
+            <h2 id="contact-heading">一起构建可靠的 AI 系统。</h2>
+            <p lang="en">LET’S BUILD TOGETHER</p>
+          </header>
           <ContactStage profile={content.profile} />
         </section>
       </main>

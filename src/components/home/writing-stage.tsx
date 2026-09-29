@@ -27,6 +27,7 @@ export function WritingStage({ posts }: WritingStageProps) {
           <li key={post.slug}>
             <article className="writing-entry">
               <div className="writing-entry-meta">
+                <span className="profile-micro" lang="en">PUBLISHED</span>
                 <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
                 <span className="writing-entry-minutes">{`${post.readingMinutes} 分钟阅读`}</span>
               </div>

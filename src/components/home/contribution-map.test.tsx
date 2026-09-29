@@ -23,10 +23,10 @@ describe("ContributionMap", () => {
 
     for (const [number, path, revision] of sources) {
       const pr = openSource.contributions.find((entry) => entry.number === number)!;
-      const prLink = within(map).getByRole("link", { name: new RegExp(`贡献落点 · .* · PR #${number} ·`) });
+      const prLink = within(map).getByRole("link", { name: new RegExp(`^(已合并|进行中) · PR #${number} ·`) });
       expect(prLink).toHaveAttribute("href", pr.url);
       // Verify source and PR stay attached to the same node.
-      const node = prLink.closest("li")!;
+      const node = prLink.closest<HTMLElement>("[data-status]")!;
       const source = within(node).getByRole("link", { name: new RegExp(`查看源码 ${path}`) });
       expect(source).toHaveAttribute("href", `${openSource.repositoryUrl}/blob/${revision}/semantica/${path}`);
       expect(node).toHaveAttribute("data-status", pr.status);
@@ -35,19 +35,34 @@ describe("ContributionMap", () => {
         expect(link).toHaveAttribute("rel", "noreferrer");
       }
     }
-    expect(within(map).getByText(/连线表示贡献归类/)).toHaveTextContent(`贡献状态截至 ${openSource.snapshotDate}`);
+    expect(within(map).getByText(/连线表示贡献归类/)).toBeVisible();
   });
 
   it("labels open work and derives changed status from the shared content snapshot", () => {
     const { rerender } = render(<ContributionMap project={openSource} />);
-    expect(screen.getByRole("link", { name: /贡献落点 · 进行中 · PR #1731/ })).toBeVisible();
-    expect(screen.queryByRole("link", { name: /贡献落点 · 已合并 · PR #1731/ })).toBeNull();
+    expect(screen.getByRole("link", { name: /进行中 · PR #1731/ })).toBeVisible();
+    expect(screen.queryByRole("link", { name: /已合并 · PR #1731/ })).toBeNull();
 
     const updated = structuredClone(openSource);
     updated.contributions.find(({ number }) => number === 1731)!.status = "merged";
     rerender(<ContributionMap project={updated} />);
-    expect(screen.getByRole("link", { name: /贡献落点 · 已合并 · PR #1731/ }).closest("li")).toHaveAttribute("data-status", "merged");
+    expect(screen.getByRole("link", { name: /已合并 · PR #1731/ }).closest("[data-status]")).toHaveAttribute("data-status", "merged");
     expect(screen.queryByText("进行中")).toBeNull();
+  });
+
+  it("keeps each PR's status explicit when a node contains mixed statuses", () => {
+    const project = structuredClone(openSource);
+    project.contributions.find(({ number }) => number === 1096)!.status = "open";
+    render(<ContributionMap project={project} />);
+    expect(screen.getByText("含进行中")).toBeVisible();
+    expect(screen.getByRole("link", { name: /^进行中 · PR #1096/ })).toHaveTextContent("进行中");
+    expect(screen.getByRole("link", { name: /^已合并 · PR #1077/ })).toHaveTextContent("已合并");
+  });
+
+  it("uses the remaining PR's verified source when the original representative is removed", () => {
+    render(<ContributionMap project={{ ...openSource, contributions: openSource.contributions.filter(({ number }) => number !== 1077) }} />);
+    expect(screen.getByRole("link", { name: /RETE 规则推理 · 查看源码/ })).toHaveAttribute("href", `${openSource.repositoryUrl}/blob/5d54919804f81d0db03f1790e109471cb73d52a1/semantica/reasoning/reasoner.py`);
+    expect(screen.queryByRole("link", { name: /PR #1077/ })).toBeNull();
   });
 
   it("omits missing contributions and their now-empty area", () => {

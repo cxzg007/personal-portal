@@ -241,10 +241,16 @@ describe("validateSiteContent", () => {
     expect(validateSiteContent(input)).toEqual({ ok: true });
   });
 
-  it("accepts a growing merged snapshot when its metric and theme are updated together", () => {
+  it("accepts a growing merged snapshot without requiring legacy theme membership", () => {
     const input = structuredClone(validSiteContent);
     input.openSource.contributions.unshift({ number: 2000, title: "新增已合并工作", status: "merged", url: "https://github.com/semantica-agi/semantica/pull/2000" });
-    input.openSource.contributionThemes[0].prNumbers.unshift(2000);
+    input.metrics.find(({ label }) => label === "已合并 PR")!.value += 1;
+    expect(validateSiteContent(input)).toEqual({ ok: true });
+  });
+
+  it("accepts a mapped open PR becoming merged without changing legacy themes", () => {
+    const input = structuredClone(validSiteContent);
+    input.openSource.contributions.find(({ number }) => number === 1731)!.status = "merged";
     input.metrics.find(({ label }) => label === "已合并 PR")!.value += 1;
     expect(validateSiteContent(input)).toEqual({ ok: true });
   });

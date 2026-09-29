@@ -18,7 +18,7 @@ describe("profile hero", () => {
     expect(screen.getByRole("link", { name: "查看实习" })).toHaveAttribute("href", "#internships");
     expect(screen.queryByRole("link", { name: "下载简历 PDF" })).toBeNull();
     expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", profile.github);
-    expect(screen.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
+    expect(screen.getByText("江俊杰").parentElement).toHaveTextContent("江俊杰/Jiang Junjie");
     expect(screen.getByText(`2027 届校招 · ${profile.targetRole}`)).toBeVisible();
     expect(
       screen.queryByText("通信工程 → 后端系统 → Agent / 知识图谱 → 可靠 AI 工程"),
