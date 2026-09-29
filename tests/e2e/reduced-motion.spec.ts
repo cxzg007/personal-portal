@@ -15,7 +15,7 @@ test("reduced motion preference keeps the layout static without hiding content",
   await expect(page.locator("#internships [data-stack-progress]")).toHaveCount(0);
   await expect(page.locator("canvas")).toHaveCount(0);
 
-  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" })).toBeVisible();
   await expect(page.getByRole("link", { name: "查看实习" })).toBeVisible();
   await expect(page.locator("main > section#internships .sticky-internship-card")).toHaveCount(3);
 

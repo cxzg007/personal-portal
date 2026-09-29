@@ -105,6 +105,7 @@ async function expectNoHiddenOffscreenContent(page: Page) {
 
 for (const width of [320, 390, 768, 1440]) {
   test(`homepage reflows at 200% text size in a ${width}px viewport`, async ({ page }) => {
+    test.skip(width < 1280, "用户明确暂缓首页移动端适配；保留用例供后续恢复验收。");
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
@@ -138,16 +139,17 @@ for (const viewport of viewports) {
   test(`homepage remains complete at ${viewport.label} ${viewport.width}x${viewport.height}`, async ({
     page,
   }) => {
+    test.skip(viewport.width < 1280, "用户明确暂缓首页移动端适配；博客各尺寸继续验收。");
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
 
     await expectNoHorizontalOverflow(page);
     await expect(
-      page.getByRole("heading", { level: 1, name: "cxzg007" }),
+      page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" }),
     ).toBeVisible();
 
-    const hero = page.getByRole("region", { name: "cxzg007" });
+    const hero = page.getByRole("region", { name: "构建可靠的 Agent 系统。" });
     await expectHorizontallyContained(hero.locator(".profile-hero-copy"));
     await expectHorizontallyContained(hero.getByRole("link", { name: "查看实习", exact: true }));
     await expectHorizontallyContained(hero.getByLabel("联系方式"));
@@ -269,7 +271,7 @@ test("homepage reference profile keeps visible geometry at 1920x1080", async ({ 
 
   await expectNoHorizontalOverflow(page);
 
-  const heroHeading = page.getByRole("heading", { level: 1, name: "cxzg007" });
+  const heroHeading = page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" });
   const brandCards = page.locator("main > section#internships").getByRole("article");
   const openSourceCard = page.locator("main > section#open-source .open-source-showcase");
   await expect(brandCards).toHaveCount(3);

@@ -57,8 +57,8 @@
 .sceneLegend span { display: inline-flex; align-items: center; gap: 0.4rem; }
 .sceneLegend span::before { content: ""; width: 12px; height: 1px; background: #8ab4ff; }
 .sceneLegend span:last-child::before { width: 6px; height: 6px; border: 1px solid #8ab4ff; background: transparent; transform: rotate(45deg); }
-.stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin: 0 1.4rem; padding: 0; list-style: none; border-top: 1px solid #354151; border-bottom: 1px solid #354151; }
-.stages button { position: relative; display: flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; min-height: 47px; padding: 0.55rem 0.15rem; border: 0; border-radius: 0; background: transparent; color: var(--replay-muted); font: inherit; font-size: 0.75rem; white-space: nowrap; cursor: pointer; }
+.stages { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; margin: 0 1.4rem; padding: 0; list-style: none; border-top: 1px solid #354151; border-bottom: 1px solid #354151; }
+.stages button { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; min-height: 47px; padding: 0.55rem 0.15rem; border: 0; border-radius: 0; background: transparent; color: var(--replay-muted); font: inherit; font-size: 0.75rem; white-space: normal; cursor: pointer; }
 .stageNumber { color: #788ba6; font: 12px var(--font-mono, monospace); }
 .stageMark { color: #6e819e; font-size: 9px; }
 .stages button[aria-current="step"] { color: #e3edff; background: linear-gradient(#8ab4ff13, #8ab4ff00); }

@@ -13,7 +13,8 @@ describe("profile hero", () => {
   it("renders the identity headline, real name, primary actions, and the merged dock identity", () => {
     render(<ProfileHero internships={internships} profile={profile} />);
 
-    expect(screen.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+    expect(screen.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" })).toBeVisible();
+    expect(screen.getByText("cxzg007")).toBeVisible();
     expect(screen.queryByText("cxzg007 Profile")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "查看实习" })).toHaveAttribute("href", "#internships");
     expect(screen.queryByRole("link", { name: "下载简历 PDF" })).toBeNull();
@@ -34,7 +35,7 @@ describe("profile hero", () => {
       expect(screen.getByRole("link", { name: `查看${internship.company}实习经历` })).toHaveAttribute("href", `#internship-${internship.id}`);
       expect(screen.getByText(internship.presentation.title)).toBeVisible();
     }
-    expect(screen.getByText("构建可靠的 Agent 系统")).toBeVisible();
+    expect(screen.getByRole("region", { name: "Agent 任务回放" })).toBeVisible();
     expect(
       screen.getByText("从语义建模到执行约束，关注 AI 应用与后端系统的可靠落地。"),
     ).toBeVisible();

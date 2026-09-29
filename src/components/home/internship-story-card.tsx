@@ -1,6 +1,7 @@
 import type { Internship } from "@/content/schema";
 
 import { BrandMark } from "./brand-mark";
+import { ProjectArtwork } from "./project-artwork";
 
 type InternshipStoryCardProps = {
   internship: Internship;
@@ -31,6 +32,7 @@ export function InternshipStoryCard({ internship, index }: InternshipStoryCardPr
           <span className="internship-chip internship-role">{internship.role}</span>
           <span className="internship-chip internship-period">{internship.period}</span>
         </p>
+        <ProjectArtwork id={internship.id} />
       </header>
       <div className="internship-copy-column">
         <h3 className="internship-value-headline">{title}</h3>

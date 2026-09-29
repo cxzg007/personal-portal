@@ -1,0 +1,49 @@
+.artwork {
+  --art-line: #c7d3e3;
+  --art-ink: #4e6480;
+  --art-blue: #5079b6;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #d9e2ed;
+  border-radius: 10px;
+  background: #eaf0f7;
+  background-image: radial-gradient(#bacbdf 0.7px, transparent 0.7px);
+  background-size: 16px 16px;
+}
+.title { display: flex; align-items: center; gap: 8px; margin: 20px 22px 0; color: #536b8c; font-family: var(--showcase-display, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; }
+.title > span { width: 5px; height: 5px; border: 1px solid currentColor; }
+.svg { display: block; width: 100%; height: auto; }
+.caption { padding: 0 20px 20px; color: #596e89; font-size: 11px; text-align: center; line-height: 1.7; }
+.baseShadow { fill: #d9e3f0; }
+.layerLow { fill: #cedbed; stroke: #bacce3; }
+.layerMid { fill: #e1eaf6; stroke: #b6c9e2; }
+.layerTop { fill: #f6f9fe; stroke: #aabfdb; }
+.fineLine { stroke: #cedaec; stroke-width: 1; }
+.flow { stroke: #7b9ccc; stroke-width: 1.4; }
+.nodeShadow { fill: #c3d4ec; }
+.node { fill: #f5f8ff; stroke: #6c93ca; stroke-width: 1.3; }
+.nodeCore { fill: #6f92c2; }
+.coreTop { fill: #4474b9; stroke: #3966a3; }
+.coreSide { fill: #2b548e; stroke: #3966a3; }
+.label { fill: var(--art-ink); font-size: 11px; font-family: var(--showcase-display, monospace); font-weight: 500; letter-spacing: 0.08em; }
+.smallLabel { fill: #5d718c; font-size: 11px; font-family: var(--showcase-display, system-ui); letter-spacing: 0.04em; }
+.callout { stroke: #8ca8cf; stroke-width: 1.2; stroke-linejoin: round; }
+.track { stroke: #c6d4e6; stroke-width: 1; }
+.frame { fill: #c5d5e9; }
+.frameActive { fill: #7a9bc9; }
+.waveGhost { stroke: #c1d0e3; stroke-width: 2; stroke-linejoin: round; }
+.wave { stroke: #537fb8; stroke-width: 2; stroke-linejoin: round; }
+.playhead { stroke: #386cb4; stroke-width: 1.4; }
+.playheadCap { fill: #386cb4; }
+.cursor { fill: #fff; stroke: #386cb4; stroke-width: 2; }
+.readout { fill: #dae6f5; stroke: #b0c7e6; }
+.readoutLabel { fill: #365f99; font-size: 12px; }
+.documentBack { fill: #d5e1f0; stroke: #b9cce4; }
+.document { fill: #f9fbff; stroke: #aac0db; }
+.documentLine { stroke: #8aa5ca; stroke-width: 3; stroke-linecap: round; }
+.highlightLine { fill: #83ade9; fill-opacity: 0.28; }
+.graphLine { stroke: #9db6d7; stroke-width: 1.2; }
+.graphNode { fill: #eaf1fb; stroke: #6f94c8; stroke-width: 1.5; }
+.graphActive { fill: #5885c2; stroke: #eaf1fb; stroke-width: 3; }
+.seal { fill: #4e7cb8; stroke: #eaf0f7; stroke-width: 3; }
+.check { stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }

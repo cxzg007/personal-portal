@@ -1,7 +1,7 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-test("homepage uses the cool white and blue design tokens", async ({ page }) => {
+test("homepage uses graphite exhibition and light reading tokens", async ({ page }) => {
   await page.goto("/");
   const tokens = await page.evaluate(() => {
     const shell = document.querySelector<HTMLElement>(".profile-shell");
@@ -12,14 +12,16 @@ test("homepage uses the cool white and blue design tokens", async ({ page }) => 
       muted: styles.getPropertyValue("--profile-muted").trim(),
     };
   });
-  expect(tokens.ink).toBe("#172b45");
-  expect(tokens.bg).toBe("#f4f7fb");
-  expect(tokens.muted).toBe("#53657d");
+  expect(tokens.ink).toBe("#19283b");
+  expect(tokens.bg).toBe("#f5f7fa");
+  expect(tokens.muted).toBe("#596779");
+  await expect(page.locator("#profile")).toHaveCSS("background-color", "rgb(16, 19, 23)");
+  await expect(page.locator("#contact")).toHaveCSS("background-color", "rgb(16, 19, 23)");
 });
 
 test("homepage paints a solid editorial surface without gradients or card shadows", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".profile-shell")).toHaveCSS("background-color", "rgb(244, 247, 251)");
+  await expect(page.locator(".profile-shell")).toHaveCSS("background-color", "rgb(245, 247, 250)");
   await expect(page.locator("#internships article").first()).toHaveCSS("box-shadow", "none");
   const font = await page
     .locator("#profile h1")
@@ -27,7 +29,7 @@ test("homepage paints a solid editorial surface without gradients or card shadow
   expect(font).toContain("system-ui");
 });
 
-test("homepage keeps readable contrast on the light theme", async ({ page }) => {
+test("homepage keeps readable contrast across dark and light sections", async ({ page }) => {
   await page.goto("/");
   const results = await new AxeBuilder({ page }).include("main").analyze();
   const contrast = results.violations.filter((v) => v.id === "color-contrast");
@@ -77,7 +79,7 @@ test("page canvas paints the warm paper token as a solid background", async ({ p
   expect(colors.bodyBackground).toBe(colors.tokenColor);
 });
 
-test("blog navigation uses the same white and blue surface as the homepage", async ({ page }) => {
+test("blog navigation retains its independent white and blue surface", async ({ page }) => {
   await page.goto("/blog");
   const nav = await page.evaluate(() => {
     const header = document.querySelector<HTMLElement>(".site-header");
@@ -134,7 +136,7 @@ test("focused navigation and call-to-action links show a blue ring of at least 2
   for (const ring of [navRing, ctaRing]) {
     expect(ring.style).not.toBe("none");
     expect(Number.parseFloat(ring.width)).toBeGreaterThanOrEqual(2);
-    expect(ring.color).toBe("rgb(36, 88, 166)");
+    expect(ring.color).toBe("rgb(138, 180, 255)");
   }
 });
 

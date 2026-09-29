@@ -58,7 +58,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
   const desktopNavigation = page.getByRole("navigation", { name: "主导航" });
   await expect(desktopNavigation).toBeVisible();
 
-  const hero = page.getByRole("region", { name: "cxzg007" });
+  const hero = page.getByRole("region", { name: "构建可靠的 Agent 系统。" });
   const postTitles = [
     "图工程之后：多智能体系统缺的是一层语义",
     "Palantir 本体论：把业务语义做成可执行的操作层",
@@ -72,6 +72,13 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
     hero.getByRole("link", { name: "查看实习", exact: true }),
     hero.getByRole("link", { name: "GitHub ↗", exact: true }),
+    ...["接收任务", "检索上下文", "生成建议", "权限校验", "提交结果"].map((stage) =>
+      hero.getByRole("button", { name: `跳转到${stage}`, exact: true }),
+    ),
+    hero.getByRole("button", { name: "播放回放", exact: true }),
+    hero.getByRole("slider", { name: "回放进度", exact: true }),
+    hero.getByRole("button", { name: "正常授权", exact: true }),
+    hero.getByRole("button", { name: "只读权限", exact: true }),
     ...["京东", "智元机器人", "中国船舶集团 722 研究所"].map((company) =>
       hero.getByRole("link", { name: `查看${company}实习经历`, exact: true }),
     ),
@@ -105,6 +112,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     page.locator("main > section#writing").getByRole("link", { name: "全部文章", exact: true }),
     contact.getByRole("link", { name: /jiangjunjie_tj@foxmail\.com/ }),
     contact.getByRole("link", { name: "GitHub", exact: true }),
+    contact.getByRole("link", { name: "回到顶部" }),
   ];
 
   for (const target of keyboardOrder) {
@@ -213,7 +221,7 @@ test("reduced motion preserves content, removes Canvas, and sets the static prof
 
   await expect(page.locator("canvas")).toHaveCount(0);
   await expect(page.locator("html[data-profile-motion='static']")).toHaveCount(1);
-  await expect(page.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" })).toBeVisible();
   await expect(page.getByRole("link", { name: "查看实习", exact: true })).toBeVisible();
   await expect(page.locator("main > section#internships")).toBeVisible();
 });

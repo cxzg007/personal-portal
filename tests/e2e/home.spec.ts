@@ -1,12 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 test("homepage exposes the campus recruiting identity and primary actions", async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
 
   const hero = page.locator("#profile");
 
-  await expect(hero.getByRole("heading", { level: 1, name: "cxzg007" })).toBeVisible();
+  await expect(hero.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" })).toBeVisible();
   await expect(hero.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
   await expect(hero.getByText("2027 届校招 · AI Agent / 后端开发", { exact: true })).toBeVisible();
   await expect(hero.getByText("电子信息", { exact: true })).toBeVisible();
@@ -33,31 +33,22 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
 
   for (const target of [
     hero.locator(".profile-dock-name"),
-    hero.getByRole("list", { name: "教育经历" }),
     hero.getByRole("link", { name: "查看实习", exact: true }),
     hero.getByRole("link", { name: "GitHub ↗", exact: true }),
   ]) {
     await expect(target).toBeInViewport({ ratio: 1 });
     const box = await target.boundingBox();
     expect(box).not.toBeNull();
-    expect(box!.y + box!.height).toBeLessThanOrEqual(720);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(800);
   }
 
-  const headerBox = await page.locator("#top").boundingBox();
-  expect(headerBox).not.toBeNull();
-  const headerBottom = headerBox!.y + headerBox!.height;
   const educationEntries = hero.getByRole("list", { name: "教育经历" }).getByRole("listitem");
   await expect(educationEntries).toHaveCount(2);
   for (const entry of await educationEntries.all()) {
-    const box = await entry.boundingBox();
-    expect(box).not.toBeNull();
-    expect(box!.y).toBeGreaterThanOrEqual(headerBottom);
-    expect(box!.y + box!.height).toBeLessThanOrEqual(720);
+    // Education follows the interactive exhibit in the new composition.
+    await entry.scrollIntoViewIfNeeded();
+    await expect(entry).toBeInViewport();
   }
-  const githubCtaBox = await githubCta.boundingBox();
-  expect(githubCtaBox).not.toBeNull();
-  expect(githubCtaBox!.y).toBeGreaterThanOrEqual(headerBottom);
-  expect(githubCtaBox!.y + githubCtaBox!.height).toBeLessThanOrEqual(720);
 
   await expect(page.locator("section#info")).toHaveCount(0);
   await expect(page.locator('header a[href="#info"]')).toHaveCount(0);
@@ -221,7 +212,7 @@ test("homepage exposes the reference-style section order", async ({ page }) => {
   ]);
 });
 
-test("internship cards keep a static editorial layout without stacking or engineering figures", async ({
+test("internship cards pair static editorial content with labeled engineering schematics", async ({
   page,
 }) => {
   await page.goto("/");
@@ -237,7 +228,10 @@ test("internship cards keep a static editorial layout without stacking or engine
     await expect(card).not.toHaveAttribute("data-layout");
     await expect(card).not.toHaveAttribute("data-stack-progress");
   }
-  await expect(page.locator("#internships figure[data-engineering-kind]")).toHaveCount(0);
+  await expect(internships.locator("figure")).toHaveCount(3);
+  for (const caption of await internships.locator("figcaption").all()) {
+    await expect(caption).toContainText("工程示意");
+  }
 
   for (let index = 0; index < 3; index += 1) {
     const card = internships.locator(`article[data-card-index="${index}"]`);

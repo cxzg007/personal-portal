@@ -1,0 +1,331 @@
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-latin.woff2") format("woff2");
+}
+
+/* Desktop engineering exhibit. The page scope keeps the blog's reading
+   palette and type intact, including after a client-side route transition. */
+.engineering-showcase {
+  --showcase-display: "Space Grotesk", system-ui, sans-serif;
+  --showcase-dark: #101317;
+  --showcase-raised: #191f28;
+  --showcase-white: #f1f5fa;
+  --showcase-muted: #a7b3c5;
+  --showcase-blue: #8ab4ff;
+  --showcase-rule: #303947;
+  --profile-width: 80rem;
+  --profile-nav-height: 4.75rem;
+  --profile-bg: #f5f7fa;
+  --profile-ink: #19283b;
+  --profile-muted: #596779;
+  background: var(--profile-bg);
+}
+
+.engineering-showcase .site-header {
+  --profile-accent: var(--showcase-blue);
+  border-color: rgb(167 179 197 / 15%);
+  background: rgb(16 19 23 / 95%);
+  color: var(--showcase-white);
+  backdrop-filter: blur(16px);
+}
+
+.engineering-showcase .header-inner {
+  width: min(calc(100% - 6rem), var(--profile-width));
+}
+
+.engineering-showcase .site-mark {
+  color: var(--showcase-white);
+  font-family: var(--showcase-display);
+  font-size: 1rem;
+  letter-spacing: -0.035em;
+}
+
+.engineering-showcase .site-mark > span:first-child {
+  border: 1px solid var(--showcase-rule);
+  background: var(--showcase-raised);
+  color: var(--showcase-blue);
+}
+
+.engineering-showcase .desktop-navigation .navigation-list a {
+  color: var(--showcase-muted);
+  font-size: 0.8125rem;
+}
+
+.engineering-showcase .desktop-navigation .navigation-list a:hover,
+.engineering-showcase .desktop-navigation .navigation-list a[aria-current="location"] {
+  color: var(--showcase-white);
+}
+
+.engineering-showcase .desktop-navigation .navigation-list a::after {
+  background: var(--showcase-blue);
+}
+
+.engineering-showcase .profile-hero {
+  --profile-ink: var(--showcase-white);
+  --profile-muted: var(--showcase-muted);
+  --profile-line: var(--showcase-rule);
+  --profile-panel: var(--showcase-raised);
+  --profile-accent: var(--showcase-blue);
+  background: var(--showcase-dark);
+  color: var(--showcase-white);
+  border: 0;
+}
+
+.engineering-showcase .profile-hero-copy {
+  width: min(calc(100% - 6rem), var(--profile-width));
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.2fr);
+  gap: 3.5rem;
+  padding-block: calc(var(--profile-nav-height) + 2.75rem) 4.25rem;
+}
+
+.engineering-showcase .profile-hero-intro {
+  gap: 0;
+  padding-block: 0.5rem;
+}
+
+.showcase-hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 2.5rem;
+  font-family: var(--showcase-display);
+  color: var(--showcase-muted);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+}
+
+.showcase-hero-eyebrow > span {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--showcase-blue);
+  box-shadow: 0 0 0 4px rgb(138 180 255 / 9%);
+}
+
+.engineering-showcase .profile-dock-name {
+  margin-bottom: 1.2rem;
+  color: #c9d4e2;
+  font-size: 1rem;
+  font-weight: 450;
+}
+
+.engineering-showcase .profile-hero h1 {
+  margin: 0;
+  color: var(--showcase-white);
+  font-size: clamp(3rem, 4.7vw, 4.375rem);
+  font-weight: 580;
+  letter-spacing: -0.065em;
+  line-height: 1.25;
+}
+
+.showcase-title-first,
+.showcase-title-last {
+  display: block;
+}
+
+.showcase-title-last { margin-top: 0.14em; }
+.showcase-title-last > span:first-child {
+  font-family: var(--showcase-display);
+  font-size: 1.3em;
+  font-weight: 500;
+  letter-spacing: -0.065em;
+}
+.showcase-title-period { color: var(--showcase-blue); }
+
+.engineering-showcase .profile-hero-kicker {
+  margin-top: 1.75rem;
+  color: var(--showcase-blue);
+  font-size: 0.8125rem;
+  font-weight: 450;
+  letter-spacing: 0.015em;
+}
+
+.engineering-showcase .profile-hero-positioning {
+  max-width: 25rem;
+  margin-top: 0.9rem;
+  color: var(--showcase-muted);
+  font-size: 0.9375rem;
+  line-height: 1.9;
+}
+
+.engineering-showcase .profile-hero-actions {
+  margin-top: 1.8rem;
+  gap: 0.8rem;
+}
+
+.engineering-showcase .profile-cta {
+  min-height: 48px;
+  padding-inline: 1.45rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 550;
+}
+
+.engineering-showcase .profile-cta-primary { background: var(--showcase-white); color: var(--showcase-dark); }
+.engineering-showcase .profile-cta-primary:hover { background: var(--showcase-blue); }
+.engineering-showcase .profile-cta-secondary { border-color: #455061; color: var(--showcase-white); }
+.engineering-showcase .profile-cta-secondary:hover { background: var(--showcase-raised); border-color: var(--showcase-blue); }
+
+.showcase-hero-signature {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 2.2rem 0 0;
+  color: #9ba8bb;
+  font-size: 0.6875rem;
+}
+.showcase-hero-signature > span:first-child { font-family: var(--showcase-display); letter-spacing: 0.04em; }
+.showcase-exhibit { min-width: 0; }
+
+.showcase-proof-strip {
+  width: min(calc(100% - 6rem), var(--profile-width));
+  margin-inline: auto;
+  border-top: 1px solid var(--showcase-rule);
+}
+
+.engineering-showcase .hero-experience-index {
+  border: 0;
+  background: transparent;
+  padding: 1.5rem 0 1.8rem;
+}
+
+.engineering-showcase .hero-experience-heading { margin-bottom: 1rem; color: var(--showcase-muted); font-size: 0.6875rem; }
+.engineering-showcase .hero-experience-index ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
+.engineering-showcase .hero-experience-index li + li { border: 0; border-left: 1px solid var(--showcase-rule); padding-left: 1.75rem; }
+.engineering-showcase .hero-experience-index a { grid-template-columns: 2.75rem minmax(0, 1fr) 20px; gap: 1rem; padding: 0.25rem 0; min-height: 80px; }
+.engineering-showcase .hero-experience-brand { display: block; }
+.engineering-showcase .hero-experience-brand .brand-mark { width: 2.75rem; height: 2.75rem; padding: 0.25rem; border: 0; border-radius: 6px; background: #fff; }
+.engineering-showcase .hero-experience-brand .brand-mark img { height: 1.6rem; }
+.engineering-showcase .hero-experience-company { font-size: 0.875rem; font-weight: 550; }
+.engineering-showcase .hero-experience-title { font-size: 0.75rem; color: var(--showcase-muted); }
+.engineering-showcase .hero-experience-period { font-family: var(--showcase-display); font-size: 0.6875rem; color: #9ba8bb; }
+.engineering-showcase .hero-experience-arrow { color: #8996a9; transition: color 180ms ease, transform 180ms ease; }
+.engineering-showcase .hero-experience-index a:hover .hero-experience-arrow { color: var(--showcase-blue); transform: translateX(3px); }
+
+.showcase-credentials {
+  --profile-muted: #596779;
+  --profile-ink: #19283b;
+  --profile-accent: #2458a6;
+  --profile-line: #d6dfec;
+  background: #edf1f6;
+  color: var(--profile-ink);
+  border-bottom: 1px solid var(--profile-line);
+}
+
+.engineering-showcase .profile-dock {
+  width: min(calc(100% - 6rem), var(--profile-width));
+  margin-inline: auto;
+  padding-block: 1.5rem;
+  border: 0;
+}
+.engineering-showcase .profile-dock-education { gap: 3rem; max-width: 47rem; }
+.engineering-showcase .profile-dock-education-entry { grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 1rem; }
+.engineering-showcase .profile-dock-education-main { grid-row: 1 / 3; }
+.engineering-showcase .profile-dock-education-school { font-size: 0.9375rem; }
+.engineering-showcase .profile-dock-education-detail { font-size: 0.6875rem; }
+.engineering-showcase .profile-dock-contacts { grid-template-columns: auto auto; gap: 1.5rem; font-size: 0.75rem; }
+
+.engineering-showcase .profile-stage {
+  width: min(calc(100% - 6rem), var(--profile-width));
+  padding-block: 6rem;
+}
+
+.showcase-section-heading { display: flex; justify-content: space-between; align-items: end; gap: 3rem; margin-bottom: 3.5rem; }
+.showcase-eyebrow { margin: 0 0 0.9rem; color: var(--profile-accent); font-family: var(--showcase-display); font-size: 0.6875rem; font-weight: 550; letter-spacing: 0.15em; line-height: 1.6; }
+.showcase-section-heading h2 { margin: 0; font-size: 2.75rem; font-weight: 550; letter-spacing: -0.04em; line-height: 1.3; }
+.showcase-section-heading > p { margin: 0 0 0.15rem; max-width: 27rem; color: var(--profile-muted); font-size: 0.875rem; line-height: 1.9; }
+
+.engineering-showcase .sticky-internship-card {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 4.5rem;
+  padding-block: 3.75rem;
+}
+.engineering-showcase .internship-card-header { position: sticky; top: calc(var(--profile-nav-height) + 2rem); align-self: start; gap: 0.9rem; }
+.engineering-showcase .internship-identity { display: flex; align-items: center; gap: 1rem; }
+.engineering-showcase .internship-company { font-size: 1rem; font-weight: 600; }
+.engineering-showcase .internship-brand-slot .brand-mark { padding: 0.3rem; border-radius: 5px; width: 3rem; height: 3rem; }
+.engineering-showcase .internship-brand-slot .brand-mark img { max-width: 100%; height: 1.7rem; object-fit: contain; }
+.engineering-showcase .internship-card-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; margin-bottom: 1rem; }
+.engineering-showcase .internship-chip { font-size: 0.6875rem; }
+.engineering-showcase .internship-period { font-family: var(--showcase-display); }
+.engineering-showcase .internship-value-headline { font-size: 1.875rem; font-weight: 550; line-height: 1.5; margin-bottom: 1.25rem; letter-spacing: -0.025em; }
+.engineering-showcase .internship-copy-column > p { font-size: 0.9375rem; line-height: 1.9; }
+.engineering-showcase .internship-copy-column > .internship-contribution { margin-block: 1rem 1.25rem; }
+.engineering-showcase .internship-work { gap: 0.8rem; font-size: 0.9375rem; line-height: 1.9; padding-left: 1rem; }
+.engineering-showcase .internship-copy-column > .internship-outcome-text { padding: 1rem 1.25rem; background: #e8eef8; border-radius: 0 6px 6px 0; font-size: 0.875rem; }
+.engineering-showcase .internship-stack-chip { padding: 0.2rem 0.55rem; border: 1px solid var(--profile-line); border-radius: 4px; background: #fff; font-family: var(--showcase-display); font-size: 0.6875rem; }
+.engineering-showcase .internship-stack { gap: 0.5rem; margin-top: 1.35rem; }
+.engineering-showcase .internship-details { font-size: 0.9375rem; }
+
+.engineering-showcase .system-project-tabs { gap: 1.5rem; }
+.engineering-showcase .system-project-tablist { width: 100%; gap: 1.75rem; border-bottom: 1px solid var(--profile-line); }
+.engineering-showcase .system-project-tab { position: relative; padding: 0.75rem 0; min-height: 3.5rem; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; font-size: 0.875rem; }
+.engineering-showcase .system-project-tab[aria-selected="true"] { background: transparent; color: var(--profile-accent); border-bottom-color: var(--profile-accent); }
+.engineering-showcase .system-project-panel { border: 1px solid var(--profile-line); border-radius: 12px; padding: 2.5rem; background: #fff; box-shadow: 0 12px 36px -24px rgb(25 40 59 / 18%); }
+.engineering-showcase .system-project-title { font-size: 1.5rem; font-weight: 550; }
+.engineering-showcase .system-project-problem { max-width: 60rem; line-height: 1.9; }
+
+.engineering-showcase .open-source-project-overview { padding: 2.75rem; border: 1px solid var(--profile-line); border-radius: 12px; background: #fff; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 3rem; }
+.engineering-showcase .open-source-showcase-header h3 { font-family: var(--showcase-display); font-size: 3.75rem; font-weight: 500; letter-spacing: -0.06em; }
+.engineering-showcase .open-source-project-heading .brand-mark { flex-basis: 5rem; width: 5rem; border: 0; background: transparent; }
+.engineering-showcase .open-source-showcase-background { font-size: 0.9375rem; line-height: 1.9; }
+.engineering-showcase .open-source-showcase-identity { display: inline-block; padding: 0.3rem 0.65rem; margin-bottom: 0.75rem; border: 1px solid #c3d3eb; border-radius: 4px; background: #e9f0fb; font-family: var(--showcase-display); font-size: 0.75rem; }
+.engineering-showcase .open-source-contributions-heading h4 { font-size: 1.5rem; font-weight: 550; }
+.engineering-showcase .open-source-stars strong,
+.engineering-showcase .open-source-stat-value { font-family: var(--showcase-display); font-weight: 500; }
+.engineering-showcase .open-source-theme-grid { gap: 1.25rem; }
+.engineering-showcase .open-source-theme-card { padding: 1.75rem 2rem; border-radius: 8px; background: #fdfefe; transition: border-color 200ms ease, box-shadow 200ms ease; }
+.engineering-showcase .open-source-theme-card:hover { border-color: #91add5; box-shadow: 0 8px 24px -18px rgb(36 88 166 / 30%); }
+.engineering-showcase .open-source-theme-name { font-size: 1.0625rem; }
+.engineering-showcase .open-source-theme-summary { font-size: 0.875rem; line-height: 1.9; }
+.engineering-showcase .open-source-pr-chip { font-family: var(--showcase-display); background: #eef3fa; border-color: transparent; font-size: 0.75rem; }
+.engineering-showcase .open-source-pr-chip:hover { border-color: var(--profile-accent); }
+.engineering-showcase .open-source-ongoing { background: #eaf0f9; border-radius: 0 6px 6px 0; }
+
+.engineering-showcase .writing-entry { grid-template-columns: minmax(8rem, 0.25fr) minmax(0, 1fr); gap: 2.5rem; padding-block: 2.5rem; }
+.engineering-showcase .writing-entry-meta { font-family: var(--showcase-display); }
+.engineering-showcase .writing-entry h3 { max-width: 38rem; font-size: 1.625rem; font-weight: 550; letter-spacing: -0.02em; line-height: 1.65; }
+.engineering-showcase .writing-entry-body > p { max-width: 48rem; font-size: 0.9375rem; line-height: 1.9; }
+.engineering-showcase .writing-entry-link { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; text-decoration: none; }
+.engineering-showcase .writing-entry-link::after { content: "↗"; transition: transform 180ms ease; }
+.engineering-showcase .writing-entry-link:hover::after { transform: translate(2px, -2px); }
+.engineering-showcase .writing-stage-footer a { font-size: 0.875rem; }
+
+.engineering-showcase .profile-stage--contact {
+  --profile-ink: var(--showcase-white);
+  --profile-muted: var(--showcase-muted);
+  --profile-accent: var(--showcase-blue);
+  --profile-line: var(--showcase-rule);
+  width: 100%;
+  margin: 0;
+  padding: 5.5rem 0 0;
+  background: var(--showcase-dark);
+  color: var(--showcase-white);
+  border: 0;
+}
+.showcase-contact-inner { width: min(calc(100% - 6rem), var(--profile-width)); margin-inline: auto; }
+.showcase-contact-inner h2 { margin: 1.8rem 0 2rem; font-size: clamp(2.75rem, 4vw, 4rem); font-weight: 500; letter-spacing: -0.04em; line-height: 1.4; }
+.showcase-contact-inner h2 > span { color: var(--showcase-blue); }
+.engineering-showcase .profile-contact-stage { display: flex; align-items: center; justify-content: space-between; gap: 3rem; padding-bottom: 4rem; }
+.engineering-showcase .profile-contact-stage > p { color: var(--showcase-muted); font-size: 0.9375rem; max-width: 38rem; }
+.engineering-showcase .profile-contact-links { flex-shrink: 0; gap: 0.75rem; }
+.engineering-showcase .profile-contact-links a { min-height: 48px; padding-inline: 1.5rem; border: 1px solid #455061; border-radius: 6px; background: transparent; color: var(--showcase-white); text-decoration: none; font-size: 0.8125rem; }
+.engineering-showcase .profile-contact-links a:first-child { background: var(--showcase-white); color: var(--showcase-dark); border-color: var(--showcase-white); }
+.engineering-showcase .profile-contact-links a:hover { background: var(--showcase-blue); border-color: var(--showcase-blue); color: var(--showcase-dark); }
+.showcase-footer { display: flex; justify-content: space-between; align-items: center; gap: 2rem; min-height: 7rem; padding-block: 1.5rem; border-top: 1px solid var(--showcase-rule); font-size: 0.75rem; }
+.showcase-footer p { display: flex; align-items: center; gap: 1.5rem; margin: 0; }
+.showcase-footer strong { font-family: var(--showcase-display); font-size: 1.25rem; font-weight: 500; letter-spacing: -0.04em; }
+.showcase-footer p > span { color: var(--showcase-muted); }
+.showcase-footer > a { display: inline-flex; min-height: 44px; align-items: center; gap: 1rem; color: var(--showcase-muted); }
+.showcase-footer > a:hover { color: var(--showcase-blue); }
+
+@media (prefers-reduced-motion: reduce) {
+  .engineering-showcase *, .engineering-showcase *::before, .engineering-showcase *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
