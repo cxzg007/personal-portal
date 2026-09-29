@@ -16,6 +16,7 @@ export function SemanticaEcosystem({
         alt="Semantica 项目能力：从多源数据到语义与上下文层，再支持 Agent、检索问答与可审计决策。底栏单列我的四项贡献重点。"
         className={styles.image}
         height={820}
+        loading="eager"
         src="/diagrams/semantica-context-layer.svg"
         unoptimized
         width={1440}
