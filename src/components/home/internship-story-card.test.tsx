@@ -11,7 +11,7 @@ afterEach(cleanup);
 
 describe("internship story card", () => {
   it.each(internships.map((internship, index) => ({ internship, index })))(
-    "renders a static editorial entry for $internship.company",
+    "renders an editorial entry for $internship.company",
     ({ internship, index }) => {
       const view = render(<InternshipStoryCard internship={internship} index={index} />);
       const card = screen.getByRole("article");
@@ -20,7 +20,6 @@ describe("internship story card", () => {
       expect(card).toHaveAttribute("data-brand", internship.logo.theme);
       expect(card.className).toContain("sticky-internship-card");
       expect(card).not.toHaveAttribute("data-layout");
-      expect(card.querySelector("figure[data-engineering-kind]")).toBeNull();
 
       expect(within(card).getByRole("img", { name: internship.logo.alt })).toBeVisible();
       expect(within(card).getByText(internship.company)).toBeVisible();
@@ -62,7 +61,6 @@ describe("internship story card", () => {
         expect(within(records).getByText(detail)).toBeInTheDocument();
       }
 
-      expect(within(card).queryByRole("button")).not.toBeInTheDocument();
       view.unmount();
     },
   );

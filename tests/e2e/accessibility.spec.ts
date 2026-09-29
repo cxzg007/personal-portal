@@ -77,11 +77,10 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     ),
     hero.getByRole("link", { name: "jiangjunjie_tj@foxmail.com", exact: true }),
     hero.getByRole("link", { name: "GitHub", exact: true }),
-    page.locator("main > section#internships").getByText("查看京东工程细节"),
-    page.locator("main > section#internships").getByText("查看智元机器人工程细节"),
-    page
-      .locator("main > section#internships")
-      .getByText("查看中国船舶集团 722 研究所工程细节"),
+    ...["京东", "智元机器人", "中国船舶集团 722 研究所"].flatMap((company, index) => [
+      page.locator("#internships figure").nth(index).getByRole("button"),
+      page.locator("main > section#internships").getByText(`查看${company}工程细节`),
+    ]),
     page.locator("#system-tab-ontology-agent-platform"),
     // Tab 键顺序包含选中架构的节点按钮（DOM 阅读顺序：semantic→relations→query→execution）。
     ...["semantic", "relations", "query", "execution"].map((nodeId) =>

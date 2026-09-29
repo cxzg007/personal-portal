@@ -221,7 +221,7 @@ test("homepage exposes the reference-style section order", async ({ page }) => {
   ]);
 });
 
-test("internship cards keep a static editorial layout without stacking or engineering figures", async ({
+test("internship cards keep a static editorial layout with controllable engineering illustrations", async ({
   page,
 }) => {
   await page.goto("/");
@@ -237,14 +237,14 @@ test("internship cards keep a static editorial layout without stacking or engine
     await expect(card).not.toHaveAttribute("data-layout");
     await expect(card).not.toHaveAttribute("data-stack-progress");
   }
-  await expect(page.locator("#internships figure[data-engineering-kind]")).toHaveCount(0);
+  await expect(page.locator("#internships figure[data-engineering-kind]")).toHaveCount(3);
 
   for (let index = 0; index < 3; index += 1) {
     const card = internships.locator(`article[data-card-index="${index}"]`);
     await expect(card.getByRole("img", { name: logos[index] })).toBeVisible();
   }
 
-  await expect(internships.getByRole("button")).toHaveCount(0);
+  await expect(internships.getByRole("button", { name: /暂停动画/ })).toHaveCount(3);
 });
 
 test("expanding any internship disclosure keeps detail items unobstructed and cards non-overlapping", async ({
