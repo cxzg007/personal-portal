@@ -14,30 +14,26 @@ export function ProfileHero({ profile, internships }: ProfileHeroProps) {
     <section aria-labelledby="profile-title" className="profile-hero" id="profile">
       <div className="profile-hero-copy">
         <div className="profile-hero-intro">
-          <p className="showcase-hero-eyebrow"><span aria-hidden="true" /> AI AGENT / BACKEND ENGINEER</p>
+          <p className="showcase-hero-eyebrow"><span aria-hidden="true" /> ONTOLOGY / OPEN SOURCE / AGENT</p>
           <p className="profile-dock-name">{profile.name} / Jiang Junjie</p>
-          <h1 id="profile-title">
-            <span className="showcase-title-first">构建可靠的</span>{" "}
-            <span className="showcase-title-last"><span>Agent</span> 系统<span className="showcase-title-period">。</span></span>
+          <h1 id="profile-title" aria-label="从业务语义，到可靠执行。">
+            <span className="showcase-title-first">从业务语义，</span>
+            <span className="showcase-title-last">到可靠执行<span className="showcase-title-period">。</span></span>
           </h1>
           <p className="profile-hero-kicker profile-dock-role">{`2027 届校招 · ${profile.targetRole}`}</p>
           <p className="profile-hero-positioning">
-            从语义建模到执行约束，关注 AI 应用与后端系统的可靠落地。
+            在京东参与本体与规则平台建设，作为 Semantica 维护者推进推理与执行能力。让业务语义成为 Agent 可理解、可执行的约束。
           </p>
+          <ul className="showcase-focus" aria-label="工作重点"><li><span>京东</span>本体与规则平台</li><li><span>Semantica</span>Maintainer / Collaborator</li></ul>
           <div className="profile-hero-actions">
             <a className="profile-cta profile-cta-primary" href="#internships">
-              查看实习
+              京东实习
             </a>
-            <a
-              className="profile-cta profile-cta-secondary"
-              href={profile.github}
-              rel="noreferrer"
-              target="_blank"
-            >
-              GitHub ↗
+            <a className="profile-cta profile-cta-secondary" href="#open-source">
+              开源贡献 <span aria-hidden="true">↗</span>
             </a>
           </div>
-          <p className="showcase-hero-signature"><span>{profile.technicalId}</span><span aria-hidden="true">/</span><span>从想法，到可运行的系统</span></p>
+          <p className="showcase-hero-signature"><span>{profile.technicalId}</span><span aria-hidden="true">/</span><a href={profile.github} rel="noreferrer" target="_blank">GitHub ↗</a></p>
         </div>
         <div className="showcase-exhibit"><AgentReplay /></div>
       </div>

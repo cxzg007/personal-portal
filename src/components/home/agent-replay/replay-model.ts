@@ -1,4 +1,4 @@
-export type ReplayScenario = "authorized" | "readonly";
+export type ReplayScenario = "authorized" | "readonly" | "conflict";
 
 export type ReplayState = {
   scenario: ReplayScenario;
@@ -15,11 +15,11 @@ export type ReplayAction =
   | { type: "tick" };
 
 export const replayStages = [
-  { id: "task", label: "接收任务", short: "TASK", progress: 0, title: "任务已进入回放队列", detail: "示例任务：审查代码变更，生成建议并提交审查结果。", event: "TASK_ACCEPTED" },
-  { id: "context", label: "检索上下文", short: "CONTEXT", progress: 25, title: "关联变更与项目约定", detail: "读取示例代码差异和审查规则，为每条建议整理依据。", event: "CONTEXT_RETRIEVED" },
-  { id: "plan", label: "生成建议", short: "REVIEW", progress: 50, title: "审查建议已整理", detail: "将发现的问题与代码位置关联，等待写入权限校验。", event: "REVIEW_PREPARED" },
-  { id: "policy", label: "权限校验", short: "POLICY", progress: 75, title: "允许写入审查结果", detail: "当前具有写入权限，审查结果可以进入提交阶段。", event: "WRITE_AUTHORIZED" },
-  { id: "result", label: "提交结果", short: "RESULT", progress: 100, title: "审查结果已提交（示例）", detail: "执行轨迹已结束，审查建议与引用依据一同保存在示例结果中。", event: "RESULT_SUBMITTED" },
+  { id: "task", label: "Agent 任务", short: "TASK", progress: 0, title: "供应商资质审核任务已接收", detail: "虚构任务：检查供应商资质是否过期，预览风险标记的写回计划。", event: "TASK_ACCEPTED" },
+  { id: "context", label: "本体映射", short: "ONTOLOGY", progress: 25, title: "从业务属性定位数据", detail: "Agent 仅提交属性编码；服务端解析供应商、资质与关联关系，确定物理字段和 JOIN 路径。", event: "ONTOLOGY_RESOLVED" },
+  { id: "plan", label: "规则编译", short: "COMPILE", progress: 50, title: "规则已编译为执行计划", detail: "服务端同步生成 SQL 与绑定参数，处理一对多关联的聚合边界，形成可预览的计划。", event: "RULE_COMPILED" },
+  { id: "policy", label: "执行校验", short: "VALIDATE", progress: 75, title: "写回条件校验通过", detail: "示例计划已人工确认；写权限与配置指纹均通过校验，允许进入事务。", event: "EXECUTION_VALIDATED" },
+  { id: "result", label: "事务写回", short: "COMMIT", progress: 100, title: "风险标记已写回（示例）", detail: "单个事务内逐条检查影响行数，全部符合预期后提交，并保留执行轨迹。", event: "TRANSACTION_COMMITTED" },
 ] as const;
 
 export const initialReplayState: ReplayState = {
@@ -56,13 +56,16 @@ export function replayProjection(state: ReplayState) {
   const stageIndex = Math.min(4, Math.floor(state.progress / 25));
   const stage = replayStages[stageIndex];
   const blocked = state.scenario === "readonly" && state.progress >= 75;
+  const rolledBack = state.scenario === "conflict" && state.progress === 100;
   return {
     stageIndex,
     stage,
     blocked,
+    rolledBack,
+    failed: blocked || rolledBack,
     ended: state.progress >= replayEnd(state.scenario),
-    title: blocked ? "写入已阻断" : stage.title,
-    detail: blocked ? "当前为只读权限。审查建议已保留，提交结果未执行。" : stage.detail,
-    event: blocked ? "WRITE_BLOCKED" : stage.event,
+    title: blocked ? "写入已阻断" : rolledBack ? "整批写回已回滚" : stage.title,
+    detail: blocked ? "当前为只读权限。执行计划可查看，事务写回未执行。" : rolledBack ? "示例中一条写入的影响行数不等于 1，触发整个事务回滚；0 条变更生效。" : stage.detail,
+    event: blocked ? "WRITE_BLOCKED" : rolledBack ? "TRANSACTION_ROLLED_BACK" : stage.event,
   };
 }

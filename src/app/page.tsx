@@ -64,19 +64,19 @@ export default async function HomePage() {
           </header>
           <StickyInternshipStack internships={content.internships} />
         </section>
-        <section aria-labelledby="systems-heading" className="profile-stage" id="systems">
-          <header className="showcase-section-heading profile-reveal">
-            <div><p className="showcase-eyebrow">UNDER THE SURFACE</p><h2 id="systems-heading">系统设计</h2></div>
-            <p>沿着数据流，理解每一次设计取舍。<br />选择一个节点，查看它的职责与边界。</p>
-          </header>
-          <SystemProjectTabs architectures={loadSystemArchitectures(content)} projects={content.caseStudies} />
-        </section>
         <section aria-labelledby="open-source-heading" className="profile-stage profile-stage--open-source" id="open-source">
           <header className="showcase-section-heading profile-reveal">
             <div><p className="showcase-eyebrow">BUILT IN THE OPEN</p><h2 id="open-source-heading">开源贡献</h2></div>
             <p>从代码贡献到持续维护。<br />让每一项工作，都有可追溯的记录。</p>
           </header>
           <OpenSourceShowcase project={content.openSource} />
+        </section>
+        <section aria-labelledby="systems-heading" className="profile-stage" id="systems">
+          <header className="showcase-section-heading profile-reveal">
+            <div><p className="showcase-eyebrow">UNDER THE SURFACE</p><h2 id="systems-heading">系统设计</h2></div>
+            <p>沿着数据流，理解每一次设计取舍。<br />选择一个节点，查看它的职责与边界。</p>
+          </header>
+          <SystemProjectTabs architectures={loadSystemArchitectures(content)} projects={content.caseStudies} />
         </section>
         {featuredPosts.length > 0 ? (
           <section aria-labelledby="writing-heading" className="profile-stage" id="writing">

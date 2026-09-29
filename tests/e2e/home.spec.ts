@@ -6,7 +6,7 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
 
   const hero = page.locator("#profile");
 
-  await expect(hero.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" })).toBeVisible();
+  await expect(hero.getByRole("heading", { level: 1, name: "从业务语义，到可靠执行。" })).toBeVisible();
   await expect(hero.getByText("江俊杰 / Jiang Junjie")).toBeVisible();
   await expect(hero.getByText("2027 届校招 · AI Agent / 后端开发", { exact: true })).toBeVisible();
   await expect(hero.getByText("电子信息", { exact: true })).toBeVisible();
@@ -20,9 +20,10 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
     "https://github.com/cxzg007",
   );
 
-  const viewInternships = hero.getByRole("link", { name: "查看实习" });
+  const viewInternships = hero.getByRole("link", { name: "京东实习", exact: true });
   const githubCta = hero.getByRole("link", { name: "GitHub ↗" });
   await expect(viewInternships).toHaveAttribute("href", "#internships");
+  await expect(hero.getByRole("link", { name: "开源贡献" })).toHaveAttribute("href", "#open-source");
   await expect(githubCta).toHaveAttribute("href", "https://github.com/cxzg007");
   await expect(githubCta).toHaveAttribute("target", "_blank");
 
@@ -33,7 +34,8 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
 
   for (const target of [
     hero.locator(".profile-dock-name"),
-    hero.getByRole("link", { name: "查看实习", exact: true }),
+    hero.getByRole("link", { name: "京东实习", exact: true }),
+    hero.getByRole("link", { name: "开源贡献", exact: true }),
     hero.getByRole("link", { name: "GitHub ↗", exact: true }),
   ]) {
     await expect(target).toBeInViewport({ ratio: 1 });
@@ -208,7 +210,7 @@ test("homepage exposes the reference-style section order", async ({ page }) => {
 
   await expect(page.locator("main > section")).toHaveCount(6);
   expect(await page.locator("main > section").evaluateAll((sections) => sections.map(({ id }) => id))).toEqual([
-    "profile", "internships", "systems", "open-source", "writing", "contact",
+    "profile", "internships", "open-source", "systems", "writing", "contact",
   ]);
 });
 

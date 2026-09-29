@@ -1,4 +1,5 @@
 import { BrandMark } from "@/components/home/brand-mark";
+import { SemanticaEcosystem } from "@/components/home/semantica-ecosystem";
 import type { OpenSourceContributionTheme, OpenSourceProject } from "@/content/schema";
 
 type OpenSourceShowcaseProps = {
@@ -81,6 +82,8 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
           ) : null}
         </section>
       </div>
+
+      <SemanticaEcosystem repositoryUrl={project.repositoryUrl} />
 
       <div className="open-source-contributions-heading">
         <div>

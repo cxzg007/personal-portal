@@ -146,12 +146,12 @@ for (const viewport of viewports) {
 
     await expectNoHorizontalOverflow(page);
     await expect(
-      page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" }),
+      page.getByRole("heading", { level: 1, name: "从业务语义，到可靠执行。" }),
     ).toBeVisible();
 
-    const hero = page.getByRole("region", { name: "构建可靠的 Agent 系统。" });
+    const hero = page.getByRole("region", { name: "从业务语义，到可靠执行。" });
     await expectHorizontallyContained(hero.locator(".profile-hero-copy"));
-    await expectHorizontallyContained(hero.getByRole("link", { name: "查看实习", exact: true }));
+    await expectHorizontallyContained(hero.getByRole("link", { name: "京东实习", exact: true }));
     await expectHorizontallyContained(hero.getByLabel("联系方式"));
     await expectHorizontallyContained(hero.getByLabel("教育经历"));
 
@@ -271,7 +271,7 @@ test("homepage reference profile keeps visible geometry at 1920x1080", async ({ 
 
   await expectNoHorizontalOverflow(page);
 
-  const heroHeading = page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" });
+  const heroHeading = page.getByRole("heading", { level: 1, name: "从业务语义，到可靠执行。" });
   const brandCards = page.locator("main > section#internships").getByRole("article");
   const openSourceCard = page.locator("main > section#open-source .open-source-showcase");
   await expect(brandCards).toHaveCount(3);

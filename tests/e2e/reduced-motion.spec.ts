@@ -4,7 +4,7 @@ import { expectNoRotation } from "./helpers/css";
 
 // Task 1 of the recruiting-conversion plan removed the `#info` stage and its
 // navigation entry; this list mirrors the remaining in-page sections.
-const NAV_SECTIONS = ["internships", "systems", "open-source", "writing", "contact"];
+const NAV_SECTIONS = ["internships", "open-source", "systems", "writing", "contact"];
 
 test("reduced motion preference keeps the layout static without hiding content", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -15,8 +15,8 @@ test("reduced motion preference keeps the layout static without hiding content",
   await expect(page.locator("#internships [data-stack-progress]")).toHaveCount(0);
   await expect(page.locator("canvas")).toHaveCount(0);
 
-  await expect(page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "查看实习" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "从业务语义，到可靠执行。" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "京东实习", exact: true })).toBeVisible();
   await expect(page.locator("main > section#internships .sticky-internship-card")).toHaveCount(3);
 
   const openSource = page.locator("main > section#open-source");

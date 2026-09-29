@@ -1,7 +1,7 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-test("homepage uses graphite exhibition and light reading tokens", async ({ page }) => {
+test("homepage uses a continuous light canvas with an inset dark exhibit", async ({ page }) => {
   await page.goto("/");
   const tokens = await page.evaluate(() => {
     const shell = document.querySelector<HTMLElement>(".profile-shell");
@@ -12,16 +12,17 @@ test("homepage uses graphite exhibition and light reading tokens", async ({ page
       muted: styles.getPropertyValue("--profile-muted").trim(),
     };
   });
-  expect(tokens.ink).toBe("#19283b");
-  expect(tokens.bg).toBe("#f5f7fa");
-  expect(tokens.muted).toBe("#596779");
-  await expect(page.locator("#profile")).toHaveCSS("background-color", "rgb(16, 19, 23)");
-  await expect(page.locator("#contact")).toHaveCSS("background-color", "rgb(16, 19, 23)");
+  expect(tokens.ink).toBe("#20383f");
+  expect(tokens.bg).toBe("#f4f7f6");
+  expect(tokens.muted).toBe("#5b6c70");
+  await expect(page.locator("#profile")).toHaveCSS("background-color", "rgb(244, 247, 246)");
+  await expect(page.locator(".showcase-exhibit")).toHaveCSS("background-color", "rgb(21, 35, 45)");
+  await expect(page.locator("#contact")).toHaveCSS("background-color", "rgb(233, 240, 239)");
 });
 
 test("homepage paints a solid editorial surface without gradients or card shadows", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".profile-shell")).toHaveCSS("background-color", "rgb(245, 247, 250)");
+  await expect(page.locator(".profile-shell")).toHaveCSS("background-color", "rgb(244, 247, 246)");
   await expect(page.locator("#internships article").first()).toHaveCSS("box-shadow", "none");
   const font = await page
     .locator("#profile h1")
@@ -36,7 +37,7 @@ test("homepage keeps readable contrast across dark and light sections", async ({
   expect(contrast).toEqual([]);
 });
 
-test("homepage keeps its scoped blue type system", async ({ page }) => {
+test("homepage keeps its scoped type system", async ({ page }) => {
   await page.goto("/");
   const values = await page.evaluate(() => {
     const root = getComputedStyle(document.documentElement);
@@ -103,7 +104,7 @@ test("blog navigation retains its independent white and blue surface", async ({ 
   expect(nav.shadow).toBe("none");
 });
 
-test("focused navigation and call-to-action links show a blue ring of at least 2px", async ({ page }) => {
+test("focused navigation and call-to-action links show a teal ring of at least 2px", async ({ page }) => {
   await page.goto("/");
   // 移动视口（<=760px）下桌面主导航被隐藏，链接只存在于汉堡菜单抽屉中，
   // 需先打开菜单并改用「移动导航」定位，否则 Tab 无法聚焦到目标链接。
@@ -115,7 +116,7 @@ test("focused navigation and call-to-action links show a blue ring of at least 2
   const navLink = isDesktopNavVisible
     ? desktopNav.getByRole("link", { name: "实习", exact: true })
     : page.getByRole("navigation", { name: "移动导航" }).getByRole("link", { name: "实习", exact: true });
-  const cta = page.getByRole("link", { name: "查看实习", exact: true });
+  const cta = page.getByRole("link", { name: "京东实习", exact: true });
   for (let i = 0; i < 6 && !(await navLink.evaluate((element) => element === document.activeElement)); i += 1) {
     await page.keyboard.press("Tab");
   }
@@ -136,13 +137,13 @@ test("focused navigation and call-to-action links show a blue ring of at least 2
   for (const ring of [navRing, ctaRing]) {
     expect(ring.style).not.toBe("none");
     expect(Number.parseFloat(ring.width)).toBeGreaterThanOrEqual(2);
-    expect(ring.color).toBe("rgb(138, 180, 255)");
+    expect(ring.color).toBe("rgb(18, 107, 112)");
   }
 });
 
 test("homepage sections use the same undecorated reading surface", async ({ page }) => {
   await page.goto("/");
-  for (const id of ["internships", "systems", "open-source", "writing", "contact"]) {
+  for (const id of ["internships", "open-source", "systems", "writing", "contact"]) {
     const section = page.locator(`#${id}`);
     await expect(section).toBeVisible();
     const decoration = await section.evaluate((element) => getComputedStyle(element, "::before").content);

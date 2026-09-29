@@ -25,7 +25,7 @@ function StageGlyph({ index }: { index: number }) {
   return <><path d="M-12-8h8l4-4h12V12h-24Z" /><path d="m-5 1 4 4 7-7" /></>;
 }
 
-function ReplayScene({ active, blocked, playing, id }: { active: number; blocked: boolean; playing: boolean; id: string }) {
+function ReplayScene({ active, blocked, rolledBack, playing, id }: { active: number; blocked: boolean; rolledBack: boolean; playing: boolean; id: string }) {
   return (
     <svg aria-hidden="true" className={styles.scene} viewBox="0 0 720 370" fill="none">
       <defs>
@@ -60,7 +60,7 @@ function ReplayScene({ active, blocked, playing, id }: { active: number; blocked
       <g className={styles.connections}>
         {nodePositions.slice(0, -1).map((position, index) => {
           const next = nodePositions[index + 1];
-          return <g key={index} data-reached={active > index} data-blocked={blocked && index === 3}>
+          return <g key={index} data-reached={active > index} data-blocked={(blocked || rolledBack) && index === 3}>
             <path d={`M${position.x} ${position.y + 8} ${next.x} ${next.y + 8}`} className={styles.connectionTrack} />
             <path d={`M${position.x} ${position.y + 8} ${next.x} ${next.y + 8}`} className={`${styles.connectionLine} ${playing && active === index ? styles.connectionFlow : ""}`} />
             <circle cx={(position.x + next.x) / 2} cy={(position.y + next.y) / 2 + 8} r="3" className={styles.connectionDot} />
@@ -68,7 +68,7 @@ function ReplayScene({ active, blocked, playing, id }: { active: number; blocked
         })}
       </g>
       {nodePositions.map(({ x, y }, index) => (
-        <g key={index} transform={`translate(${x} ${y})`} className={styles.node} data-active={active === index} data-reached={active >= index} data-blocked={blocked && index === 3}>
+        <g key={index} transform={`translate(${x} ${y})`} className={styles.node} data-active={active === index} data-reached={active >= index} data-blocked={(blocked && index === 3) || (rolledBack && index === 4)}>
           <ellipse cy="15" rx="50" ry="20" fill="#080d15" opacity=".42" />
           <path d="M-43-5 0 16 43-5 0-26Z" className={styles.nodeFoot} />
           <path d="M-36-19 0-1 36-19V3L0 21-36 3Z" className={styles.nodeFront} />
@@ -129,22 +129,22 @@ export function AgentReplay(): React.JSX.Element {
   }, [state.playing]);
 
   return (
-    <section ref={rootRef} className={styles.replay} aria-label="Agent 任务回放" data-scenario={state.scenario} data-playing={state.playing}>
+    <section ref={rootRef} className={styles.replay} aria-label="本体与规则执行" data-scenario={state.scenario} data-playing={state.playing}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}><span />INTERACTIVE SYSTEM</p>
-          <h2 className={styles.title}>Agent 任务回放</h2>
+          <p className={styles.eyebrow}><span />ONTOLOGY → EXECUTION</p>
+          <h2 className={styles.title}>本体与规则执行</h2>
         </div>
-        <span className={styles.example}>示例数据 · 交互演示</span>
+        <span className={styles.example}>供应商资质审核 · 虚构数据</span>
       </header>
 
       <div className={styles.workbench}>
         <div className={styles.sceneCaption}>
-          <span>代码审查 → 结果提交</span>
-          <span className={styles.sceneState}><i />{view.blocked ? "权限已阻断" : state.playing ? "回放中" : view.ended ? "回放结束" : "等待播放"}</span>
+          <span>业务语义 → 受控写回</span>
+          <span className={styles.sceneState}><i />{view.blocked ? "权限已阻断" : view.rolledBack ? "事务已回滚" : state.playing ? "回放中" : view.ended ? "回放结束" : "等待播放"}</span>
         </div>
-        <ReplayScene active={view.stageIndex} blocked={view.blocked} playing={state.playing} id={id} />
-        <div className={styles.sceneLegend} aria-hidden="true"><span>执行路径</span><span>权限边界</span></div>
+        <ReplayScene active={view.stageIndex} blocked={view.blocked} rolledBack={view.rolledBack} playing={state.playing} id={id} />
+        <div className={styles.sceneLegend} aria-hidden="true"><span>执行路径</span><span>执行边界</span></div>
       </div>
 
       <ol className={styles.stages} aria-label="回放阶段">
@@ -159,8 +159,8 @@ export function AgentReplay(): React.JSX.Element {
         ))}
       </ol>
 
-      <div className={styles.event} role="status" aria-live="polite" aria-atomic="true" data-blocked={view.blocked}>
-        <div className={styles.eventMarker} aria-hidden="true">{view.blocked ? "!" : "↳"}</div>
+      <div className={styles.event} role="status" aria-live="polite" aria-atomic="true" data-blocked={view.failed}>
+        <div className={styles.eventMarker} aria-hidden="true">{view.failed ? "!" : "↳"}</div>
         <div className={styles.eventContent}>
           <p className={styles.eventMeta}><span>当前事件</span><code>{view.event}</code></p>
           <p className={styles.eventTitle}>{view.title}</p>
@@ -177,15 +177,16 @@ export function AgentReplay(): React.JSX.Element {
         </button>
         <div className={styles.timeline}>
           <div className={styles.timelineLabel}><label htmlFor={`${id}-progress`}>回放进度</label><span>{String(state.progress).padStart(2, "0")}<small> / 100%</small></span></div>
-          <input id={`${id}-progress`} className={styles.range} type="range" min="0" max="100" step="1" value={state.progress} disabled={!hydrated} aria-valuetext={`${state.progress}%，${view.stage.label}${view.blocked ? "，写入已阻断" : ""}`} onChange={(event) => dispatch({ type: "seek", progress: Number(event.target.value) })} style={{ "--replay-progress": `${state.progress}%` } as CSSProperties} />
+          <input id={`${id}-progress`} className={styles.range} type="range" min="0" max="100" step="1" value={state.progress} disabled={!hydrated} aria-valuetext={`${state.progress}%，${view.stage.label}${view.blocked ? "，写入已阻断" : view.rolledBack ? "，整批写回已回滚" : ""}`} onChange={(event) => dispatch({ type: "seek", progress: Number(event.target.value) })} style={{ "--replay-progress": `${state.progress}%` } as CSSProperties} />
         </div>
-        <div className={styles.scenarios} role="group" aria-label="权限场景">
+        <div className={styles.scenarios} role="group" aria-label="执行场景">
           <button type="button" disabled={!hydrated} aria-pressed={state.scenario === "authorized"} onClick={() => dispatch({ type: "scenario", scenario: "authorized" })}>正常授权</button>
           <button type="button" disabled={!hydrated} aria-pressed={state.scenario === "readonly"} onClick={() => dispatch({ type: "scenario", scenario: "readonly" })}>只读权限</button>
+          <button type="button" disabled={!hydrated} aria-pressed={state.scenario === "conflict"} onClick={() => dispatch({ type: "scenario", scenario: "conflict" })}>行数异常</button>
         </div>
       </div>
       <p className={styles.disclaimer}>仅演示执行逻辑，不发送真实请求；进度不代表实际耗时。</p>
-      <noscript><p className={styles.noScript}>当前为静态示例。启用 JavaScript 后可播放回放、切换权限场景。</p></noscript>
+      <noscript><p className={styles.noScript}>当前为静态示例。启用 JavaScript 后可播放回放、切换执行场景。</p></noscript>
     </section>
   );
 }

@@ -9,7 +9,7 @@ const auditedRoutes = [
   "/blog/graph-engineering-ontology",
 ] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
-const primaryNavItems = ["实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
+const primaryNavItems = ["实习", "开源", "系统", "博客", "联系", "GitHub"] as const;
 
 async function expectNextTab(page: Page, target: Locator) {
   await page.keyboard.press("Tab");
@@ -58,7 +58,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
   const desktopNavigation = page.getByRole("navigation", { name: "主导航" });
   await expect(desktopNavigation).toBeVisible();
 
-  const hero = page.getByRole("region", { name: "构建可靠的 Agent 系统。" });
+  const hero = page.getByRole("region", { name: "从业务语义，到可靠执行。" });
   const postTitles = [
     "图工程之后：多智能体系统缺的是一层语义",
     "Palantir 本体论：把业务语义做成可执行的操作层",
@@ -70,15 +70,17 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     skipLink,
     page.getByRole("link", { name: "返回首页" }),
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
-    hero.getByRole("link", { name: "查看实习", exact: true }),
+    hero.getByRole("link", { name: "京东实习", exact: true }),
+    hero.getByRole("link", { name: "开源贡献", exact: true }),
     hero.getByRole("link", { name: "GitHub ↗", exact: true }),
-    ...["接收任务", "检索上下文", "生成建议", "权限校验", "提交结果"].map((stage) =>
+    ...["Agent 任务", "本体映射", "规则编译", "执行校验", "事务写回"].map((stage) =>
       hero.getByRole("button", { name: `跳转到${stage}`, exact: true }),
     ),
     hero.getByRole("button", { name: "播放回放", exact: true }),
     hero.getByRole("slider", { name: "回放进度", exact: true }),
     hero.getByRole("button", { name: "正常授权", exact: true }),
     hero.getByRole("button", { name: "只读权限", exact: true }),
+    hero.getByRole("button", { name: "行数异常", exact: true }),
     ...["京东", "智元机器人", "中国船舶集团 722 研究所"].map((company) =>
       hero.getByRole("link", { name: `查看${company}实习经历`, exact: true }),
     ),
@@ -89,14 +91,11 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     page
       .locator("main > section#internships")
       .getByText("查看中国船舶集团 722 研究所工程细节"),
-    page.locator("#system-tab-ontology-agent-platform"),
-    // Tab 键顺序包含选中架构的节点按钮（DOM 阅读顺序：semantic→relations→query→execution）。
-    ...["semantic", "relations", "query", "execution"].map((nodeId) =>
-      page.locator(`#architecture-node-ontology-agent-platform-${nodeId}`),
-    ),
     openSource.getByRole("link", { name: "13,513 GitHub Stars" }),
     openSource.getByRole("link", { name: /#1 GitHub Trending 日榜/ }),
     openSource.getByRole("link", { name: /#3 Trendshift · Python 周榜/ }),
+    openSource.getByRole("link", { name: "查看完整能力图" }),
+    openSource.getByRole("link", { name: "能力图来源：项目 README" }),
     ...[0, 1, 2, 3, 4, 5, 6].map((index) =>
       openSource.getByRole("link", { name: /^已合并 · PR #/ }).nth(index),
     ),
@@ -104,6 +103,10 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     openSource.getByRole("link", { name: /^进行中 · PR #1731/ }),
     openSource.getByRole("link", { name: "Semantica GitHub repository", exact: true }),
     openSource.getByRole("link", { name: "阅读相关技术文章", exact: true }),
+    page.locator("#system-tab-ontology-agent-platform"),
+    ...["semantic", "relations", "query", "execution"].map((nodeId) =>
+      page.locator(`#architecture-node-ontology-agent-platform-${nodeId}`),
+    ),
     // 写作区每条目含两个链接（h3 标题链接在前，aria-label 的阅读全文在后），条目后为列表页入口。
     ...postTitles.flatMap((postTitle) => [
       page.locator("main > section#writing").getByRole("link", { name: postTitle, exact: true }),
@@ -221,8 +224,8 @@ test("reduced motion preserves content, removes Canvas, and sets the static prof
 
   await expect(page.locator("canvas")).toHaveCount(0);
   await expect(page.locator("html[data-profile-motion='static']")).toHaveCount(1);
-  await expect(page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "查看实习", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "从业务语义，到可靠执行。" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "京东实习", exact: true })).toBeVisible();
   await expect(page.locator("main > section#internships")).toBeVisible();
 });
 

@@ -24,10 +24,24 @@ describe("Agent replay", () => {
     });
 
     expect(screen.getByRole("status")).toHaveTextContent("写入已阻断");
-    expect(screen.getByRole("status")).toHaveTextContent("提交结果未执行");
-    expect(screen.queryByText("审查结果已提交（示例）")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "跳转到提交结果" })).toBeDisabled();
+    expect(screen.getByRole("status")).toHaveTextContent("事务写回未执行");
+    expect(screen.queryByText("风险标记已写回（示例）")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "跳转到事务写回" })).toBeDisabled();
     expect(screen.getByRole("slider", { name: "回放进度" })).toHaveValue("75");
+  });
+
+  it("rolls back the entire write when an affected-row check fails, and resets before switching to success", () => {
+    render(<AgentReplay />);
+    fireEvent.click(screen.getByRole("button", { name: "行数异常" }));
+    fireEvent.change(screen.getByRole("slider", { name: "回放进度" }), { target: { value: "100" } });
+    expect(screen.getByRole("status")).toHaveTextContent("整批写回已回滚");
+    expect(screen.getByRole("status")).toHaveTextContent("0 条变更生效");
+    expect(screen.getByRole("status")).not.toHaveTextContent("风险标记已写回");
+    expect(screen.getByRole("button", { name: "重播回放" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "正常授权" }));
+    expect(screen.getByRole("slider", { name: "回放进度" })).toHaveValue("0");
+    fireEvent.change(screen.getByRole("slider", { name: "回放进度" }), { target: { value: "100" } });
+    expect(screen.getByRole("status")).toHaveTextContent("风险标记已写回（示例）");
   });
 
   it("starts static and pauses playback when seeking or choosing a stage", () => {
@@ -45,10 +59,10 @@ describe("Agent replay", () => {
     expect(screen.getByRole("button", { name: "播放回放" })).toBeEnabled();
 
     fireEvent.click(screen.getByRole("button", { name: "播放回放" }));
-    fireEvent.click(screen.getByRole("button", { name: "跳转到检索上下文" }));
+    fireEvent.click(screen.getByRole("button", { name: "跳转到本体映射" }));
     act(() => vi.advanceTimersByTime(1_000));
     expect(slider).toHaveValue("25");
-    expect(screen.getByRole("button", { name: "跳转到检索上下文" })).toHaveAttribute("aria-current", "step");
+    expect(screen.getByRole("button", { name: "跳转到本体映射" })).toHaveAttribute("aria-current", "step");
   });
 
   it("resets playback and its previous outcome when changing permission scenarios", () => {
@@ -66,12 +80,13 @@ describe("Agent replay", () => {
     fireEvent.click(screen.getByRole("button", { name: "正常授权" }));
     expect(slider).toHaveValue("0");
     expect(screen.getByRole("status")).not.toHaveTextContent("写入已阻断");
-    expect(screen.getByRole("button", { name: "跳转到提交结果" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "跳转到事务写回" })).toBeEnabled();
   });
 
   it.each([
-    { scenario: "正常授权", progress: "100", result: "审查结果已提交（示例）" },
+    { scenario: "正常授权", progress: "100", result: "风险标记已写回（示例）" },
     { scenario: "只读权限", progress: "75", result: "写入已阻断" },
+    { scenario: "行数异常", progress: "100", result: "整批写回已回滚" },
   ])("stops playback at the $scenario outcome and can replay from the beginning", ({ scenario, progress, result }) => {
     render(<AgentReplay />);
     fireEvent.click(screen.getByRole("button", { name: scenario }));
@@ -139,7 +154,7 @@ describe("Agent replay", () => {
   it("server-renders a labeled static example with disabled controls and a no-JavaScript explanation", () => {
     const root = document.createElement("div");
     root.innerHTML = renderToStaticMarkup(<AgentReplay />);
-    expect(root.textContent).toContain("示例数据");
+    expect(root.textContent).toContain("虚构数据");
     expect(root.querySelector("noscript")?.textContent).toContain("启用 JavaScript");
     const controls = root.querySelectorAll<HTMLButtonElement | HTMLInputElement>("button, input");
     expect(controls.length).toBeGreaterThan(0);

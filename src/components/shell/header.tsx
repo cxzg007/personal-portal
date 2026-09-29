@@ -7,8 +7,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // 锚点统一带 "/" 前缀：首页上仍为页内滚动，博客页/文章页上则跳回首页对应分区。
 const navigation = [
   { label: "实习", href: "/#internships" },
-  { label: "系统", href: "/#systems" },
   { label: "开源", href: "/#open-source" },
+  { label: "系统", href: "/#systems" },
   { label: "博客", href: "/#writing", blogHref: "/blog" },
   { label: "联系", href: "/#contact" },
   { label: "GitHub", href: "https://github.com/cxzg007" },

@@ -6,7 +6,7 @@ test.use({ javaScriptEnabled: false });
 
 test("core recruiting content is server rendered", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1, name: "构建可靠的 Agent 系统。" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "从业务语义，到可靠执行。" })).toBeVisible();
   for (const company of ["京东", "智元机器人", "中国船舶集团 722 研究所"]) {
     await expect(page.getByText(company, { exact: true }).first()).toBeVisible();
   }

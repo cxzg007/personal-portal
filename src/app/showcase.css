@@ -10,25 +10,33 @@
    palette and type intact, including after a client-side route transition. */
 .engineering-showcase {
   --showcase-display: "Space Grotesk", system-ui, sans-serif;
-  --showcase-dark: #101317;
-  --showcase-raised: #191f28;
-  --showcase-white: #f1f5fa;
-  --showcase-muted: #a7b3c5;
-  --showcase-blue: #8ab4ff;
-  --showcase-rule: #303947;
+  --showcase-dark: #15232d;
+  --showcase-raised: #e9f0ef;
+  --showcase-ink: #20383f;
+  --showcase-muted: #5b6c70;
+  --showcase-accent: #126b70;
+  --showcase-rule: #d2dfdc;
   --profile-width: 80rem;
   --profile-nav-height: 4.75rem;
-  --profile-bg: #f5f7fa;
-  --profile-ink: #19283b;
-  --profile-muted: #596779;
+  --profile-bg: #f4f7f6;
+  --profile-ink: #20383f;
+  --profile-muted: #5b6c70;
+  --profile-accent: #126b70;
+  --profile-accent-hover: #0a5156;
+  --profile-line: #d2dfdc;
+  --profile-bg-deep: #e9f0ef;
+  --profile-ink-wash: #e9f0ef;
+  --profile-accent-wash: #e9f0ef;
+  --profile-panel-deep: #f4f7f6;
+  --profile-hairline: #d2dfdc;
   background: var(--profile-bg);
 }
 
 .engineering-showcase .site-header {
-  --profile-accent: var(--showcase-blue);
-  border-color: rgb(167 179 197 / 15%);
-  background: rgb(16 19 23 / 95%);
-  color: var(--showcase-white);
+  --profile-accent: var(--showcase-accent);
+  border-color: var(--showcase-rule);
+  background: rgb(244 247 246 / 95%);
+  color: var(--showcase-ink);
   backdrop-filter: blur(16px);
 }
 
@@ -37,7 +45,7 @@
 }
 
 .engineering-showcase .site-mark {
-  color: var(--showcase-white);
+  color: var(--showcase-ink);
   font-family: var(--showcase-display);
   font-size: 1rem;
   letter-spacing: -0.035em;
@@ -46,7 +54,7 @@
 .engineering-showcase .site-mark > span:first-child {
   border: 1px solid var(--showcase-rule);
   background: var(--showcase-raised);
-  color: var(--showcase-blue);
+  color: var(--showcase-accent);
 }
 
 .engineering-showcase .desktop-navigation .navigation-list a {
@@ -56,28 +64,28 @@
 
 .engineering-showcase .desktop-navigation .navigation-list a:hover,
 .engineering-showcase .desktop-navigation .navigation-list a[aria-current="location"] {
-  color: var(--showcase-white);
+  color: var(--showcase-ink);
 }
 
 .engineering-showcase .desktop-navigation .navigation-list a::after {
-  background: var(--showcase-blue);
+  background: var(--showcase-accent);
 }
 
 .engineering-showcase .profile-hero {
-  --profile-ink: var(--showcase-white);
+  --profile-ink: var(--showcase-ink);
   --profile-muted: var(--showcase-muted);
   --profile-line: var(--showcase-rule);
   --profile-panel: var(--showcase-raised);
-  --profile-accent: var(--showcase-blue);
-  background: var(--showcase-dark);
-  color: var(--showcase-white);
+  --profile-accent: var(--showcase-accent);
+  background: var(--profile-bg);
+  color: var(--showcase-ink);
   border: 0;
 }
 
 .engineering-showcase .profile-hero-copy {
   width: min(calc(100% - 6rem), var(--profile-width));
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.2fr);
-  gap: 3.5rem;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.2fr);
+  gap: 3rem;
   padding-block: calc(var(--profile-nav-height) + 2.75rem) 4.25rem;
 }
 
@@ -90,7 +98,7 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  margin: 0 0 2.5rem;
+  margin: 0 0 2rem;
   font-family: var(--showcase-display);
   color: var(--showcase-muted);
   font-size: 0.6875rem;
@@ -102,23 +110,23 @@
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 50%;
-  background: var(--showcase-blue);
-  box-shadow: 0 0 0 4px rgb(138 180 255 / 9%);
+  background: var(--showcase-accent);
+  box-shadow: 0 0 0 4px rgb(18 107 112 / 9%);
 }
 
 .engineering-showcase .profile-dock-name {
   margin-bottom: 1.2rem;
-  color: #c9d4e2;
+  color: var(--profile-ink);
   font-size: 1rem;
   font-weight: 450;
 }
 
 .engineering-showcase .profile-hero h1 {
   margin: 0;
-  color: var(--showcase-white);
-  font-size: clamp(3rem, 4.7vw, 4.375rem);
+  color: var(--showcase-ink);
+  font-size: clamp(2.65rem, 3.55vw, 3.5rem);
   font-weight: 580;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.045em;
   line-height: 1.25;
 }
 
@@ -128,24 +136,18 @@
 }
 
 .showcase-title-last { margin-top: 0.14em; }
-.showcase-title-last > span:first-child {
-  font-family: var(--showcase-display);
-  font-size: 1.3em;
-  font-weight: 500;
-  letter-spacing: -0.065em;
-}
-.showcase-title-period { color: var(--showcase-blue); }
+.showcase-title-period { color: var(--showcase-accent); }
 
 .engineering-showcase .profile-hero-kicker {
-  margin-top: 1.75rem;
-  color: var(--showcase-blue);
+  margin-top: 1.5rem;
+  color: var(--showcase-accent);
   font-size: 0.8125rem;
   font-weight: 450;
   letter-spacing: 0.015em;
 }
 
 .engineering-showcase .profile-hero-positioning {
-  max-width: 25rem;
+  max-width: 28rem;
   margin-top: 0.9rem;
   color: var(--showcase-muted);
   font-size: 0.9375rem;
@@ -165,21 +167,25 @@
   font-weight: 550;
 }
 
-.engineering-showcase .profile-cta-primary { background: var(--showcase-white); color: var(--showcase-dark); }
-.engineering-showcase .profile-cta-primary:hover { background: var(--showcase-blue); }
-.engineering-showcase .profile-cta-secondary { border-color: #455061; color: var(--showcase-white); }
-.engineering-showcase .profile-cta-secondary:hover { background: var(--showcase-raised); border-color: var(--showcase-blue); }
+.engineering-showcase .profile-cta-primary { background: var(--profile-accent); color: #fff; }
+.engineering-showcase .profile-cta-primary:hover { background: var(--profile-accent-hover); }
+.engineering-showcase .profile-cta-secondary { border-color: #a5bdb9; color: var(--profile-accent); }
+.engineering-showcase .profile-cta-secondary:hover { background: var(--showcase-raised); border-color: var(--showcase-accent); }
 
 .showcase-hero-signature {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin: 2.2rem 0 0;
-  color: #9ba8bb;
+  color: var(--profile-muted);
   font-size: 0.6875rem;
 }
 .showcase-hero-signature > span:first-child { font-family: var(--showcase-display); letter-spacing: 0.04em; }
-.showcase-exhibit { min-width: 0; }
+.showcase-hero-signature a { color: var(--profile-accent); text-underline-offset: 4px; }
+.showcase-focus { display: grid; gap: 0.75rem; margin: 1.35rem 0 0; padding: 0 0 0 1rem; border-left: 2px solid #a5c6c1; list-style: none; color: var(--profile-muted); font-size: 0.75rem; line-height: 1.6; }
+.showcase-focus li { display: flex; flex-wrap: wrap; column-gap: 0.65rem; }
+.showcase-focus span { color: var(--profile-ink); font-family: var(--showcase-display); font-weight: 600; }
+.showcase-exhibit { min-width: 0; padding: 1.5rem 0 1.25rem; border: 1px solid #33464f; border-radius: 18px; background: var(--showcase-dark); box-shadow: 0 24px 56px -32px rgb(21 35 45 / 45%); }
 
 .showcase-proof-strip {
   width: min(calc(100% - 6rem), var(--profile-width));
@@ -202,16 +208,12 @@
 .engineering-showcase .hero-experience-brand .brand-mark img { height: 1.6rem; }
 .engineering-showcase .hero-experience-company { font-size: 0.875rem; font-weight: 550; }
 .engineering-showcase .hero-experience-title { font-size: 0.75rem; color: var(--showcase-muted); }
-.engineering-showcase .hero-experience-period { font-family: var(--showcase-display); font-size: 0.6875rem; color: #9ba8bb; }
-.engineering-showcase .hero-experience-arrow { color: #8996a9; transition: color 180ms ease, transform 180ms ease; }
-.engineering-showcase .hero-experience-index a:hover .hero-experience-arrow { color: var(--showcase-blue); transform: translateX(3px); }
+.engineering-showcase .hero-experience-period { font-family: var(--showcase-display); font-size: 0.6875rem; color: var(--profile-muted); }
+.engineering-showcase .hero-experience-arrow { color: var(--profile-muted); transition: color 180ms ease, transform 180ms ease; }
+.engineering-showcase .hero-experience-index a:hover .hero-experience-arrow { color: var(--showcase-accent); transform: translateX(3px); }
 
 .showcase-credentials {
-  --profile-muted: #596779;
-  --profile-ink: #19283b;
-  --profile-accent: #2458a6;
-  --profile-line: #d6dfec;
-  background: #edf1f6;
+  background: var(--showcase-raised);
   color: var(--profile-ink);
   border-bottom: 1px solid var(--profile-line);
 }
@@ -244,6 +246,7 @@
   gap: 4.5rem;
   padding-block: 3.75rem;
 }
+.engineering-showcase #internship-jd-ontology-platform .internship-value-headline { color: var(--profile-accent); }
 .engineering-showcase .internship-card-header { position: sticky; top: calc(var(--profile-nav-height) + 2rem); align-self: start; gap: 0.9rem; }
 .engineering-showcase .internship-identity { display: flex; align-items: center; gap: 1rem; }
 .engineering-showcase .internship-company { font-size: 1rem; font-weight: 600; }
@@ -256,7 +259,7 @@
 .engineering-showcase .internship-copy-column > p { font-size: 0.9375rem; line-height: 1.9; }
 .engineering-showcase .internship-copy-column > .internship-contribution { margin-block: 1rem 1.25rem; }
 .engineering-showcase .internship-work { gap: 0.8rem; font-size: 0.9375rem; line-height: 1.9; padding-left: 1rem; }
-.engineering-showcase .internship-copy-column > .internship-outcome-text { padding: 1rem 1.25rem; background: #e8eef8; border-radius: 0 6px 6px 0; font-size: 0.875rem; }
+.engineering-showcase .internship-copy-column > .internship-outcome-text { padding: 1rem 1.25rem; background: var(--showcase-raised); border-radius: 0 6px 6px 0; font-size: 0.875rem; }
 .engineering-showcase .internship-stack-chip { padding: 0.2rem 0.55rem; border: 1px solid var(--profile-line); border-radius: 4px; background: #fff; font-family: var(--showcase-display); font-size: 0.6875rem; }
 .engineering-showcase .internship-stack { gap: 0.5rem; margin-top: 1.35rem; }
 .engineering-showcase .internship-details { font-size: 0.9375rem; }
@@ -270,21 +273,23 @@
 .engineering-showcase .system-project-problem { max-width: 60rem; line-height: 1.9; }
 
 .engineering-showcase .open-source-project-overview { padding: 2.75rem; border: 1px solid var(--profile-line); border-radius: 12px; background: #fff; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 3rem; }
-.engineering-showcase .open-source-showcase-header h3 { font-family: var(--showcase-display); font-size: 3.75rem; font-weight: 500; letter-spacing: -0.06em; }
-.engineering-showcase .open-source-project-heading .brand-mark { flex-basis: 5rem; width: 5rem; border: 0; background: transparent; }
+.engineering-showcase .open-source-showcase-header h3 { font-family: var(--showcase-display); font-size: 1rem; font-weight: 500; letter-spacing: 0.01em; color: var(--profile-muted); }
+.engineering-showcase .open-source-project-heading { flex-direction: column-reverse; align-items: flex-start; gap: 0.5rem; }
+.engineering-showcase .open-source-project-heading .brand-mark { flex-basis: auto; width: 17rem; height: auto; padding: 0; border: 0; background: transparent; }
+.engineering-showcase .open-source-project-heading .brand-mark img { width: 100%; height: auto; }
 .engineering-showcase .open-source-showcase-background { font-size: 0.9375rem; line-height: 1.9; }
-.engineering-showcase .open-source-showcase-identity { display: inline-block; padding: 0.3rem 0.65rem; margin-bottom: 0.75rem; border: 1px solid #c3d3eb; border-radius: 4px; background: #e9f0fb; font-family: var(--showcase-display); font-size: 0.75rem; }
+.engineering-showcase .open-source-showcase-identity { display: inline-block; padding: 0.3rem 0.65rem; margin-bottom: 0.75rem; border: 1px solid #b5ceca; border-radius: 4px; background: var(--showcase-raised); font-family: var(--showcase-display); font-size: 0.75rem; }
 .engineering-showcase .open-source-contributions-heading h4 { font-size: 1.5rem; font-weight: 550; }
 .engineering-showcase .open-source-stars strong,
 .engineering-showcase .open-source-stat-value { font-family: var(--showcase-display); font-weight: 500; }
 .engineering-showcase .open-source-theme-grid { gap: 1.25rem; }
 .engineering-showcase .open-source-theme-card { padding: 1.75rem 2rem; border-radius: 8px; background: #fdfefe; transition: border-color 200ms ease, box-shadow 200ms ease; }
-.engineering-showcase .open-source-theme-card:hover { border-color: #91add5; box-shadow: 0 8px 24px -18px rgb(36 88 166 / 30%); }
+.engineering-showcase .open-source-theme-card:hover { border-color: #85ada7; box-shadow: 0 8px 24px -18px rgb(18 107 112 / 25%); }
 .engineering-showcase .open-source-theme-name { font-size: 1.0625rem; }
 .engineering-showcase .open-source-theme-summary { font-size: 0.875rem; line-height: 1.9; }
-.engineering-showcase .open-source-pr-chip { font-family: var(--showcase-display); background: #eef3fa; border-color: transparent; font-size: 0.75rem; }
+.engineering-showcase .open-source-pr-chip { font-family: var(--showcase-display); background: var(--showcase-raised); border-color: transparent; font-size: 0.75rem; }
 .engineering-showcase .open-source-pr-chip:hover { border-color: var(--profile-accent); }
-.engineering-showcase .open-source-ongoing { background: #eaf0f9; border-radius: 0 6px 6px 0; }
+.engineering-showcase .open-source-ongoing { background: var(--showcase-raised); border-radius: 0 6px 6px 0; }
 
 .engineering-showcase .writing-entry { grid-template-columns: minmax(8rem, 0.25fr) minmax(0, 1fr); gap: 2.5rem; padding-block: 2.5rem; }
 .engineering-showcase .writing-entry-meta { font-family: var(--showcase-display); }
@@ -296,32 +301,32 @@
 .engineering-showcase .writing-stage-footer a { font-size: 0.875rem; }
 
 .engineering-showcase .profile-stage--contact {
-  --profile-ink: var(--showcase-white);
+  --profile-ink: var(--showcase-ink);
   --profile-muted: var(--showcase-muted);
-  --profile-accent: var(--showcase-blue);
+  --profile-accent: var(--showcase-accent);
   --profile-line: var(--showcase-rule);
   width: 100%;
   margin: 0;
   padding: 5.5rem 0 0;
-  background: var(--showcase-dark);
-  color: var(--showcase-white);
+  background: var(--showcase-raised);
+  color: var(--showcase-ink);
   border: 0;
 }
 .showcase-contact-inner { width: min(calc(100% - 6rem), var(--profile-width)); margin-inline: auto; }
 .showcase-contact-inner h2 { margin: 1.8rem 0 2rem; font-size: clamp(2.75rem, 4vw, 4rem); font-weight: 500; letter-spacing: -0.04em; line-height: 1.4; }
-.showcase-contact-inner h2 > span { color: var(--showcase-blue); }
+.showcase-contact-inner h2 > span { color: var(--showcase-accent); }
 .engineering-showcase .profile-contact-stage { display: flex; align-items: center; justify-content: space-between; gap: 3rem; padding-bottom: 4rem; }
 .engineering-showcase .profile-contact-stage > p { color: var(--showcase-muted); font-size: 0.9375rem; max-width: 38rem; }
 .engineering-showcase .profile-contact-links { flex-shrink: 0; gap: 0.75rem; }
-.engineering-showcase .profile-contact-links a { min-height: 48px; padding-inline: 1.5rem; border: 1px solid #455061; border-radius: 6px; background: transparent; color: var(--showcase-white); text-decoration: none; font-size: 0.8125rem; }
-.engineering-showcase .profile-contact-links a:first-child { background: var(--showcase-white); color: var(--showcase-dark); border-color: var(--showcase-white); }
-.engineering-showcase .profile-contact-links a:hover { background: var(--showcase-blue); border-color: var(--showcase-blue); color: var(--showcase-dark); }
+.engineering-showcase .profile-contact-links a { min-height: 48px; padding-inline: 1.5rem; border: 1px solid #a5bdb9; border-radius: 6px; background: transparent; color: var(--showcase-ink); text-decoration: none; font-size: 0.8125rem; }
+.engineering-showcase .profile-contact-links a:first-child { background: var(--profile-accent); color: #fff; border-color: var(--profile-accent); }
+.engineering-showcase .profile-contact-links a:hover { background: var(--profile-accent-hover); border-color: var(--profile-accent-hover); color: #fff; }
 .showcase-footer { display: flex; justify-content: space-between; align-items: center; gap: 2rem; min-height: 7rem; padding-block: 1.5rem; border-top: 1px solid var(--showcase-rule); font-size: 0.75rem; }
 .showcase-footer p { display: flex; align-items: center; gap: 1.5rem; margin: 0; }
 .showcase-footer strong { font-family: var(--showcase-display); font-size: 1.25rem; font-weight: 500; letter-spacing: -0.04em; }
 .showcase-footer p > span { color: var(--showcase-muted); }
 .showcase-footer > a { display: inline-flex; min-height: 44px; align-items: center; gap: 1rem; color: var(--showcase-muted); }
-.showcase-footer > a:hover { color: var(--showcase-blue); }
+.showcase-footer > a:hover { color: var(--showcase-accent); }
 
 @media (prefers-reduced-motion: reduce) {
   .engineering-showcase *, .engineering-showcase *::before, .engineering-showcase *::after {
