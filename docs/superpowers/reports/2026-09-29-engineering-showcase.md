@@ -36,3 +36,13 @@ PLAYWRIGHT_REUSE_EXISTING_SERVER=1 node node_modules/@playwright/test/cli.js tes
 ## 发布边界
 
 保存新分支并发布独立 Preview。正式域名继续指向旧版，等用户查看后再决定切换。首页规范见 `design-system/personal-portal/pages/homepage.md`。
+
+## 保存与预览结果
+
+- 实现提交：`a0a680e9b6e2ed8c850f5d5582a16edaa0df2326`，远程 `design/engineering-showcase` 已确认。此前还包含回放组件提交 `d95b8d3`、`6bead07`。
+- 旧分支远程仍为 `design/ui-ux-homepage@53cc65140ddae67bcc338574edbc9578302422ea`。
+- Vercel 独立 Preview：`dpl_8RLeUXaJSx9veF4y5XiyonsXjTYR`，READY，构建成功。地址：`https://jiangjunjie-personal-portal-o8vt5ojeb-junjie1467-6343s-projects.vercel.app`。
+- 此项目的 Preview 启用了 Vercel 登录保护；未登录请求跳到登录页，CLI curl 同样收到 302。未改动保护配置，因此云端页面交互未做未经登录的验证；上述浏览器功能与视觉验收均基于本地生产构建。
+- 本地生产预览：`http://127.0.0.1:3103`。主页、博客列表、两篇正文生产浏览器检查均无 console error/pageerror。
+- 正式域名 `https://jiangjunjie-personal-portal.vercel.app` 实测 200，h1 仍为 `cxzg007`、没有新回放组件，证实未切换正式站。
+- 截图辅助逻辑已等待回放控件完成水合后再截图，避免 Playwright 注入 caret 样式时与水合竞争；9 项桌面视觉再次通过，基线无需再改。

@@ -16,6 +16,10 @@ test.beforeEach(async ({ page }, testInfo) => {
 async function prepareStablePage(page: Page, route: string) {
   await page.goto(route);
   await page.evaluate(() => document.fonts.ready);
+  if (route === "/") {
+    // Screenshot caret styling must wait until React has hydrated the range.
+    await expect(page.getByRole("button", { name: "播放回放", exact: true })).toBeEnabled();
+  }
   await expect(page.locator("canvas")).toHaveCount(0);
   await page.evaluate(() => window.scrollTo(0, 0));
 }

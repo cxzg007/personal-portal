@@ -52,4 +52,4 @@
 - [x] Run production preview at port 3103. Capture 1280/1440/1920 desktop views; inspect before updating changed desktop baselines.
 - [x] Run full unit suite, lint, TypeScript, production build and Chromium E2E. Blog visual baselines must remain unchanged.
 - [x] Review diff independently for design/spec compliance and correctness; resolve material findings and rerun only affected checks.
-- [ ] Save implementation commit and new remote branch; leave production on baseline. Supply preview and commit details to user.
+- [x] Save implementation commit and new remote branch; leave production on baseline. Supply preview and commit details to user.
