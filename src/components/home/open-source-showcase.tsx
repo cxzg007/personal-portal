@@ -1,4 +1,5 @@
 import { BrandMark } from "@/components/home/brand-mark";
+import { ContributionMap } from "@/components/home/contribution-map";
 import type { OpenSourceContributionTheme, OpenSourceProject } from "@/content/schema";
 
 type OpenSourceShowcaseProps = {
@@ -94,6 +95,8 @@ export function OpenSourceShowcase({ project }: OpenSourceShowcaseProps) {
       </div>
 
       <p className="open-source-role-summary">{project.roleSummary}</p>
+
+      <ContributionMap project={project} />
 
       <ul aria-label="Semantica 贡献主题" className="open-source-theme-grid">
         {themeGroups.map(({ theme, contributions }) => (

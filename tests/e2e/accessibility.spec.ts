@@ -89,6 +89,9 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     openSource.getByRole("link", { name: "13,513 GitHub Stars" }),
     openSource.getByRole("link", { name: /#1 GitHub Trending 日榜/ }),
     openSource.getByRole("link", { name: /#3 Trendshift · Python 周榜/ }),
+    ...Array.from({ length: 13 }, (_, index) =>
+      openSource.getByRole("figure", { name: "贡献落点图" }).getByRole("link").nth(index),
+    ),
     ...[0, 1, 2, 3, 4, 5, 6].map((index) =>
       openSource.getByRole("link", { name: /^已合并 · PR #/ }).nth(index),
     ),
