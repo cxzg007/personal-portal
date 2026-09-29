@@ -27,7 +27,7 @@ function StageGlyph({ index }: { index: number }) {
 
 function ReplayScene({ active, blocked, playing, id }: { active: number; blocked: boolean; playing: boolean; id: string }) {
   return (
-    <svg aria-hidden="true" className={styles.scene} viewBox="0 0 720 366" fill="none">
+    <svg aria-hidden="true" className={styles.scene} viewBox="0 0 720 370" fill="none">
       <defs>
         <linearGradient id={`${id}-surface`} x1="360" y1="70" x2="360" y2="351" gradientUnits="userSpaceOnUse">
           <stop stopColor="#1e2a3a" /><stop offset="1" stopColor="#131b25" />
@@ -132,7 +132,7 @@ export function AgentReplay(): React.JSX.Element {
     <section ref={rootRef} className={styles.replay} aria-label="Agent 任务回放" data-scenario={state.scenario} data-playing={state.playing}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}><span />INTERACTIVE SYSTEM / 01</p>
+          <p className={styles.eyebrow}><span />INTERACTIVE SYSTEM</p>
           <h2 className={styles.title}>Agent 任务回放</h2>
         </div>
         <span className={styles.example}>示例数据 · 交互演示</span>
