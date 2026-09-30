@@ -51,13 +51,13 @@ test.describe("desktop entrance", () => {
     await expect(page.locator(title)).toHaveCSS("opacity", "0");
     await expect(page.locator(rows).first()).toHaveCSS("opacity", "0");
     const end = await animations.evaluate((items) => Math.max(...items.map((item) => Number(item.effect!.getComputedTiming().endTime))));
-    expect(end).toBeGreaterThanOrEqual(900);
-    expect(end).toBeLessThanOrEqual(1000);
+    expect(end).toBeGreaterThanOrEqual(1800);
+    expect(end).toBeLessThanOrEqual(2100);
 
-    await animations.evaluate((items) => items.forEach((item) => { item.currentTime = 300; }));
+    await animations.evaluate((items) => items.forEach((item) => { item.currentTime = 600; }));
     expect(await page.locator(title).evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.8);
     await expect(page.locator(rows).first()).toHaveCSS("opacity", "0");
-    await animations.evaluate((items) => items.forEach((item) => { item.currentTime = 600; }));
+    await animations.evaluate((items) => items.forEach((item) => { item.currentTime = 1200; }));
     const opacity = await page.locator(rows).evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)));
     expect(opacity[0]).toBeGreaterThan(opacity[1]);
     expect(opacity[1]).toBeGreaterThan(opacity[2]);

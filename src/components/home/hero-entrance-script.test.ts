@@ -90,7 +90,9 @@ describe("hero entrance bootstrap", () => {
 
   it("bounds the lifetime even if CSS animation events never arrive", () => {
     start();
-    vi.advanceTimersByTime(1600);
+    vi.advanceTimersByTime(1920);
+    expect(hero.dataset.heroEntrance).toBe("running");
+    vi.advanceTimersByTime(880);
     expect(hero.dataset.heroEntrance).toBe("complete");
     expect(vi.getTimerCount()).toBe(0);
   });

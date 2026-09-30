@@ -30,7 +30,7 @@ export const HERO_ENTRANCE_SCRIPT = `(() => {
     hero.addEventListener('animationend', (event) => {
       if (event.animationName === 'hero-entrance-rise' && event.target.hasAttribute('data-hero-entrance-last')) finish();
     }, options);
-    fallback = window.setTimeout(finish, 1600);
+    fallback = window.setTimeout(finish, 2800);
     hero.dataset.heroEntrance = 'running';
   } catch {
     // Storage, APIs or inline execution may be restricted. Reading comes first.

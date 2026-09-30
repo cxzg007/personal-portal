@@ -310,23 +310,23 @@
     clip-path: inset(-0.15em -0.1em -0.18em -0.1em);
   }
   .profile-hero[data-hero-entrance="running"] .profile-hero-title-text {
-    animation: hero-entrance-title 600ms var(--hero-ease-out) backwards;
+    animation: hero-entrance-title 1200ms var(--hero-ease-out) backwards;
   }
   .profile-hero[data-hero-entrance="running"] :is(.profile-dock-name, .profile-hero-lead, .profile-hero-kicker, .profile-hero-positioning, .profile-hero-actions, .profile-dock) {
-    animation: hero-entrance-rise 500ms var(--hero-ease-out) backwards;
+    animation: hero-entrance-rise 1000ms var(--hero-ease-out) backwards;
   }
-  .profile-hero[data-hero-entrance="running"] .profile-dock-name { animation-delay: 60ms; }
-  .profile-hero[data-hero-entrance="running"] .profile-hero-lead { animation-delay: 180ms; }
-  .profile-hero[data-hero-entrance="running"] .profile-hero-kicker { animation-delay: 240ms; }
-  .profile-hero[data-hero-entrance="running"] .profile-hero-positioning { animation-delay: 300ms; }
-  .profile-hero[data-hero-entrance="running"] .profile-hero-actions { animation-delay: 360ms; }
-  .profile-hero[data-hero-entrance="running"] .profile-dock { animation-delay: 440ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-dock-name { animation-delay: 120ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-lead { animation-delay: 360ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-kicker { animation-delay: 480ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-positioning { animation-delay: 600ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-actions { animation-delay: 720ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-dock { animation-delay: 880ms; }
   .profile-hero[data-hero-entrance="running"] .hero-experience-heading {
-    animation: hero-entrance-rise 400ms var(--hero-ease-out) 320ms backwards;
+    animation: hero-entrance-rise 800ms var(--hero-ease-out) 640ms backwards;
   }
   .profile-hero[data-hero-entrance="running"] .hero-experience-index li {
-    animation: hero-entrance-rise 400ms var(--hero-ease-out) backwards;
-    animation-delay: calc(400ms + var(--hero-entrance-order) * 80ms);
+    animation: hero-entrance-rise 800ms var(--hero-ease-out) backwards;
+    animation-delay: calc(800ms + var(--hero-entrance-order) * 160ms);
   }
   .profile-hero[data-hero-entrance="running"] .hero-experience-index { border-top-color: transparent; }
   .profile-hero[data-hero-entrance="running"] .hero-experience-index::before {
@@ -340,7 +340,7 @@
     background: var(--profile-accent);
     pointer-events: none;
     transform-origin: left;
-    animation: hero-entrance-line 600ms var(--hero-ease-out) 320ms backwards;
+    animation: hero-entrance-line 1200ms var(--hero-ease-out) 640ms backwards;
   }
 }
 
