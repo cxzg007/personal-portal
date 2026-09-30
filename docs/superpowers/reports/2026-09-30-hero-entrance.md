@@ -42,4 +42,13 @@
 
 ## 正式站部署
 
-本节在生产部署与线上核验完成后补充。
+- 代码提交：`fb4073a`，已推送 `origin/design/hero-entrance`。
+- Vercel Production：`dpl_3scNaTHLHzZGhaWrsawiSzxNZvpM`，状态 READY。
+- 正式站：https://jiangjunjie-personal-portal.vercel.app/
+- 部署地址：https://jiangjunjie-personal-portal-qaifkvv7t-junjie1467-6343s-projects.vercel.app
+- 北京时间 2026-09-30 10:49 完成正式域名浏览器核验：HTTP 200；12 项动画正常开始、结束，首项至末项约 956ms，最终 opacity=1、transform=none。
+- 刷新、博客返回不重播；独立 reduced-motion 会话静态显示；无 pageerror 或 console error。
+- 开源区 19 个 PR 各出现一次，Semantica 图标正常加载；canonical 指向正式域名，无横向溢出。
+- 原始核验结果见 [production-checks.json](assets/2026-09-30-hero-entrance/production-checks.json)。
+
+部署记录补充提交仅修改文档与核验产物，无需重新部署页面代码。

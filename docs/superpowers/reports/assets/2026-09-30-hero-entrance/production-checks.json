@@ -1,0 +1,167 @@
+{
+  "checkedAt": "2026-09-30T02:49:39.169Z",
+  "url": "https://jiangjunjie-personal-portal.vercel.app/",
+  "status": 200,
+  "first": {
+    "state": "complete",
+    "title": {
+      "opacity": "1",
+      "transform": "none"
+    },
+    "events": [
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-title",
+        "time": 2175.0999999940395,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2230.8999999910593,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2347.3999999910593,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2405.8999999910593,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2472.5999999940395,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-line",
+        "time": 2489.199999988079,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2489.2999999970198,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2530.8999999910593,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2564.199999988079,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2605.8999999910593,
+        "elapsed": 0
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2662.699999988079,
+        "elapsed": 0
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 2730.8999999910593,
+        "elapsed": 0.5
+      },
+      {
+        "type": "animationstart",
+        "name": "hero-entrance-rise",
+        "time": 2731,
+        "elapsed": 0
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-title",
+        "time": 2764.199999988079,
+        "elapsed": 0.6
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 2847.5999999940395,
+        "elapsed": 0.49999999999999994
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 2889.2999999970198,
+        "elapsed": 0.39999999999999997
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 2905.8999999910593,
+        "elapsed": 0.5
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 2964.2999999970198,
+        "elapsed": 0.5
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 2964.3999999910593,
+        "elapsed": 0.4
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 3030.8999999910593,
+        "elapsed": 0.5
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 3047,
+        "elapsed": 0.4
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-line",
+        "time": 3089.199999988079,
+        "elapsed": 0.5999999999999999
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 3105.8999999910593,
+        "elapsed": 0.49999999999999994
+      },
+      {
+        "type": "animationend",
+        "name": "hero-entrance-rise",
+        "time": 3130.8999999910593,
+        "elapsed": 0.4
+      }
+    ],
+    "canonical": "https://jiangjunjie-personal-portal.vercel.app/",
+    "prCount": 19,
+    "uniquePRs": 19,
+    "iconLoaded": true,
+    "overflow": false
+  },
+  "reload": null,
+  "blogReturn": null,
+  "reducedState": null,
+  "errors": []
+}
