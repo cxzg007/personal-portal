@@ -29,6 +29,8 @@ test("homepage paints a solid editorial surface without gradients or card shadow
 
 test("homepage keeps readable contrast on the light theme", async ({ page }) => {
   await page.goto("/");
+  // Contrast is measured in the fully revealed reading state, not mid-fade.
+  await expect(page.locator("#profile")).not.toHaveAttribute("data-hero-entrance", "running");
   const results = await new AxeBuilder({ page }).include("main").analyze();
   const contrast = results.violations.filter((v) => v.id === "color-contrast");
   expect(contrast).toEqual([]);

@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import type { Internship } from "@/content/schema";
 
 import { BrandMark } from "./brand-mark";
@@ -7,8 +9,12 @@ export function HeroExperienceIndex({ internships }: { internships: Internship[]
     <nav aria-label="经历索引" className="hero-experience-index">
       <p className="hero-experience-heading">经历索引 <span lang="en">EXPERIENCE</span></p>
       <ol>
-        {internships.map((internship) => (
-          <li key={internship.id}>
+        {internships.map((internship, index) => (
+          <li
+            key={internship.id}
+            style={{ "--hero-entrance-order": index } as CSSProperties}
+            data-hero-entrance-last={index === internships.length - 1 ? "true" : undefined}
+          >
             <a
               aria-label={`查看${internship.company}实习经历`}
               href={`#internship-${internship.id}`}

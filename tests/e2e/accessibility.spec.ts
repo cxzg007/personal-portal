@@ -32,6 +32,10 @@ async function expectVisibleFocus(locator: Locator) {
 for (const route of auditedRoutes) {
   test(`${route} has no WCAG 2.1 A/AA axe violations`, async ({ page }) => {
     await page.goto(route);
+    // Audit the reading state after the first-visit fade has naturally settled.
+    if (route === "/") {
+      await expect(page.locator("#profile")).not.toHaveAttribute("data-hero-entrance", "running");
+    }
 
     const results = await new AxeBuilder({ page }).withTags([...axeTags]).analyze();
 

@@ -128,6 +128,7 @@
 
 /* Identity and the three actual projects share one first-fold composition. */
 .profile-hero {
+  --hero-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   background: var(--profile-panel);
   border-bottom: 1px solid var(--profile-line);
 }
@@ -171,6 +172,8 @@
   line-height: 1.05;
   overflow-wrap: anywhere;
 }
+
+.profile-hero-title-text { display: block; }
 
 .profile-hero-lead {
   margin: 0.4rem 0 0;
@@ -229,6 +232,7 @@
 .profile-cta-secondary:hover { border-color: var(--profile-accent); background: var(--profile-bg); }
 
 .hero-experience-index {
+  position: relative;
   min-width: 0;
   padding: 1.4rem 1.5rem 0.4rem;
   border: 1px solid var(--profile-line);
@@ -298,6 +302,62 @@
 .hero-experience-period { font-size: 0.8125rem; color: var(--profile-muted); font-variant-numeric: tabular-nums; }
 .hero-experience-arrow { width: 20px; height: 20px; color: var(--profile-accent); }
 .hero-experience-index a:hover .hero-experience-company { color: var(--profile-accent); }
+
+/* First-visit choreography: content remains static unless the pre-paint
+   bootstrap opts in. Backwards fill only; completion needs no JS cleanup. */
+@media (min-width: 761px) and (prefers-reduced-motion: no-preference) {
+  .profile-hero[data-hero-entrance="running"] #profile-title {
+    clip-path: inset(-0.15em -0.1em -0.18em -0.1em);
+  }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-title-text {
+    animation: hero-entrance-title 600ms var(--hero-ease-out) backwards;
+  }
+  .profile-hero[data-hero-entrance="running"] :is(.profile-dock-name, .profile-hero-lead, .profile-hero-kicker, .profile-hero-positioning, .profile-hero-actions, .profile-dock) {
+    animation: hero-entrance-rise 500ms var(--hero-ease-out) backwards;
+  }
+  .profile-hero[data-hero-entrance="running"] .profile-dock-name { animation-delay: 60ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-lead { animation-delay: 180ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-kicker { animation-delay: 240ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-positioning { animation-delay: 300ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-hero-actions { animation-delay: 360ms; }
+  .profile-hero[data-hero-entrance="running"] .profile-dock { animation-delay: 440ms; }
+  .profile-hero[data-hero-entrance="running"] .hero-experience-heading {
+    animation: hero-entrance-rise 400ms var(--hero-ease-out) 320ms backwards;
+  }
+  .profile-hero[data-hero-entrance="running"] .hero-experience-index li {
+    animation: hero-entrance-rise 400ms var(--hero-ease-out) backwards;
+    animation-delay: calc(400ms + var(--hero-entrance-order) * 80ms);
+  }
+  .profile-hero[data-hero-entrance="running"] .hero-experience-index { border-top-color: transparent; }
+  .profile-hero[data-hero-entrance="running"] .hero-experience-index::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -1px;
+    right: -1px;
+    height: 3px;
+    border-radius: 4px 4px 0 0;
+    background: var(--profile-accent);
+    pointer-events: none;
+    transform-origin: left;
+    animation: hero-entrance-line 600ms var(--hero-ease-out) 320ms backwards;
+  }
+}
+
+@keyframes hero-entrance-title {
+  from { opacity: 0; transform: translateY(110%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-entrance-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-entrance-line {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
 
 /* Education is a compact, grounded footer to the hero. */
 .profile-dock {
