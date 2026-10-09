@@ -3,6 +3,7 @@ import type { Page } from "@playwright/test";
 
 const ontologyTitle = "Palantir 本体论：把业务语义做成可执行的操作层";
 const graphOntologyTitle = "图工程之后：多智能体系统缺的是一层语义";
+const semanticaTitle = "Semantica 开源实践：让推理有依据，让变化可追溯";
 
 test("mobile contents can be expanded and followed without JavaScript", async ({ browser }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "one no-JavaScript check at a mobile viewport");
@@ -13,7 +14,7 @@ test("mobile contents can be expanded and followed without JavaScript", async ({
   });
   const page = await context.newPage();
   try {
-    for (const slug of ["graph-engineering-ontology", "palantir-ontology-notes"]) {
+    for (const slug of ["graph-engineering-ontology", "palantir-ontology-notes", "semantica-reasoning-engineering"]) {
       await page.goto(`${testInfo.project.use.baseURL}/blog/${slug}`);
       const summary = page.locator(".article-toc-mobile summary");
       const toc = page.getByRole("navigation", { name: "文章目录" });
@@ -31,9 +32,9 @@ test("mobile contents can be expanded and followed without JavaScript", async ({
   }
 });
 
-test("both articles remain readable with 200 percent text at narrow and wide widths", async ({ page }, testInfo) => {
+test("articles remain readable with 200 percent text at narrow and wide widths", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "explicit viewport matrix");
-  for (const slug of ["graph-engineering-ontology", "palantir-ontology-notes"]) {
+  for (const slug of ["graph-engineering-ontology", "palantir-ontology-notes", "semantica-reasoning-engineering"]) {
     await page.goto(`/blog/${slug}`);
     await expect(page.locator(".article-prose")).toBeVisible();
     await page.addStyleTag({ content: "html { font-size: 200%; }" });
@@ -148,6 +149,7 @@ for (const route of [
   "/blog",
   "/blog/graph-engineering-ontology",
   "/blog/palantir-ontology-notes",
+  "/blog/semantica-reasoning-engineering",
 ] as const) {
   test(`${route} loaded script bodies exclude Three.js and React Three Fiber`, async ({ page }) => {
     await expectRouteBundlesWithoutThree(page, route);
@@ -213,7 +215,7 @@ test("blog index uses the blue portfolio palette with readable article rows", as
   expect(values.cardBackground).toBe("rgba(0, 0, 0, 0)");
   expect(values.cardMetaFont).toContain("system-ui");
 
-  await expect(page.locator(".blog-card h2")).toHaveText([graphOntologyTitle, ontologyTitle]);
+  await expect(page.locator(".blog-card h2")).toHaveText([semanticaTitle, graphOntologyTitle, ontologyTitle]);
   const originalCard = page.locator(".blog-card").filter({ hasText: ontologyTitle });
   await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(4);
   await expect(page.getByRole("link", { exact: true, name: graphOntologyTitle })).toBeVisible();

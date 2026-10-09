@@ -154,7 +154,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
   );
   await expect(openSource.getByRole("link", { name: "阅读相关技术文章" })).toHaveAttribute(
     "href",
-    "/blog/graph-engineering-ontology",
+    "/blog/semantica-reasoning-engineering",
   );
 
   const contact = page.locator("main > section#contact");
@@ -372,7 +372,10 @@ test("writing stage renders the public articles with full-read destinations", as
   await page.goto("/");
 
   const writing = page.locator("main > section#writing");
-  await expect(writing.getByRole("article")).toHaveCount(2);
+  await expect(writing.getByRole("article")).toHaveCount(3);
+  await expect(
+    writing.getByRole("link", { name: "阅读文章：Semantica 开源实践：让推理有依据，让变化可追溯" }),
+  ).toHaveAttribute("href", "/blog/semantica-reasoning-engineering");
   await expect(
     writing.getByRole("heading", { name: "图工程之后：多智能体系统缺的是一层语义" }),
   ).toBeVisible();
