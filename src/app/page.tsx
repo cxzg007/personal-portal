@@ -11,7 +11,6 @@ import { getAllPosts } from "@/content/posts";
 import { loadSystemArchitectures } from "@/content/system-architectures";
 import { serializeJsonLd } from "@/lib/discovery";
 import { getSiteUrl } from "@/lib/site-url";
-import { latinMono, latinSans } from "./fonts";
 
 export default async function HomePage() {
   const content = loadSiteContent();
@@ -48,7 +47,7 @@ export default async function HomePage() {
   };
 
   return (
-    <div className={`profile-shell ${latinSans.variable} ${latinMono.variable}`}>
+    <div className="profile-shell">
       <Header showWriting={featuredPosts.length > 0} />
       <PageMotionController />
       <main id="main-content" tabIndex={-1}>
