@@ -232,9 +232,9 @@ test("publishes the ontology article with working contents and adjacent navigati
   const disclosure = page.locator(".article-toc-mobile summary");
   if (await disclosure.isVisible()) await disclosure.click();
   const tocLink = page.getByRole("navigation", { name: "文章目录" })
-    .getByRole("link", { name: "动作连接了建议与执行" });
+    .getByRole("link", { name: "3. 动作定义与审批状态" });
   await tocLink.click();
-  await expect(page.getByRole("heading", { name: "动作连接了建议与执行" })).toBeInViewport();
+  await expect(page.getByRole("heading", { name: "3. 动作定义与审批状态" })).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.getByRole("link", { name: new RegExp(graphOntologyTitle) }).click();
   await expect(page).toHaveURL(/\/blog\/graph-engineering-ontology$/);
@@ -261,7 +261,7 @@ test("publishes the Graph Engineering ontology article with formatted content", 
   await page.getByRole("link", { name: graphOntologyTitle, exact: true }).click();
   await expect(page).toHaveURL(/\/blog\/graph-engineering-ontology$/);
   await expect(page.getByRole("heading", { level: 1, name: graphOntologyTitle })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "一张图能说明什么" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "1. 工作流结构与共享语义" })).toBeVisible();
   await expect(page.locator(".article-prose pre")).toContainText("sh:minCount 1");
   await expect(page.locator(".article-prose img")).toHaveCount(0);
   await expect(page.locator(".article-prose")).not.toContainText("**");
@@ -351,7 +351,7 @@ test("opens the article with a table of contents and returns to the blog index",
   const disclosure = page.locator(".article-toc-mobile summary");
   if (await disclosure.isVisible()) await disclosure.click();
   await expect(
-    page.getByRole("link", { name: "一张图能说明什么" }),
+    page.getByRole("link", { name: "1. 工作流结构与共享语义" }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "W3C · Shapes Constraint Language（SHACL）", exact: true })).toHaveAttribute("href", "https://www.w3.org/TR/shacl/");
   await expect(page.locator("pre code").first()).toBeVisible();

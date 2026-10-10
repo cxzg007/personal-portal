@@ -168,7 +168,7 @@ describe("post loading", () => {
       featured: true,
       draft: false,
     });
-    expect(semantica?.headings.map(({ text }) => text)).toContain("先检查依据，再比较相关性");
+    expect(semantica?.headings.map(({ text }) => text)).toContain("4. 检索候选的证据校验");
   });
 
   it("keeps the posts directory and the loader registry in sync", () => {

@@ -136,7 +136,7 @@ test("article publishes its own metadata and BlogPosting JSON-LD", async ({ page
     headline: articleTitle,
     description: articleDescription,
     datePublished: "2026-09-03",
-    dateModified: "2026-09-28",
+    dateModified: "2026-10-10",
     url: `${siteOrigin}/blog/${articleSlug}`,
     author: { "@type": "Person", name: "江俊杰" },
   });

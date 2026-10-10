@@ -46,8 +46,8 @@ test("Semantica article renders both supplied diagrams, sources, contents, and m
 
   const disclosure = page.locator(".article-toc-mobile summary");
   if (await disclosure.isVisible()) await disclosure.click();
-  await page.getByRole("navigation", { name: "文章目录" }).getByRole("link", { name: "先检查依据，再比较相关性" }).click();
-  await expect(page.getByRole("heading", { name: "先检查依据，再比较相关性" })).toBeInViewport();
+  await page.getByRole("navigation", { name: "文章目录" }).getByRole("link", { name: "4. 检索候选的证据校验" }).click();
+  await expect(page.getByRole("heading", { name: "4. 检索候选的证据校验" })).toBeInViewport();
   await expect(prose.getByRole("link", { name: "PR #1831", exact: true })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/1831");
   await expect(prose.getByRole("link", { name: "PR #1731", exact: true })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/1731");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://portfolio.example.test${articlePath}`);
