@@ -159,16 +159,16 @@ describe("post loading", () => {
   });
 
   it("features the Semantica engineering article in the public index", () => {
-    const [latest] = getAllPosts();
+    const semantica = getAllPosts().find((post) => post.slug === "semantica-reasoning-engineering");
 
-    expect(latest).toMatchObject({
+    expect(semantica).toMatchObject({
       slug: "semantica-reasoning-engineering",
       title: "Semantica 开源实践：让推理有依据，让变化可追溯",
       publishedAt: "2026-10-09",
       featured: true,
       draft: false,
     });
-    expect(latest.headings.map(({ text }) => text)).toContain("先检查依据，再比较相关性");
+    expect(semantica?.headings.map(({ text }) => text)).toContain("先检查依据，再比较相关性");
   });
 
   it("keeps the posts directory and the loader registry in sync", () => {

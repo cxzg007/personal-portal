@@ -16,7 +16,9 @@ test("Semantica article is discoverable from the homepage, contribution section,
   await page.getByRole("searchbox", { name: "搜索文章" }).fill("Semantica");
   await expect(page.locator(".blog-card")).toHaveCount(1);
   await page.getByRole("link", { name: title, exact: true }).click();
-  await expect(page.getByRole("navigation", { name: "相邻文章" }).getByRole("link")).toHaveAttribute("href", "/blog/graph-engineering-ontology");
+  const neighbors = page.getByRole("navigation", { name: "相邻文章" });
+  await expect(neighbors.getByRole("link", { name: /上一篇/ })).toHaveAttribute("href", "/blog/graph-engineering-ontology");
+  await expect(neighbors.getByRole("link", { name: /下一篇/ })).toHaveAttribute("href", "/blog/high-concurrency-read-write-design");
 });
 
 test("Semantica article renders both supplied diagrams, sources, contents, and metadata", async ({ page, request }) => {

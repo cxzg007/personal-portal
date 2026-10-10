@@ -372,7 +372,10 @@ test("writing stage renders the public articles with full-read destinations", as
   await page.goto("/");
 
   const writing = page.locator("main > section#writing");
-  await expect(writing.getByRole("article")).toHaveCount(3);
+  await expect(writing.getByRole("article")).toHaveCount(4);
+  await expect(
+    writing.getByRole("link", { name: "阅读文章：高并发架构：读写分工与一致性取舍" }),
+  ).toHaveAttribute("href", "/blog/high-concurrency-read-write-design");
   await expect(
     writing.getByRole("link", { name: "阅读文章：Semantica 开源实践：让推理有依据，让变化可追溯" }),
   ).toHaveAttribute("href", "/blog/semantica-reasoning-engineering");

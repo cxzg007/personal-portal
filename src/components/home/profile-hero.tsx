@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { SiteContent } from "@/content/schema";
 
 import { HeroExperienceIndex } from "./hero-experience-index";
@@ -27,6 +28,9 @@ export function ProfileHero({ profile, internships }: ProfileHeroProps) {
             <a className="profile-cta profile-cta-primary" href="#internships">
               查看实习
             </a>
+            <Link className="profile-cta profile-cta-secondary" href="/blog">
+              阅读博客
+            </Link>
             <a
               className="profile-cta profile-cta-secondary"
               href={profile.github}

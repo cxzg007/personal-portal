@@ -36,7 +36,7 @@ test("homepage publishes canonical, share metadata, and validated ProfilePage JS
     sameAs: ["https://github.com/cxzg007"],
   });
   expect(profile).toMatchObject({ url: siteOrigin, name: "江俊杰｜AI Agent / 后端开发" });
-  await expect(page.locator("#writing").getByRole("article")).toHaveCount(3);
+  await expect(page.locator("#writing").getByRole("article")).toHaveCount(4);
 });
 
 test("share card is a stable sanitized asset and the resume PDF is not exposed", async ({ request }) => {
@@ -94,6 +94,7 @@ test("sitemap, robots, and RSS expose every public article with absolute URLs", 
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog</loc>`);
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/${articleSlug}</loc>`);
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/semantica-reasoning-engineering</loc>`);
+  expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/high-concurrency-read-write-design</loc>`);
 
   const robots = await request.get("/robots.txt");
   expect(robots.ok()).toBe(true);
@@ -109,6 +110,7 @@ test("sitemap, robots, and RSS expose every public article with absolute URLs", 
   expect(rssXml).toContain(`<title>${articleTitle}</title>`);
   expect(rssXml).toContain(`<link>${siteOrigin}/blog/${articleSlug}</link>`);
   expect(rssXml).toContain(`<link>${siteOrigin}/blog/semantica-reasoning-engineering</link>`);
+  expect(rssXml).toContain(`<link>${siteOrigin}/blog/high-concurrency-read-write-design</link>`);
   expect(rssXml).toContain("<pubDate>Thu, 03 Sep 2026 00:00:00 GMT</pubDate>");
   expect(rssXml).toContain("<category>本体工程</category>");
 });

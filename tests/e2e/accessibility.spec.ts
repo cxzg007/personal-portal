@@ -8,6 +8,7 @@ const auditedRoutes = [
   "/blog/palantir-ontology-notes",
   "/blog/graph-engineering-ontology",
   "/blog/semantica-reasoning-engineering",
+  "/blog/high-concurrency-read-write-design",
 ] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
 const primaryNavItems = ["实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
@@ -65,6 +66,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
 
   const hero = page.getByRole("region", { name: "cxzg007" });
   const postTitles = [
+    "高并发架构：读写分工与一致性取舍",
     "Semantica 开源实践：让推理有依据，让变化可追溯",
     "图工程之后：多智能体系统缺的是一层语义",
     "Palantir 本体论：把业务语义做成可执行的操作层",
@@ -77,6 +79,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
     page.getByRole("link", { name: "返回首页" }),
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
     hero.getByRole("link", { name: "查看实习", exact: true }),
+    hero.getByRole("link", { name: "阅读博客", exact: true }),
     hero.getByRole("link", { name: "GitHub ↗", exact: true }),
     ...["京东", "智元机器人", "中国船舶集团 722 研究所"].map((company) =>
       hero.getByRole("link", { name: `查看${company}实习经历`, exact: true }),
@@ -186,6 +189,10 @@ test("blog filters and article actions remain keyboard operable", async ({ page 
   const filterGroup = page.getByRole("group", { name: "按标签筛选" });
   for (const name of [
     "全部",
+    "系统架构",
+    "高并发",
+    "缓存",
+    "读书笔记",
     "Semantica",
     "规则推理",
     "知识图谱",

@@ -40,6 +40,7 @@ type PostModule = { default: ComponentType };
 type PostLoaderMap = Record<string, () => Promise<PostModule>>;
 
 const postLoaders = {
+  "high-concurrency-read-write-design": () => import("../../content/posts/high-concurrency-read-write-design.mdx"),
   "semantica-reasoning-engineering": () => import("../../content/posts/semantica-reasoning-engineering.mdx"),
   "palantir-ontology-notes": () => import("../../content/posts/palantir-ontology-notes.mdx"),
   "graph-engineering-ontology": () => import("../../content/posts/graph-engineering-ontology.mdx"),

@@ -1,0 +1,10 @@
+.git/
+.worktrees/
+.superpowers/
+.env*
+docs/
+design-system/
+tests/
+test-results/
+playwright-report/
+*.tsbuildinfo
