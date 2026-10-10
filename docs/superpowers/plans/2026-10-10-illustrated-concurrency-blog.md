@@ -21,8 +21,18 @@
 
 - [x] 运行 ESLint、TypeScript、单元测试及生产构建。
 - [x] 检查博客与元数据回归、四张配图加载、目录跳转、首屏布局和键盘操作，并查看实际截图。
-- [ ] 提交并推送当前功能分支，部署 Vercel 正式站，核验公开首页、新文章和图片地址。
+- [x] 提交并推送当前功能分支，部署 Vercel 正式站，核验公开首页、新文章和图片地址。
 
 验证记录：ESLint、TypeScript、232 项单元测试、Next.js 生产构建通过。浏览器回归首轮 120 项通过；三类旧断言更新后，8 项相关检查通过（含新增文章三种视口的 Axe 检查）。9 项对应视觉检查通过，已逐张查看文章四张图及首页、列表截图。
 
 部署输入使用 `.vercelignore` 排除本地环境文件、草稿、截图和测试报告；干运行确认四张公开 PNG 与新 MDX 均进入部署包。
+
+## 正式站核验
+
+- 代码提交：`545fa08`，已推送 `origin/design/homepage-typography`。
+- Vercel 生产部署：`dpl_HNn1d4x3jUNJ1dHGqyDb8EAfJYuv`，状态 READY。
+- 正式域名：`https://jiangjunjie-personal-portal.vercel.app`。
+- 文章地址：`/blog/high-concurrency-read-write-design`。
+- 已在正式域名通过首页按钮进入列表，再打开新文章；标题、canonical、四张配图、高清原图新窗口、RSS 与 sitemap 均核验通过。
+- 四张线上 PNG 的 SHA-256 与本地公开资源一致，浏览器无 pageerror。
+- 本地截图及核验 JSON 位于忽略入库的 `.superpowers/concurrency-publication/`。
