@@ -5,6 +5,7 @@ const ontologyTitle = "Palantir 本体论：把业务语义做成可执行的操
 const graphOntologyTitle = "图工程之后：多智能体系统缺的是一层语义";
 const semanticaTitle = "Semantica 开源实践：让推理有依据，让变化可追溯";
 const concurrencyTitle = "高并发架构：读写分工与一致性取舍";
+const availabilityTitle = "服务可用性治理：重试、故障隔离与过载保护";
 
 test("mobile contents can be expanded and followed without JavaScript", async ({ browser }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "one no-JavaScript check at a mobile viewport");
@@ -216,7 +217,7 @@ test("blog index uses the blue portfolio palette with readable article rows", as
   expect(values.cardBackground).toBe("rgba(0, 0, 0, 0)");
   expect(values.cardMetaFont).toContain("system-ui");
 
-  await expect(page.locator(".blog-card h2")).toHaveText([concurrencyTitle, semanticaTitle, graphOntologyTitle, ontologyTitle]);
+  await expect(page.locator(".blog-card h2")).toHaveText([availabilityTitle, concurrencyTitle, semanticaTitle, graphOntologyTitle, ontologyTitle]);
   const originalCard = page.locator(".blog-card").filter({ hasText: ontologyTitle });
   await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(4);
   await expect(page.getByRole("link", { exact: true, name: graphOntologyTitle })).toBeVisible();

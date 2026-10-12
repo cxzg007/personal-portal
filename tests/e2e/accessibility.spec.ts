@@ -9,6 +9,7 @@ const auditedRoutes = [
   "/blog/graph-engineering-ontology",
   "/blog/semantica-reasoning-engineering",
   "/blog/high-concurrency-read-write-design",
+  "/blog/service-availability-governance",
 ] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
 const primaryNavItems = ["实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
@@ -66,10 +67,10 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
 
   const hero = page.getByRole("region", { name: "cxzg007" });
   const postTitles = [
+    "服务可用性治理：重试、故障隔离与过载保护",
     "高并发架构：读写分工与一致性取舍",
     "Semantica 开源实践：让推理有依据，让变化可追溯",
     "图工程之后：多智能体系统缺的是一层语义",
-    "Palantir 本体论：把业务语义做成可执行的操作层",
   ];
   const openSource = page.locator("main > section#open-source");
   const contact = page.locator("main > section#contact");

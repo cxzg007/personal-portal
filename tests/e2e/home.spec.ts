@@ -374,6 +374,9 @@ test("writing stage renders the public articles with full-read destinations", as
   const writing = page.locator("main > section#writing");
   await expect(writing.getByRole("article")).toHaveCount(4);
   await expect(
+    writing.getByRole("link", { name: "阅读文章：服务可用性治理：重试、故障隔离与过载保护" }),
+  ).toHaveAttribute("href", "/blog/service-availability-governance");
+  await expect(
     writing.getByRole("link", { name: "阅读文章：高并发架构：读写分工与一致性取舍" }),
   ).toHaveAttribute("href", "/blog/high-concurrency-read-write-design");
   await expect(
@@ -387,10 +390,8 @@ test("writing stage renders the public articles with full-read destinations", as
   ).toHaveAttribute("href", "/blog/graph-engineering-ontology");
   await expect(
     writing.getByRole("heading", { name: "Palantir 本体论：把业务语义做成可执行的操作层" }),
-  ).toBeVisible();
-  await expect(
-    writing.getByRole("link", { name: "阅读文章：Palantir 本体论：把业务语义做成可执行的操作层" }),
-  ).toHaveAttribute("href", "/blog/palantir-ontology-notes");
+  ).toHaveCount(0);
+  await expect(writing.getByRole("link", { name: "全部文章" })).toHaveAttribute("href", "/blog");
 });
 
 test("brand marks load eagerly and never shift page height after load", async ({ page }) => {

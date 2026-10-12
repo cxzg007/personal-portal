@@ -95,6 +95,7 @@ test("sitemap, robots, and RSS expose every public article with absolute URLs", 
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/${articleSlug}</loc>`);
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/semantica-reasoning-engineering</loc>`);
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/high-concurrency-read-write-design</loc>`);
+  expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/service-availability-governance</loc>`);
 
   const robots = await request.get("/robots.txt");
   expect(robots.ok()).toBe(true);
@@ -111,6 +112,7 @@ test("sitemap, robots, and RSS expose every public article with absolute URLs", 
   expect(rssXml).toContain(`<link>${siteOrigin}/blog/${articleSlug}</link>`);
   expect(rssXml).toContain(`<link>${siteOrigin}/blog/semantica-reasoning-engineering</link>`);
   expect(rssXml).toContain(`<link>${siteOrigin}/blog/high-concurrency-read-write-design</link>`);
+  expect(rssXml).toContain(`<link>${siteOrigin}/blog/service-availability-governance</link>`);
   expect(rssXml).toContain("<pubDate>Thu, 03 Sep 2026 00:00:00 GMT</pubDate>");
   expect(rssXml).toContain("<category>本体工程</category>");
 });
