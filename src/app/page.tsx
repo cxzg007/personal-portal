@@ -1,4 +1,5 @@
 import { ContactStage } from "@/components/home/contact-stage";
+import { LabEntry } from "@/components/home/lab-entry";
 import { OpenSourceShowcase } from "@/components/home/open-source-showcase";
 import { PageMotionController } from "@/components/home/page-motion-controller";
 import { ProfileHero } from "@/components/home/profile-hero";
@@ -86,6 +87,13 @@ export default async function HomePage() {
             <WritingStage posts={featuredPosts} />
           </section>
         ) : null}
+        <section aria-labelledby="lab-heading" className="profile-stage" id="lab">
+          <header className="profile-section-heading profile-reveal">
+            <h2 id="lab-heading">交互实验</h2>
+            <p lang="en">LAB</p>
+          </header>
+          <LabEntry />
+        </section>
         <section aria-labelledby="contact-heading" className="profile-stage profile-stage--contact" id="contact">
           <header className="profile-section-heading profile-reveal">
             <h2 id="contact-heading">一起构建可靠的 AI 系统。</h2>

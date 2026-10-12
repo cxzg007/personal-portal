@@ -10,6 +10,7 @@ const navigation = [
   { label: "系统", href: "/#systems" },
   { label: "开源", href: "/#open-source" },
   { label: "博客", href: "/#writing", blogHref: "/blog" },
+  { label: "实验", href: "/#lab" },
   { label: "联系", href: "/#contact" },
   { label: "GitHub", href: "https://github.com/cxzg007" },
 ] as const;
