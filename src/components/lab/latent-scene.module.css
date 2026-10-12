@@ -11,6 +11,10 @@
   position: absolute;
   inset: 0;
   cursor: pointer;
+  /* 画布盖在网页上面，必须让出指针事件，否则屏幕里什么都点不动。
+     镜头需要的指针位置改由 window 上的监听提供。 */
+  pointer-events: none;
+  z-index: 2;
 }
 
 .canvas:focus-visible {
@@ -22,9 +26,22 @@
   display: block;
 }
 
+/* CSS3DRenderer 渲染的真网页层，垫在画布下面，共用同一个相机。 */
+.cssLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cssLayer :global(iframe) {
+  color-scheme: dark;
+}
+
 .hud {
   position: absolute;
   inset: 0;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -96,6 +113,13 @@
 .hint {
   margin: 0;
   align-self: center;
+  transition: opacity 320ms ease;
+}
+
+/* 贴近后屏幕自己的输入行已经写着「Esc 退出终端」，外层提示让位，
+   免得两条提示叠在一起。 */
+.hint[data-dim="true"] {
+  opacity: 0;
 }
 
 .hintText {
@@ -128,7 +152,8 @@
     transition: none;
   }
 
-  .brand {
+  .brand,
+  .hint {
     transition: none;
   }
 }

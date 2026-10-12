@@ -1,0 +1,349 @@
+.shell {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 56px 1fr 74px;
+  background: #070d12;
+  color: #c9dbe3;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  overflow: hidden;
+  cursor: default;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 28px;
+  background: #0c161d;
+  border-bottom: 1px solid rgba(110, 231, 212, 0.14);
+}
+
+.headTitle {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  color: #6ee7d4;
+}
+
+.headMeta {
+  font-size: 14px;
+  color: #44606e;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6ee7d4;
+  box-shadow: 0 0 10px rgba(110, 231, 212, 0.8);
+  animation: breathe 2600ms ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  min-height: 0;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 24px 0;
+  background: #0d1a21;
+  border-right: 1px solid rgba(110, 231, 212, 0.08);
+}
+
+.navItem {
+  appearance: none;
+  border: 0;
+  border-left: 2px solid transparent;
+  background: none;
+  padding: 10px 26px;
+  text-align: left;
+  font: inherit;
+  font-size: 16px;
+  color: #5c7b88;
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.navItem:hover {
+  color: #9db9c4;
+  background: rgba(110, 231, 212, 0.04);
+}
+
+.navItem[aria-selected="true"] {
+  color: #6ee7d4;
+  border-left-color: #6ee7d4;
+  background: rgba(110, 231, 212, 0.07);
+}
+
+.navItem:focus-visible {
+  outline: 2px solid #6ee7d4;
+  outline-offset: -2px;
+}
+
+.main {
+  padding: 26px 32px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.boot {
+  margin: 0 0 22px;
+  display: grid;
+  gap: 4px;
+  color: #3f6475;
+  font-size: 15px;
+}
+
+.bootRow {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+}
+
+.turn {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+  line-height: 1.55;
+}
+
+.speaker {
+  color: #44606e;
+}
+
+.caret {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  margin-left: 3px;
+  vertical-align: -2px;
+  background: #6ee7d4;
+  animation: blink 1100ms step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(24, 38px);
+  gap: 4px;
+  margin: 22px 0 16px;
+}
+
+.cell {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 3px;
+  cursor: crosshair;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.cell:hover,
+.cell:focus-visible {
+  outline: 0;
+  transform: scale(1.22);
+  box-shadow: 0 0 0 1px #6ee7d4;
+}
+
+.readout {
+  min-height: 24px;
+  color: #6ee7d4;
+  font-size: 15px;
+}
+
+.caption {
+  margin: 0 0 4px;
+  color: #44606e;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+
+.bars {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  max-width: 860px;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 148px 1fr 64px;
+  align-items: center;
+  gap: 16px;
+  font-size: 15px;
+}
+
+.track {
+  height: 14px;
+  border-radius: 3px;
+  background: #16303a;
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: #6ee7d4;
+  transition: width 420ms ease;
+}
+
+.value {
+  color: #44606e;
+  text-align: right;
+}
+
+.trace {
+  display: grid;
+  gap: 0;
+  margin-top: 14px;
+  max-width: 860px;
+}
+
+.traceRow {
+  display: grid;
+  grid-template-columns: 116px 1fr 84px;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(110, 231, 212, 0.07);
+  font-size: 14px;
+}
+
+.traceStage {
+  color: #9db9c4;
+}
+
+.traceBar {
+  display: block;
+  height: 8px;
+  border-radius: 3px;
+  background: rgba(110, 231, 212, 0.55);
+}
+
+.traceCost {
+  color: #44606e;
+  text-align: right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .caret {
+    animation: none;
+  }
+
+  .cell,
+  .fill,
+  .navItem {
+    transition: none;
+  }
+}
+
+.answer {
+  display: grid;
+  gap: 7px;
+  line-height: 1.62;
+  max-width: 760px;
+}
+
+.answer p {
+  margin: 0;
+}
+
+.streamLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px !important;
+}
+
+/* 采样是一个 token 一个 token 吐出来的，逐个淡入把这件事说清楚。 */
+.token {
+  padding: 2px 8px;
+  border: 1px solid rgba(110, 231, 212, 0.26);
+  border-radius: 3px;
+  background: rgba(110, 231, 212, 0.07);
+  color: #6ee7d4;
+  font-size: 14px;
+  opacity: 0;
+  animation: emit 420ms ease forwards;
+}
+
+@keyframes emit {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.status {
+  margin: 26px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(110, 231, 212, 0.08);
+  color: #3f6475;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .token {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* 底部输入行：终端本来就该有一条，顺便把版面的下沿撑住。
+   第四阶段的 token 外溢交互会挂在这里。 */
+.prompt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 32px;
+  background: #0a1319;
+  border-top: 1px solid rgba(110, 231, 212, 0.12);
+}
+
+.promptMark {
+  color: #6ee7d4;
+  font-size: 16px;
+}
+
+.promptInput {
+  flex: 1;
+  appearance: none;
+  border: 0;
+  background: none;
+  color: #c9dbe3;
+  font: inherit;
+  font-size: 15px;
+  padding: 10px 0;
+}
+
+.promptInput::placeholder {
+  color: #3f6475;
+}
+
+.promptInput:focus {
+  outline: 0;
+}
+
+.promptHint {
+  color: #3f6475;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}

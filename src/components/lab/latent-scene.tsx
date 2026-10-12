@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 
 import {
   PANEL_SIZE,
@@ -18,10 +19,20 @@ import {
   stageOnPanelHover,
   terminalDistance,
 } from "./camera-rig";
+import { parseBridgeMessage, stageOnBridgeMessage } from "./terminal-bridge";
 import styles from "./latent-scene.module.css";
 
 const FOV = 35;
 const BACKGROUND = 0x05070a;
+
+/**
+ * 屏幕里那张网页的像素尺寸，和 PANEL_SIZE 同比例（1440 / 900 = 16 / 10）。
+ *
+ * 取 1440 是因为贴近终端时面板差不多铺满常见的笔记本视口，这时 CSS3D 的缩放
+ * 接近 1:1，字才不会被放大到发虚。
+ */
+const SCREEN_PX = { width: 1440, height: 900 } as const;
+const SCREEN_URL = "/lab/latent/terminal";
 
 /** 网络层沿 Z 轴排布；终端面板在 z = 0，所以正数在面板前方。 */
 const LAYERS = [
@@ -192,78 +203,69 @@ function buildDust(random: () => number) {
 }
 
 /**
- * 终端面板的占位内容。
+ * 终端屏幕：一块真网页 + 一块看不见的遮挡面。
  *
- * 下一步这里会换成真正的 iframe（CSS3D + 遮挡面片），现在先用贴图把版式定下来。
+ * iframe 没法贴到 WebGL 画布上，所以它由 CSS3DRenderer 单独渲染在画布下面，
+ * 靠同一个相机保持透视一致。画布本身是透明的，再在屏幕的位置放一块
+ * NoBlending 的全透明面片——它会把那块区域的 alpha 直接写成 0，于是下面的
+ * 网页从画布里透出来；而任何比它离相机更近的节点和连线仍然画在上面，
+ * 屏幕就被正确地挡住了。这是 Henry Heffernan 作品集里最关键的一招。
  */
-function createPanelTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 640;
-  const context = canvas.getContext("2d");
-  if (!context) return null;
+function createScreen() {
+  const holder = document.createElement("div");
+  holder.style.width = `${SCREEN_PX.width}px`;
+  holder.style.height = `${SCREEN_PX.height}px`;
+  // iframe 载入前先铺上终端底色，免得露出一块空洞。
+  holder.style.background = "#070d12";
+  holder.style.overflow = "hidden";
 
-  context.fillStyle = "#070d12";
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  const iframe = document.createElement("iframe");
+  iframe.src = SCREEN_URL;
+  iframe.title = "Latent Terminal 屏幕内容";
+  iframe.style.width = `${SCREEN_PX.width}px`;
+  iframe.style.height = `${SCREEN_PX.height}px`;
+  iframe.style.border = "0";
+  iframe.style.display = "block";
+  // 只有贴近终端时才把事件交给网页，否则点击要留给镜头。
+  iframe.style.pointerEvents = "none";
+  holder.appendChild(iframe);
 
-  context.fillStyle = "#0c161d";
-  context.fillRect(0, 0, canvas.width, 56);
-  context.fillStyle = "#6ee7d4";
-  context.font = "600 20px ui-monospace, SFMono-Regular, Menlo, monospace";
-  context.fillText("LATENT TERMINAL", 28, 36);
-  context.fillStyle = "#44606e";
-  // 状态字靠左挨着标题：贴近终端时右上角被机位切换按钮占着，放右边会叠字。
-  context.fillText("· attached", 248, 36);
+  const object = new CSS3DObject(holder);
+  object.scale.setScalar(PANEL_SIZE.width / SCREEN_PX.width);
 
-  context.fillStyle = "#1b2b34";
-  context.fillRect(0, 56, 232, canvas.height - 56);
-  const navItems = ["对话 chat", "注意力 attn", "概率 logits", "日志 trace"];
-  navItems.forEach((item, index) => {
-    context.fillStyle = index === 0 ? "#6ee7d4" : "#5c7b88";
-    context.font = "16px ui-monospace, SFMono-Regular, Menlo, monospace";
-    context.fillText(item, 28, 112 + index * 40);
+  const occluderMaterial = new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    transparent: true,
+    opacity: 0,
+    blending: THREE.NoBlending,
+    side: THREE.DoubleSide,
   });
+  const occluder = new THREE.Mesh(
+    new THREE.PlaneGeometry(PANEL_SIZE.width, PANEL_SIZE.height),
+    occluderMaterial,
+  );
 
-  const logLines = [
-    "> tokenizer ready            vocab 128k",
-    "> weights  8/8 shards        bf16",
-    "> kv cache warm              ctx 32768",
-    "",
-    "user:  把这段结构讲清楚",
-    "model: 正在沿着注意力路径生成…",
-  ];
-  logLines.forEach((line, index) => {
-    context.fillStyle = line.startsWith(">") ? "#3f6475" : "#c9dbe3";
-    context.font = "17px ui-monospace, SFMono-Regular, Menlo, monospace";
-    context.fillText(line, 272, 118 + index * 30);
+  // 斜着看屏幕时压暗。真显示器有可视角，少了这层，网页会像贴纸一样浮在场景里。
+  const dimmerMaterial = new THREE.MeshBasicMaterial({
+    color: 0x04080b,
+    transparent: true,
+    opacity: 0,
+    depthWrite: false,
   });
+  const dimmer = new THREE.Mesh(
+    new THREE.PlaneGeometry(PANEL_SIZE.width, PANEL_SIZE.height),
+    dimmerMaterial,
+  );
+  dimmer.position.z = 0.02;
 
-  // 注意力热力图：用格子表示一次前向里各层的激活强度。
-  const gridX = 272;
-  const gridY = 330;
-  const cell = 26;
-  for (let row = 0; row < 7; row += 1) {
-    for (let col = 0; col < 18; col += 1) {
-      const weight = Math.abs(Math.sin(row * 1.7 + col * 0.63)) * Math.abs(Math.cos(col * 0.21 + row * 0.4));
-      context.fillStyle = `rgba(110, 231, 212, ${0.08 + weight * 0.72})`;
-      context.fillRect(gridX + col * cell, gridY + row * cell, cell - 4, cell - 4);
-    }
-  }
-
-  // token 概率条
-  const bars = [0.82, 0.54, 0.37, 0.21, 0.12];
-  bars.forEach((value, index) => {
-    const y = 540 + index * 18;
-    context.fillStyle = "#16303a";
-    context.fillRect(gridX, y, 420, 10);
-    context.fillStyle = "#6ee7d4";
-    context.fillRect(gridX, y, 420 * value, 10);
-  });
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 4;
-  return texture;
+  return {
+    iframe,
+    object,
+    occluder,
+    dimmer,
+    dimmerMaterial,
+    disposables: [occluder.geometry, occluderMaterial, dimmer.geometry, dimmerMaterial],
+  };
 }
 
 function createGlowTexture() {
@@ -294,6 +296,7 @@ function hasWebGL() {
 
 export default function LatentScene() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cssContainerRef = useRef<HTMLDivElement>(null);
   const [stage, setStage] = useState<StageKey>("idle");
   // 这个组件只在客户端挂载（ssr: false），所以可以在初始化时就探测 WebGL，
   // 不必在 effect 里再 setState 触发一次额外渲染。
@@ -303,23 +306,34 @@ export default function LatentScene() {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    const cssContainer = cssContainerRef.current;
+    if (!container || !cssContainer) return;
     if (unsupported) return;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const random = createRandom(20261012);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(BACKGROUND);
+    // 画布必须透明，屏幕那块的 alpha 被挖空后才能看见下面的 iframe。
+    // 底色改由外层容器的 CSS 背景提供。
     scene.fog = new THREE.FogExp2(BACKGROUND, 0.0062);
+    const cssScene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 2000);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      powerPreference: "high-performance",
+    });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(BACKGROUND, 0);
     renderer.domElement.setAttribute("aria-hidden", "true");
     container.appendChild(renderer.domElement);
+
+    const cssRenderer = new CSS3DRenderer();
+    cssContainer.appendChild(cssRenderer.domElement);
 
     const disposables: Array<{ dispose: () => void }> = [];
     const layers = buildLayers(random);
@@ -329,13 +343,11 @@ export default function LatentScene() {
     scene.add(layers.group, edges.lines, pulses.points, dust.points);
     disposables.push(...layers.disposables, ...edges.disposables, ...pulses.disposables, ...dust.disposables);
 
-    // 终端面板
-    const panelTexture = createPanelTexture();
-    const panelMaterial = new THREE.MeshBasicMaterial({ map: panelTexture ?? undefined, toneMapped: false });
-    const panel = new THREE.Mesh(new THREE.PlaneGeometry(PANEL_SIZE.width, PANEL_SIZE.height), panelMaterial);
-    scene.add(panel);
-    disposables.push(panel.geometry, panelMaterial);
-    if (panelTexture) disposables.push(panelTexture);
+    // 终端屏幕
+    const screen = createScreen();
+    cssScene.add(screen.object);
+    scene.add(screen.occluder, screen.dimmer);
+    disposables.push(...screen.disposables);
 
     const frameMaterial = new THREE.LineBasicMaterial({ color: 0x6ee7d4, transparent: true, opacity: 0.8 });
     const frameGeometry = new THREE.EdgesGeometry(
@@ -422,6 +434,8 @@ export default function LatentScene() {
       transitionDuration = reduceMotion.matches ? 320 : 1200;
       currentStage = next;
       stageRef.current = next;
+      // 贴近后网页接管指针，退出后交还给镜头。
+      screen.iframe.style.pointerEvents = next === "terminal" ? "auto" : "none";
       setStage(next);
     };
     requestStageRef.current = requestStage;
@@ -433,11 +447,13 @@ export default function LatentScene() {
     const isPointerOnPanel = () => {
       if (!pointerInside) return false;
       raycaster.setFromCamera(pointer, camera);
-      return raycaster.intersectObject(panel, false).length > 0;
+      return raycaster.intersectObject(screen.occluder, false).length > 0;
     };
 
+    // 指针和键盘都挂在 window 上。画布设了 pointer-events: none——它必须让位，
+    // 否则盖在上面会把 iframe 的点击全吃掉——所以不能再往画布上挂监听。
     const onPointerMove = (event: PointerEvent) => {
-      const rect = renderer.domElement.getBoundingClientRect();
+      const rect = container.getBoundingClientRect();
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       pointer.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
       pointerInside = true;
@@ -450,11 +466,17 @@ export default function LatentScene() {
       requestStage(stageOnPanelHover(currentStage, false));
     };
 
-    const onClick = () => {
+    const onClick = (event: MouseEvent) => {
+      // HUD 上的机位按钮自己会处理点击，别再叠一次镜头切换。
+      if (event.target instanceof Element && event.target.closest("button, a")) return;
       requestStage(stageOnClick(currentStage));
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
+      // 焦点在按钮或输入框里时，按键归控件所有。
+      if (event.target instanceof Element && event.target.closest("button, a, input, textarea, select")) {
+        return;
+      }
       if (event.key === "Escape") {
         requestStage(stageOnEscape(currentStage));
         return;
@@ -465,10 +487,24 @@ export default function LatentScene() {
       }
     };
 
-    renderer.domElement.addEventListener("pointermove", onPointerMove);
-    renderer.domElement.addEventListener("pointerleave", onPointerLeave);
-    renderer.domElement.addEventListener("click", onClick);
-    container.addEventListener("keydown", onKeyDown);
+    /**
+     * 屏幕里的网页把它那边发生的事报上来。
+     *
+     * iframe 挡住了外层的指针事件，没有这条通道，访客从屏幕边缘滑出去时
+     * 镜头会一直卡在贴近状态，在终端里按 Esc 也不会有任何反应。
+     */
+    const onBridgeMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      const message = parseBridgeMessage(event.data);
+      if (!message) return;
+      requestStage(stageOnBridgeMessage(currentStage, message));
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("click", onClick);
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("message", onBridgeMessage);
+    document.addEventListener("pointerleave", onPointerLeave);
 
     const resize = () => {
       const { clientWidth, clientHeight } = container;
@@ -476,6 +512,7 @@ export default function LatentScene() {
       camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(clientWidth, clientHeight, false);
+      cssRenderer.setSize(clientWidth, clientHeight);
     };
     resize();
     const resizeObserver = new ResizeObserver(resize);
@@ -534,7 +571,12 @@ export default function LatentScene() {
         glowMaterial.opacity = 0.72 + Math.sin(now * 0.0011) * 0.14;
       }
 
+      // 屏幕法线朝 +Z，相机越偏离正面，可视角越差，画面压得越暗。
+      const facing = Math.abs(camera.position.clone().sub(screen.occluder.position).normalize().z);
+      screen.dimmerMaterial.opacity = (1 - facing) * 0.82;
+
       renderer.render(scene, camera);
+      cssRenderer.render(cssScene, camera);
     };
 
     frameId = requestAnimationFrame(renderFrame);
@@ -554,13 +596,16 @@ export default function LatentScene() {
       cancelAnimationFrame(frameId);
       document.removeEventListener("visibilitychange", onVisibility);
       resizeObserver.disconnect();
-      renderer.domElement.removeEventListener("pointermove", onPointerMove);
-      renderer.domElement.removeEventListener("pointerleave", onPointerLeave);
-      renderer.domElement.removeEventListener("click", onClick);
-      container.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("click", onClick);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("message", onBridgeMessage);
+      document.removeEventListener("pointerleave", onPointerLeave);
       for (const item of disposables) item.dispose();
       renderer.dispose();
       renderer.domElement.remove();
+      screen.object.element.remove();
+      cssRenderer.domElement.remove();
     };
   }, [unsupported]);
 
@@ -575,6 +620,7 @@ export default function LatentScene() {
 
   return (
     <div className={styles.root}>
+      <div aria-hidden={stage !== "terminal"} className={styles.cssLayer} ref={cssContainerRef} />
       <div
         aria-label="潜空间三维原型：点击进入结构，移到终端上放大，按 Esc 退出"
         className={styles.canvas}
@@ -600,7 +646,7 @@ export default function LatentScene() {
             </button>
           ))}
         </div>
-        <p className={styles.hint}>
+        <p className={styles.hint} data-dim={stage === "terminal" ? "true" : undefined}>
           <span className={styles.hintText}>{STAGE_COPY[stage].hint}</span>
         </p>
       </div>
