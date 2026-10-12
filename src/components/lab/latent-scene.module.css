@@ -1,0 +1,134 @@
+.root {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: #05070a;
+  color: #cfe3ea;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+.canvas:focus-visible {
+  outline: 2px solid #6ee7d4;
+  outline-offset: -4px;
+}
+
+.canvas :global(canvas) {
+  display: block;
+}
+
+.hud {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(20px, 3vw, 40px);
+  pointer-events: none;
+  font-family: var(--font-mono);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: opacity 420ms ease;
+}
+
+/* 贴近终端时面板自带抬头，HUD 标题让位，免得两行字叠在一起。 */
+.brand[data-dim="true"] {
+  opacity: 0;
+}
+
+.brandTitle {
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: #6ee7d4;
+}
+
+.brandSub {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgba(207, 227, 234, 0.55);
+}
+
+.stages {
+  position: absolute;
+  top: clamp(20px, 3vw, 40px);
+  right: clamp(20px, 3vw, 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.stageButton {
+  padding: 6px 12px;
+  border: 1px solid rgba(110, 231, 212, 0.22);
+  border-radius: 999px;
+  background: rgba(5, 7, 10, 0.78);
+  backdrop-filter: blur(6px);
+  color: rgba(207, 227, 234, 0.62);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease;
+}
+
+.stageButton:hover {
+  color: #cfe3ea;
+  border-color: rgba(110, 231, 212, 0.45);
+}
+
+.stageButton[aria-current="true"] {
+  color: #05070a;
+  background: #6ee7d4;
+  border-color: #6ee7d4;
+}
+
+.hint {
+  margin: 0;
+  align-self: center;
+}
+
+.hintText {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(5, 7, 10, 0.72);
+  backdrop-filter: blur(6px);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: rgba(207, 227, 234, 0.78);
+}
+
+.fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  background: #05070a;
+  color: rgba(207, 227, 234, 0.75);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stageButton {
+    transition: none;
+  }
+
+  .brand {
+    transition: none;
+  }
+}
