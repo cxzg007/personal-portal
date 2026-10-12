@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   BRIDGE_SOURCE,
+  type BridgeMessage,
   encodeBridgeMessage,
   parseBridgeMessage,
   stageOnBridgeMessage,
@@ -57,10 +58,15 @@ describe("stageOnBridgeMessage", () => {
 });
 
 describe("提交与前向传播", () => {
-  it("提交带上 token 数量，往返都能解析", () => {
-    expect(parseBridgeMessage(encodeBridgeMessage({ type: "submit", tokens: 9 }))).toEqual({
+  it("提交带上 token 数量和命中域，往返都能解析", () => {
+    expect(
+      parseBridgeMessage(
+        encodeBridgeMessage({ type: "submit", tokens: 9, domains: ["internship", "open-source"] }),
+      ),
+    ).toEqual({
       type: "submit",
       tokens: 9,
+      domains: ["internship", "open-source"],
     });
     expect(
       parseBridgeMessage(encodeBridgeMessage({ type: "flight", phase: "returned" })),
@@ -73,6 +79,32 @@ describe("提交与前向传播", () => {
     expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit", tokens: -4 })).toBeNull();
     expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit", tokens: 3.7 })).toBeNull();
     expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit", tokens: "9" })).toBeNull();
+    // 域名缺失当成协议不符：说明发消息的不是我们这版内层页。
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit", tokens: 6 })).toBeNull();
+  });
+
+  it("认不出的域名被滤掉，整条提交还算有效", () => {
+    expect(
+      parseBridgeMessage({
+        source: BRIDGE_SOURCE,
+        type: "submit",
+        tokens: 6,
+        domains: ["internship", "weather", "internship"],
+      }),
+    ).toEqual({ type: "submit", tokens: 6, domains: ["internship"] });
+  });
+
+  it("跳转只放站内绝对路径过去", () => {
+    expect(parseBridgeMessage(encodeBridgeMessage({ type: "navigate", href: "/#open-source" }))).toEqual({
+      type: "navigate",
+      href: "/#open-source",
+    });
+    // 协议相对地址在浏览器眼里是外站，只判断开头是斜杠会把它漏进来。
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "navigate", href: "//evil.example" })).toBeNull();
+    expect(
+      parseBridgeMessage({ source: BRIDGE_SOURCE, type: "navigate", href: "https://evil.example" }),
+    ).toBeNull();
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "navigate" })).toBeNull();
   });
 
   it("认不出的相位不放行", () => {
@@ -81,11 +113,17 @@ describe("提交与前向传播", () => {
   });
 
   it("只有贴在终端上提交才把镜头推开", () => {
-    const submit = { type: "submit", tokens: 6 } as const;
+    const submit: BridgeMessage = { type: "submit", tokens: 6, domains: [] };
     expect(stageOnBridgeMessage("terminal", submit)).toBe("forward");
     // 传播途中又提交一次，镜头不该重新起跳；是否受理由场景那边决定。
     expect(stageOnBridgeMessage("forward", submit)).toBe("forward");
     expect(stageOnBridgeMessage("idle", submit)).toBe("idle");
+  });
+
+  it("跳转不改机位：页面马上就要被换掉了", () => {
+    expect(stageOnBridgeMessage("terminal", { type: "navigate", href: "/#internships" })).toBe(
+      "terminal",
+    );
   });
 
   it("传播途中指针扫过面板不会把镜头拽回终端", () => {

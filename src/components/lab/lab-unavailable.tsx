@@ -29,7 +29,7 @@ export function LabUnavailable({ reason }: { reason: Reason }) {
     <div className={styles.root}>
       <main className={styles.card}>
         <p className={styles.eyebrow}>LATENT TERMINAL</p>
-        <h1 className={styles.title}>潜空间 · 一个可以走进去的模型</h1>
+        <h1 className={styles.title}>潜空间 · 一份可以问的简历</h1>
         <div className={styles.posterFrame}>
           <Image
             alt="潜空间场景静帧：一台终端嵌在多层半透明网络结构中间"
@@ -42,8 +42,9 @@ export function LabUnavailable({ reason }: { reason: Reason }) {
           />
         </div>
         <p className={styles.lead}>
-          一叠半透明的网络层悬在空中，中间那块屏幕是一张真的网页，可以点、可以输入。向它问一句话，这句话会被切成
-          token 从屏幕里飞出来，穿过每一层，再带着答案回到屏幕上。
+          一叠半透明的结构悬在空中，每一层放着我的一类内容：实习、系统、开源、博客。中间那块屏幕是一张真的网页，
+          向它问一句话，这句话会被切成 token
+          飞出屏幕，一路走到放着答案的那一层，点亮它，再把检索到的条目带回来。
         </p>
         <p className={styles.reason}>{copy.zh}</p>
         <p className={styles.reasonEn} lang="en">

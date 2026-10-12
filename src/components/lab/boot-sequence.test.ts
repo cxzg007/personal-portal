@@ -67,13 +67,13 @@ describe("日志行状态", () => {
     state = advanceBoot(state, "weights", 3);
     expect(bootStepStatus(weights, state)).toBe("3/7");
     state = advanceBoot(state, "weights", 4);
-    expect(bootStepStatus(weights, state)).toBe("bf16");
+    expect(bootStepStatus(weights, state)).toBe("5 content domains");
   });
 
   it("单步的那些在做完前只显示省略号", () => {
     const tokenizer = BOOT_STEPS.find((step) => step.key === "tokenizer")!;
     const state = createBootState();
     expect(bootStepStatus(tokenizer, state)).toBe("…");
-    expect(bootStepStatus(tokenizer, advanceBoot(state, "tokenizer"))).toBe("vocab 128k");
+    expect(bootStepStatus(tokenizer, advanceBoot(state, "tokenizer"))).toBe("cjk bigram");
   });
 });

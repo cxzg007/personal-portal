@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 
+import { DOMAIN_LABEL, DOMAIN_LAYER, type LatentDomain } from "@/lib/latent-index";
+
 import {
   PANEL_SIZE,
   STAGE_COPY,
@@ -52,7 +54,13 @@ const BACKGROUND = 0x05070a;
 const SCREEN_PX = { width: 1440, height: 900 } as const;
 const SCREEN_URL = "/lab/latent/terminal";
 
-/** 网络层沿 Z 轴排布；终端面板在 z = 0，所以正数在面板前方。 */
+/**
+ * 网络层沿 Z 轴排布；终端面板在 z = 0，所以正数在面板前方。
+ *
+ * 面板后方的五层各自绑一个内容域。这一步让整叠结构从装饰变成了存放东西的地方：
+ * 问一句话，token 只穿过真正命中的那几层，看到的路径就是检索实际落在哪儿。
+ * 前方两层不绑内容——它们在面板前面，是这句话还没进去时待的位置。
+ */
 const LAYERS = [
   { z: 30, cols: 8, rows: 5, width: 72, height: 44, hue: 0.52, intensity: 0.3 },
   { z: 17, cols: 9, rows: 6, width: 64, height: 40, hue: 0.5, intensity: 0.45 },
@@ -62,6 +70,43 @@ const LAYERS = [
   { z: -56, cols: 9, rows: 6, width: 50, height: 33, hue: 0.68, intensity: 0.55 },
   { z: -70, cols: 8, rows: 5, width: 48, height: 32, hue: 0.74, intensity: 0.4 },
 ];
+
+/**
+ * 第几层放哪个域。
+ *
+ * 绑定关系不写在 LAYERS 里，而是由 DOMAIN_LAYER 反推：终端的索引页也要标出层号，
+ * 两边各写一份迟早会对不上，而对不上的后果是界面说的和画面演的不是一回事。
+ */
+const DOMAIN_BY_LAYER = new Map<number, LatentDomain>(
+  (Object.entries(DOMAIN_LAYER) as Array<[LatentDomain, number]>).map(([domain, layer]) => [
+    layer - 1,
+    domain,
+  ]),
+);
+
+/**
+ * 规划这趟要走多深、点亮哪几层。
+ *
+ * 试过只把命中的那一层串进路径：单域命中时轨迹退化成一条近乎笔直的线，整叠结构
+ * 的层次全看不见了，反而不像是在穿过什么。改成一路穿到最深的那个命中层再掉头——
+ * 中间几层照样要路过，这本来也是物理上该发生的事——深度于是表示"答案藏得多深"，
+ * 亮起来的层表示"答案在哪儿"，两件事各自有自己的表达。
+ *
+ * 没给命中域时走完全程。这只会在协议被绕过时发生，那时让它跑完整条路
+ * 比什么都不显示要好。
+ */
+function flightLayers(domains: readonly LatentDomain[]): { path: number[]; lit: Set<number> } {
+  const bound: number[] = [];
+  for (let index = 0; index < LAYERS.length; index += 1) {
+    if (DOMAIN_BY_LAYER.has(index)) bound.push(index);
+  }
+
+  const lit = bound.filter((index) => domains.includes(DOMAIN_BY_LAYER.get(index)!));
+  if (lit.length === 0) return { path: bound, lit: new Set(bound) };
+
+  const deepest = lit[lit.length - 1];
+  return { path: bound.filter((index) => index <= deepest), lit: new Set(lit) };
+}
 
 /**
  * 两层之间间隔多久。七层加起来约两秒——再快就只剩一次闪烁，看不出结构是有厚度的；
@@ -166,13 +211,21 @@ function createLayerBuilder(random: () => number) {
     return true;
   };
 
-  /** 新建的层淡入到满，再按 dim 统一压暗。dim 为 0 时就是原来的亮度。 */
-  const fade = (delta: number, dim = 0) => {
-    for (const entry of entries) {
+  /**
+   * 新建的层淡入到满，再按 dim 统一压暗。dim 为 0 时就是原来的亮度。
+   *
+   * lit 里的层不跟着压暗，还往满推一点。压暗整叠结构已经能让 token 看清，
+   * 但那样五层看着都一样；把命中的层单独留亮，才看得出这次检索落在哪儿。
+   */
+  const fade = (delta: number, dim = 0, lit: ReadonlySet<number> | null = null) => {
+    for (let index = 0; index < entries.length; index += 1) {
+      const entry = entries[index];
       if (entry.level < LAYER_OPACITY) {
         entry.level = Math.min(LAYER_OPACITY, entry.level + delta * 3.4);
       }
-      entry.material.opacity = entry.level * (1 - dim);
+      entry.material.opacity = lit?.has(index)
+        ? Math.min(1, entry.level * (1 + dim * 0.24))
+        : entry.level * (1 - dim);
     }
   };
 
@@ -472,6 +525,8 @@ export default function LatentScene() {
   const cssContainerRef = useRef<HTMLDivElement>(null);
   const [stage, setStage] = useState<StageKey>("boot");
   const [boot, setBoot] = useState<BootState>(createBootState);
+  /** 这次提问命中了哪几个内容域、走到第几层，前向传播时在 HUD 上说出来。 */
+  const [hitReadout, setHitReadout] = useState<string | null>(null);
   const stageRef = useRef<StageKey>("boot");
   const requestStageRef = useRef<(next: StageKey) => void>(() => {});
 
@@ -585,6 +640,8 @@ export default function LatentScene() {
     let flightStart = 0;
     let flightReturned = false;
     let flightDim = 0;
+    /** 这趟要点亮的层。为 null 时所有层一视同仁地压暗。 */
+    let flightLit: ReadonlySet<number> | null = null;
 
     const postToScreen = (message: BridgeMessage) => {
       screen.iframe.contentWindow?.postMessage(
@@ -598,26 +655,34 @@ export default function LatentScene() {
       scene.remove(flight.points, flight.lines);
       for (const item of flight.disposables) item.dispose();
       flight = null;
+      flightLit = null;
     };
 
     /** 发射成功才返回 true；没发射出去的话镜头也不该动。 */
-    const launchFlight = (tokens: number) => {
-      // 减弱动效时不派 token，也不动镜头，但答案照给——这个交互的信息
-      // 不能只存在于动画里。
-      if (reduceMotion.matches) {
-        postToScreen({ type: "flight", phase: "returned" });
-        return false;
-      }
+    const launchFlight = (tokens: number, domains: readonly LatentDomain[]) => {
+      // 减弱动效时不派 token，也不动镜头。答案照给，由调用方统一回执——
+      // 这个交互的信息不能只存在于动画里。
+      if (reduceMotion.matches) return false;
       // 结构还没建完就没有路可走；上一趟还没跑完也不受理，两股 token
       // 叠在一起谁也看不清。
       if (!layers.done || flight) return false;
 
-      const deep = layers.nodesByLayer.filter((_, index) => (LAYERS[index]?.z ?? 0) < 0);
-      flightPaths = planFlight(deep, random, tokens);
+      const { path, lit } = flightLayers(domains);
+      flightPaths = planFlight(
+        path.map((index) => layers.nodesByLayer[index]),
+        random,
+        tokens,
+      );
+      flightLit = lit;
       flight = buildFlight(flightPaths, tokenSprite);
       scene.add(flight.points, flight.lines);
       flightStart = performance.now();
       flightReturned = false;
+      // 读数在这里拼好，HUD 那边只管显示：深度和域名都是这次发射的事实，
+      // 分成两个状态传过去只会多一次不同步的机会。
+      const names = domains.map((domain) => DOMAIN_LABEL[domain]).join(" / ");
+      const deepest = path[path.length - 1] + 1;
+      setHitReadout(domains.length > 0 ? `命中 ${names} · 走到第 ${deepest} 层` : null);
       return true;
     };
 
@@ -772,10 +837,21 @@ export default function LatentScene() {
       if (event.origin !== window.location.origin) return;
       const message = parseBridgeMessage(event.data);
       if (!message) return;
+      if (message.type === "navigate") {
+        // 屏幕里的链接要换掉整个窗口。留在 iframe 里跳的话，访客会得到一个
+        // 套在三维壳子里的普通页面，而外面的场景还停在原处。
+        window.location.href = message.href;
+        return;
+      }
       if (message.type === "submit") {
         // 只有贴在终端上提交才算数，而且要先确认 token 真的派出去了，
         // 否则镜头退开后画面里什么也不会发生。
-        if (currentStage !== "terminal" || !launchFlight(message.tokens)) return;
+        if (currentStage !== "terminal" || !launchFlight(message.tokens, message.domains)) {
+          // 不受理也要回一声：屏幕里那条问答在等这个信号，没有它会一直停在
+          // "检索中"。内容本来就已经检索好了，动画跑不跑都不该拦着它显示。
+          postToScreen({ type: "flight", phase: "returned" });
+          return;
+        }
       }
       requestStage(stageOnBridgeMessage(currentStage, message));
     };
@@ -820,7 +896,7 @@ export default function LatentScene() {
       // 有 token 在跑就把其余部分压下去，跑完再缓缓亮回来。
       const dimTarget = flight ? FLIGHT_DIM : 0;
       flightDim += (dimTarget - flightDim) * Math.min(1, delta * 4.5);
-      layers.fade(delta, flightDim);
+      layers.fade(delta, flightDim, flightLit);
       if (edges) edges.lines.material.opacity = EDGE_OPACITY * (1 - flightDim);
       if (pulses) pulses.points.material.opacity = PULSE_OPACITY * (1 - flightDim);
 
@@ -956,7 +1032,7 @@ export default function LatentScene() {
     <div className={styles.root}>
       <div aria-hidden={stage !== "terminal"} className={styles.cssLayer} ref={cssContainerRef} />
       <div
-        aria-label="潜空间三维原型：点击进入结构，移到终端上放大，按 Esc 退出"
+        aria-label="潜空间三维原型：点击进入结构，移到终端上放大后可以提问，按 Esc 退出"
         className={styles.canvas}
         ref={containerRef}
         role="application"
@@ -965,7 +1041,7 @@ export default function LatentScene() {
       <div className={styles.hud}>
         <div className={styles.brand} data-dim={dimHud ? "true" : undefined}>
           <span className={styles.brandTitle}>LATENT TERMINAL</span>
-          <span className={styles.brandSub}>潜空间原型 · 场景与三机位</span>
+          <span className={styles.brandSub}>潜空间 · 一份可以问的简历</span>
         </div>
         {/* 载入阶段不给机位按钮。它们直接调 requestStage，会绕过接入这一步。 */}
         {stage === "boot" ? null : (
@@ -984,7 +1060,13 @@ export default function LatentScene() {
           </div>
         )}
         <p className={styles.hint} data-dim={dimHud ? "true" : undefined}>
-          <span className={styles.hintText}>{STAGE_COPY[stage].hint}</span>
+          {/*
+            前向传播时这行提示换成命中读数。另起一行会和机位按钮挤在一起，
+            而这句话本来就是在说"现在正在发生什么"，换内容比加一处更合适。
+          */}
+          <span className={styles.hintText}>
+            {stage === "forward" && hitReadout ? hitReadout : STAGE_COPY[stage].hint}
+          </span>
         </p>
       </div>
       <GrainOverlay />

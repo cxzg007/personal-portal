@@ -140,9 +140,9 @@ export function stageOnAdvance(current: StageKey): StageKey {
 }
 
 export const STAGE_COPY: Record<StageKey, { label: string; hint: string }> = {
-  boot: { label: "接入 / Attach", hint: "正在载入模型 · Loading model" },
+  boot: { label: "接入 / Attach", hint: "正在构建结构 · Building the structure" },
   idle: { label: "远景 / Overview", hint: "点击进入结构 · Click to enter" },
   approach: { label: "中景 / Approach", hint: "移到终端上放大 · Hover the terminal" },
   terminal: { label: "终端 / Terminal", hint: "按 Esc 退出 · Press Esc to exit" },
-  forward: { label: "前向 / Forward", hint: "这句话正在穿过模型 · Running a forward pass" },
+  forward: { label: "前向 / Forward", hint: "正在检索 · Retrieving from the structure" },
 };

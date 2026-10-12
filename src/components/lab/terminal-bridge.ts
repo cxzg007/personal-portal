@@ -15,6 +15,8 @@
  * 一样（window 上什么消息都有），没必要维护两份校验。
  */
 
+import { LATENT_DOMAINS, type LatentDomain } from "@/lib/latent-index";
+
 import { type StageKey, stageOnEscape, stageOnPanelHover } from "./camera-rig";
 
 export const BRIDGE_SOURCE = "latent-terminal";
@@ -33,8 +35,18 @@ export type BridgeMessage =
   | { type: "pointerleave" }
   /** 内层按键，只转发对镜头有意义的那几个。 */
   | { type: "key"; key: string }
-  /** 内层提交了一句话，外层据此派出相应数量的 token。 */
-  | { type: "submit"; tokens: number }
+  /**
+   * 内层提交了一句话：token 数决定派多少个光点，命中域决定它们穿过哪几层。
+   * 检索在内层做完才上报，外层不需要再认识内容，只负责把这条路走出来。
+   */
+  | { type: "submit"; tokens: number; domains: LatentDomain[] }
+  /**
+   * 内层的链接要跳转。
+   *
+   * iframe 里直接 <a> 跳转只会换掉屏幕里那一帧，外面的场景还留在原地，
+   * 访客会看到一个套在三维壳子里的普通页面。所以链接交给外层换顶层地址。
+   */
+  | { type: "navigate"; href: string }
   /** 外层回报前向传播走到了哪一步，内层据此决定什么时候开始吐字。 */
   | { type: "flight"; phase: FlightSignal };
 
@@ -67,7 +79,22 @@ export function parseBridgeMessage(data: unknown): BridgeMessage | null {
       const tokens = payload.tokens;
       // 数量会直接拿去开缓冲区，非整数或负数必须在进场前就挡掉。
       if (typeof tokens !== "number" || !Number.isInteger(tokens) || tokens <= 0) return null;
-      return { type: "submit", tokens };
+      const raw = payload.domains;
+      if (!Array.isArray(raw)) return null;
+      // 认不出的域名直接丢掉而不是整条作废：外层只拿它去挑层，多一个少一个
+      // 无非是少点亮一层，为此把整次提交吞掉反而更糟。
+      const domains = raw.filter((item): item is LatentDomain =>
+        LATENT_DOMAINS.includes(item as LatentDomain),
+      );
+      return { type: "submit", tokens, domains: [...new Set(domains)] };
+    }
+    case "navigate": {
+      const href = payload.href;
+      if (typeof href !== "string") return null;
+      // 只放站内绝对路径过去。"//example.com" 在浏览器眼里是协议相对的外站地址，
+      // 光判断开头是斜杠会把它漏进来。
+      if (!href.startsWith("/") || href.startsWith("//")) return null;
+      return { type: "navigate", href };
     }
     case "flight":
       return typeof payload.phase === "string" && FLIGHT_SIGNALS.includes(payload.phase)

@@ -21,11 +21,11 @@ type Props = {
 /**
  * 接入前挡在场景前面的载入屏。
  *
- * 它不只是等待界面，还承担两件事：第一，把"这是一个模型"这件事在第一屏讲清楚，
+ * 它不只是等待界面，还承担两件事：第一，把"这是一叠放着内容的结构"这件事在第一屏讲清楚，
  * 访客不用猜自己在看什么；第二，替场景争取时间——七层结构正在后面一层一层长出来，
  * 从日志的缝隙里能看见它，等待因此变成了可看的过程。
  *
- * 不做自动跳转。模型载完了也停在这里等一次点击，因为后面的镜头推进和 iframe 取得
+ * 不做自动跳转。结构建完了也停在这里等一次点击，因为后面的镜头推进和 iframe 取得
  * 焦点都应该由访客的动作触发，而不是页面自己开始动。
  */
 export function BootOverlay({ active, boot, onAttach }: Props) {
@@ -50,7 +50,7 @@ export function BootOverlay({ active, boot, onAttach }: Props) {
       <div className={styles.panel}>
         <p className={styles.title}>
           LATENT TERMINAL
-          <span className={styles.titleSub}>潜空间 · 一个可以走进去的模型</span>
+          <span className={styles.titleSub}>潜空间 · 一份可以问的简历</span>
         </p>
 
         <ol className={styles.log}>
@@ -69,7 +69,7 @@ export function BootOverlay({ active, boot, onAttach }: Props) {
         </ol>
 
         <div
-          aria-label="模型载入进度"
+          aria-label="结构构建进度"
           aria-valuemax={100}
           aria-valuemin={0}
           aria-valuenow={percent}

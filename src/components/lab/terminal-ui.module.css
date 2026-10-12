@@ -1,3 +1,11 @@
+/*
+ * 屏幕里那张网页的样式。
+ *
+ * 它被 CSS3D 放在 1440×900 的面板上，贴近时缩放接近 1:1，所以这里的字号
+ * 按真实终端来定，不按网页正文的习惯缩小。配色压在青绿单色里：场景那叠层
+ * 已经有色相变化，屏幕再多一套颜色就会和结构打起来。
+ */
+
 .shell {
   position: fixed;
   inset: 0;
@@ -101,19 +109,15 @@
 
 /*
  * 1440×900 的屏幕里对话只占上面三分之一，底下一大片空白，看着像没做完。
- * 聊天记录改成贴着输入框向上堆（margin-top: auto），这也是聊天界面的常规读法：
- * 最新一句离输入框最近。超出高度时 .main 正常滚动，旧消息仍然翻得回去。
+ * 问答记录改成贴着输入框向上堆（margin-top: auto），这也是对话界面的常规读法：
+ * 最新一句离输入框最近。超出高度时 .main 正常滚动，旧的问答仍然翻得回去。
  */
 .chat {
   margin-top: auto;
 }
 
-/*
- * 另外三页内容都不长，顶对齐会在下半屏留一大片空白。上下都给 auto 外边距让它居中；
- * 内容真的超高时 auto 会退成 0，.main 照常滚动。
- */
+/* 内容页的卡片顶对齐：条目可能很多，居中会让第一条莫名其妙往下掉。 */
 .panel {
-  margin-top: auto;
   margin-bottom: auto;
 }
 
@@ -127,14 +131,60 @@
 
 .bootRow {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 220px 1fr;
+}
+
+/* 空输入框是这个交互最大的门槛，开场先把能问什么说清楚。 */
+.intro {
+  max-width: 800px;
+  margin-bottom: 26px;
+}
+
+.introLead {
+  margin: 0 0 20px;
+  line-height: 1.7;
+  color: #9db9c4;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chip {
+  appearance: none;
+  padding: 7px 13px;
+  border: 1px solid rgba(110, 231, 212, 0.26);
+  border-radius: 3px;
+  background: rgba(110, 231, 212, 0.05);
+  color: #6ee7d4;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.chip:hover {
+  background: rgba(110, 231, 212, 0.13);
+  border-color: rgba(110, 231, 212, 0.5);
+}
+
+.chip:focus-visible {
+  outline: 2px solid #6ee7d4;
+  outline-offset: 2px;
+}
+
+.exchange {
+  margin-bottom: 26px;
 }
 
 .turn {
   display: grid;
   grid-template-columns: 74px 1fr;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   line-height: 1.55;
 }
 
@@ -157,37 +207,6 @@
   50% { opacity: 0; }
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(24, 38px);
-  gap: 4px;
-  margin: 22px 0 16px;
-}
-
-.cell {
-  appearance: none;
-  border: 0;
-  padding: 0;
-  width: 38px;
-  height: 38px;
-  border-radius: 3px;
-  cursor: crosshair;
-  transition: transform 140ms ease, box-shadow 140ms ease;
-}
-
-.cell:hover,
-.cell:focus-visible {
-  outline: 0;
-  transform: scale(1.22);
-  box-shadow: 0 0 0 1px #6ee7d4;
-}
-
-.readout {
-  min-height: 24px;
-  color: #6ee7d4;
-  font-size: 15px;
-}
-
 .caption {
   margin: 0 0 4px;
   color: #44606e;
@@ -195,113 +214,220 @@
   letter-spacing: 0.04em;
 }
 
-.bars {
-  display: grid;
-  gap: 16px;
-  margin-top: 22px;
-  max-width: 860px;
-}
-
-.bar {
-  display: grid;
-  grid-template-columns: 148px 1fr 64px;
-  align-items: center;
-  gap: 16px;
+.readout {
+  min-height: 24px;
+  margin: 18px 0 0;
+  color: #6ee7d4;
   font-size: 15px;
-}
-
-.track {
-  height: 14px;
-  border-radius: 3px;
-  background: #16303a;
-  overflow: hidden;
-}
-
-.fill {
-  display: block;
-  height: 100%;
-  background: #6ee7d4;
-  transition: width 420ms ease;
-}
-
-.value {
-  color: #44606e;
-  text-align: right;
-}
-
-.trace {
-  display: grid;
-  gap: 0;
-  margin-top: 14px;
-  max-width: 860px;
-}
-
-.traceRow {
-  display: grid;
-  grid-template-columns: 116px 1fr 84px;
-  gap: 16px;
-  align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(110, 231, 212, 0.07);
-  font-size: 14px;
-}
-
-.traceStage {
-  color: #9db9c4;
-}
-
-.traceBar {
-  display: block;
-  height: 8px;
-  border-radius: 3px;
-  background: rgba(110, 231, 212, 0.55);
-}
-
-.traceCost {
-  color: #44606e;
-  text-align: right;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dot,
-  .caret {
-    animation: none;
-  }
-
-  .cell,
-  .fill,
-  .navItem {
-    transition: none;
-  }
 }
 
 .answer {
   display: grid;
-  gap: 7px;
-  line-height: 1.62;
-  max-width: 760px;
+  gap: 10px;
+  max-width: 860px;
+  min-width: 0;
 }
 
-.answer p {
+.replySummary {
   margin: 0;
-}
-
-.streamLine {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 7px;
-  margin-top: 6px !important;
-}
-
-/* 采样是一个 token 一个 token 吐出来的，逐个淡入把这件事说清楚。 */
-.token {
-  padding: 2px 8px;
-  border: 1px solid rgba(110, 231, 212, 0.26);
-  border-radius: 3px;
-  background: rgba(110, 231, 212, 0.07);
   color: #6ee7d4;
   font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+/* 一条命中，和内容页的卡片同一套版式，只多了分数和命中别名。 */
+.card,
+.hit {
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px solid rgba(110, 231, 212, 0.12);
+  border-left: 2px solid rgba(110, 231, 212, 0.55);
+  border-radius: 3px;
+  background: rgba(110, 231, 212, 0.035);
+}
+
+.cards {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  max-width: 880px;
+}
+
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.tag {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 2px;
+  background: rgba(110, 231, 212, 0.14);
+  color: #6ee7d4;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+.cardTitle {
+  margin: 0;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #dceef3;
+}
+
+.score {
+  margin-left: auto;
+  flex: none;
+  color: #3f6475;
+  font-size: 13px;
+}
+
+.cardSub {
+  margin: 0 0 8px;
+  color: #5c7b88;
+  font-size: 14px;
+}
+
+.cardLine {
+  margin: 0 0 5px;
+  line-height: 1.62;
+  color: #a8c2cc;
+  font-size: 14px;
+}
+
+.hitFoot {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.matched {
+  color: #3f6475;
+  font-size: 13px;
+}
+
+.link {
+  margin-left: auto;
+  color: #6ee7d4;
+  font-size: 14px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(110, 231, 212, 0.3);
+}
+
+.link:hover {
+  border-bottom-color: #6ee7d4;
+}
+
+.link:focus-visible {
+  outline: 2px solid #6ee7d4;
+  outline-offset: 3px;
+}
+
+.card .link {
+  display: inline-block;
+  margin: 6px 0 0;
+}
+
+/* token 还在外面跑的时候占住这一行。 */
+.waiting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #44606e;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+}
+
+/*
+ * 索引页：一格一个条目，深浅就是别名数量。
+ *
+ * 这一页原来是一张伪造的注意力热图。图案是好看的，但它什么也没说。
+ * 换成索引本身之后，纹理还在，而每一格都能点、能读出它是哪一条。
+ */
+.indexRows {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  max-width: 880px;
+}
+
+.indexRow {
+  display: grid;
+  grid-template-columns: 150px 1fr 36px;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(110, 231, 212, 0.07);
+}
+
+.indexLabel {
+  display: flex;
+  flex-direction: column;
+  color: #9db9c4;
+  font-size: 15px;
+}
+
+.indexLabel em {
+  color: #3f6475;
+  font-size: 13px;
+  font-style: normal;
+  letter-spacing: 0.06em;
+}
+
+.indexCells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.indexCell {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 3px;
+  cursor: crosshair;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.indexCell:hover,
+.indexCell:focus-visible,
+.indexCell[data-active="true"] {
+  outline: 0;
+  transform: scale(1.14);
+  box-shadow: 0 0 0 1px #6ee7d4;
+}
+
+/* 索引页内容不高，底下那片空当交给这段说明：它正好解释了层号是怎么回事。 */
+.indexNote {
+  max-width: 760px;
+  margin: 14px 0 0;
+  line-height: 1.75;
+  color: #5c7b88;
+  font-size: 14px;
+}
+
+.indexCount {
+  color: #3f6475;
+  font-size: 14px;
+  text-align: right;
+}
+
+/* 命中逐条落下，节奏和外面那趟 token 的回程接得上。 */
+.hit {
+  opacity: 0;
+  animation: emit 420ms ease forwards;
+}
+
+.replyLine {
+  margin: 0;
+  line-height: 1.68;
   opacity: 0;
   animation: emit 420ms ease forwards;
 }
@@ -311,24 +437,7 @@
   to { opacity: 1; transform: none; }
 }
 
-.status {
-  margin: 26px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid rgba(110, 231, 212, 0.08);
-  color: #3f6475;
-  font-size: 14px;
-  letter-spacing: 0.04em;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .token {
-    opacity: 1;
-    animation: none;
-  }
-}
-
-/* 底部输入行：终端本来就该有一条，顺便把版面的下沿撑住。
-   第四阶段的 token 外溢交互会挂在这里。 */
+/* 底部输入行：终端本来就该有一条，顺便把版面的下沿撑住。 */
 .prompt {
   display: flex;
   align-items: center;
@@ -368,73 +477,22 @@
   letter-spacing: 0.04em;
 }
 
-/* 这块屏幕是整个场景里唯一一处真界面，静止不动时它会立刻露出是张贴图。
-   下面两组动效都压得很轻——只在明度上，不动尺寸也不动位置，读数时不会分心。 */
-
-@keyframes cellBreathe {
-  0%, 100% { opacity: 0.82; }
-  50% { opacity: 1; }
-}
-
-/* 用 nth-child 错开相位，热力图因此像在呼吸，而不是整块一起闪。 */
-.cell {
-  animation: cellBreathe 3800ms ease-in-out infinite;
-}
-
-.cell:nth-child(3n) { animation-delay: -1300ms; }
-.cell:nth-child(5n) { animation-delay: -2500ms; }
-.cell:nth-child(7n) { animation-delay: -700ms; }
-
-/* 悬停的那一格要读准数值，这时停下来。 */
-.cell:hover,
-.cell:focus-visible {
-  animation: none;
-  opacity: 1;
-}
-
-@keyframes logitFlicker {
-  0%, 100% { opacity: 1; }
-  42% { opacity: 0.86; }
-  46% { opacity: 1; }
-  74% { opacity: 0.92; }
-}
-
-.fill {
-  animation: logitFlicker 2600ms ease-in-out infinite;
-}
-
-.bar:nth-child(2n) .fill { animation-delay: -900ms; }
-.bar:nth-child(3n) .fill { animation-delay: -1700ms; }
-
 @media (prefers-reduced-motion: reduce) {
-  .cell,
-  .fill {
+  .dot,
+  .caret,
+  .hit,
+  .replyLine {
     animation: none;
-    opacity: 1;
   }
-}
 
-/* 回答逐行落下，和上面那排 token 用同一条 emit 曲线，节奏上是一回事。 */
-.replyLine {
-  margin: 0;
-  opacity: 0;
-  animation: emit 420ms ease forwards;
-}
-
-/* token 还在外面跑的时候占住这一行。 */
-.waiting {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  color: #44606e;
-  font-size: 15px;
-  letter-spacing: 0.03em;
-}
-
-@media (prefers-reduced-motion: reduce) {
+  .hit,
   .replyLine {
     opacity: 1;
-    animation: none;
+  }
+
+  .navItem,
+  .chip,
+  .indexCell {
+    transition: none;
   }
 }

@@ -22,11 +22,17 @@ export type BootStep = {
   total: number;
 };
 
+/*
+ * 三行附注写的是这一页真实的构造，不是编出来的模型规格。
+ * 原先那三行是 "vocab 128k / bf16 / ctx 32768"：它们把界面衬得很像一台推理机，
+ * 但这里既没有模型也没有权重，屏幕里跑的是一套确定性检索。既然连 token 飞行
+ * 那段都坚持只呈现真发生过的事，这块载入屏没有理由例外。
+ */
 export const BOOT_STEPS: readonly BootStep[] = [
-  { key: "tokenizer", label: "tokenizer", detail: "vocab 128k", total: 1 },
+  { key: "tokenizer", label: "tokenizer", detail: "cjk bigram", total: 1 },
   // 七个分片对应场景里的七层结构，每建好一层就报一次。
-  { key: "weights", label: "weight shards", detail: "bf16", total: 7 },
-  { key: "cache", label: "kv cache", detail: "ctx 32768", total: 1 },
+  { key: "weights", label: "layer shards", detail: "5 content domains", total: 7 },
+  { key: "cache", label: "screen", detail: "1440×900 iframe", total: 1 },
 ];
 
 export type BootState = Record<BootStepKey, number>;

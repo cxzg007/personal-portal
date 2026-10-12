@@ -32,13 +32,14 @@ export function LabEntry() {
         <p className={styles.eyebrow} lang="en">
           WEBGL · THREE.JS · CSS3D
         </p>
-        <h3 className={styles.title}>潜空间 · 一个可以走进去的模型</h3>
+        <h3 className={styles.title}>潜空间 · 一份可以问的简历</h3>
         <p className={styles.lead}>
-          一叠半透明的网络层悬在空中，中间那块屏幕是一张真的网页，可以点、可以输入。向它问一句话，这句话会被切成
-          token 从屏幕里飞出来，穿过每一层，再带着答案回到屏幕上。
+          一叠半透明的结构悬在空中，每一层放着我的一类内容：实习、系统、开源、博客。中间那块屏幕是一张真的网页，
+          向它问「你在京东做了什么」，这句话会被切成 token
+          飞出屏幕，一路走到放着答案的那一层，点亮它，再把检索到的条目带回来。
         </p>
         <p className={styles.note}>
-          三段式镜头、真实的载入进度、WebGL 与 DOM 同处一个三维空间。建议在电脑上打开，触屏设备会看到一张静帧。
+          检索是确定性的关键词匹配，不接模型也不发请求，内容与本页同出一源。建议在电脑上打开，触屏设备会看到一张静帧。
         </p>
         <Link className={styles.enter} href="/lab/latent">
           进入实验 · Enter the prototype
