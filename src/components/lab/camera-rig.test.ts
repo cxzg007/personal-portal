@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   PANEL_SIZE,
+  STAGE_KEYFRAMES,
+  STAGE_ORDER,
   easeInOutQuint,
   lerpVec3,
   stageOnAdvance,
@@ -91,5 +93,28 @@ describe("lerpVec3", () => {
     const from = { x: 0, y: 10, z: -4 };
     const to = { x: 4, y: 0, z: 4 };
     expect(lerpVec3(from, to, 0.5)).toEqual({ x: 2, y: 5, z: 0 });
+  });
+});
+
+describe("前向传播机位", () => {
+  it("不出现在 HUD 可跳的机位里：它是一次过程，手动跳进去镜头会和 token 对不上", () => {
+    expect(STAGE_ORDER).not.toContain("forward");
+  });
+
+  it("传播途中点击、回车、悬停都不改变机位", () => {
+    expect(stageOnClick("forward")).toBe("forward");
+    expect(stageOnAdvance("forward")).toBe("forward");
+    expect(stageOnPanelHover("forward", true)).toBe("forward");
+    expect(stageOnPanelHover("forward", false)).toBe("forward");
+  });
+
+  it("Esc 留出口，退回中景", () => {
+    expect(stageOnEscape("forward")).toBe("approach");
+  });
+
+  it("侧上方机位看得见 Z 轴进深：相机不在面板法线上", () => {
+    const { position, target } = STAGE_KEYFRAMES.forward;
+    expect(Math.abs(position.x)).toBeGreaterThan(40);
+    expect(target.z).toBeLessThan(0);
   });
 });

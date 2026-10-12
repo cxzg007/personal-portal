@@ -55,3 +55,45 @@ describe("stageOnBridgeMessage", () => {
     expect(stageOnBridgeMessage("approach", { type: "ready" })).toBe("approach");
   });
 });
+
+describe("提交与前向传播", () => {
+  it("提交带上 token 数量，往返都能解析", () => {
+    expect(parseBridgeMessage(encodeBridgeMessage({ type: "submit", tokens: 9 }))).toEqual({
+      type: "submit",
+      tokens: 9,
+    });
+    expect(
+      parseBridgeMessage(encodeBridgeMessage({ type: "flight", phase: "returned" })),
+    ).toEqual({ type: "flight", phase: "returned" });
+  });
+
+  it("数量不合法就丢掉：它会被直接拿去开缓冲区", () => {
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit" })).toBeNull();
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit", tokens: 0 })).toBeNull();
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit", tokens: -4 })).toBeNull();
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit", tokens: 3.7 })).toBeNull();
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "submit", tokens: "9" })).toBeNull();
+  });
+
+  it("认不出的相位不放行", () => {
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "flight", phase: "boom" })).toBeNull();
+    expect(parseBridgeMessage({ source: BRIDGE_SOURCE, type: "flight" })).toBeNull();
+  });
+
+  it("只有贴在终端上提交才把镜头推开", () => {
+    const submit = { type: "submit", tokens: 6 } as const;
+    expect(stageOnBridgeMessage("terminal", submit)).toBe("forward");
+    // 传播途中又提交一次，镜头不该重新起跳；是否受理由场景那边决定。
+    expect(stageOnBridgeMessage("forward", submit)).toBe("forward");
+    expect(stageOnBridgeMessage("idle", submit)).toBe("idle");
+  });
+
+  it("传播途中指针扫过面板不会把镜头拽回终端", () => {
+    expect(stageOnBridgeMessage("forward", { type: "pointerenter" })).toBe("forward");
+    expect(stageOnBridgeMessage("forward", { type: "pointerleave" })).toBe("forward");
+  });
+
+  it("传播途中按 Esc 可以退回中景", () => {
+    expect(stageOnBridgeMessage("forward", { type: "key", key: "Escape" })).toBe("approach");
+  });
+});

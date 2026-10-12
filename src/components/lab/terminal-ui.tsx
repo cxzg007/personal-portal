@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { BRIDGE_SOURCE, FORWARDED_KEYS, encodeBridgeMessage } from "./terminal-bridge";
+import {
+  BRIDGE_SOURCE,
+  FORWARDED_KEYS,
+  encodeBridgeMessage,
+  parseBridgeMessage,
+} from "./terminal-bridge";
+import { tokenCount } from "./token-flight";
 import styles from "./terminal-ui.module.css";
 
 /**
@@ -38,6 +44,23 @@ const ANSWER = [
 /** 正在生成的那串 token，用来表现采样是一个一个往外吐的。 */
 const STREAM = ["沿着", "注意力", "路径", "逐层", "展开"];
 
+/**
+ * 一次提问的回答。
+ *
+ * 内容写的就是外面刚刚发生的事：这几个 token 确实从这块屏幕出发，穿过了那几层，
+ * 又回到了这里。模型是假的，但这趟路程是真跑了一遍的，所以这段话不算谎话。
+ */
+function replyFor(tokens: number): string[] {
+  return [
+    `这句话被切成 ${tokens} 个 token，刚才从这块屏幕送了出去。`,
+    "它们逐层穿过权重，在最深的一层掉头，再沿另一条路回来。",
+    "你看到的那趟路程，就是这次回答的全部来历。",
+  ];
+}
+
+/** 一问一答。reply 为 null 表示 token 还在外面跑。 */
+type Exchange = { id: number; question: string; tokens: number; reply: string[] | null };
+
 const ROWS = 12;
 const COLS = 24;
 
@@ -66,13 +89,15 @@ export default function TerminalUI() {
   const [tab, setTab] = useState<TabKey>("chat");
   const [hovered, setHovered] = useState<{ row: number; col: number } | null>(null);
   const [draft, setDraft] = useState("");
-  const [sent, setSent] = useState<string[]>([]);
+  const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const postRef = useRef<(message: Parameters<typeof encodeBridgeMessage>[0]) => void>(() => {});
+  const embeddedRef = useRef(false);
 
   useEffect(() => {
     // 顶层打开这个路由时没有父窗口可通知，直接退化成一个普通页面。
     const parentWindow = window.parent;
     const embedded = parentWindow !== window;
+    embeddedRef.current = embedded;
 
     const post = (message: Parameters<typeof encodeBridgeMessage>[0]) => {
       if (!embedded) return;
@@ -91,14 +116,33 @@ export default function TerminalUI() {
       if (FORWARDED_KEYS.includes(event.key)) post({ type: "key", key: event.key });
     };
 
+    /**
+     * 外层回报 token 已经带着结果回到屏幕，这时才开始吐字。
+     *
+     * 回答不是提交的瞬间出现的——它要等那趟路程跑完。这条等待是这个交互的
+     * 全部意义：答案看起来是被带回来的，而不是本来就在那儿。
+     */
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      const message = parseBridgeMessage(event.data);
+      if (message?.type !== "flight" || message.phase !== "returned") return;
+      setExchanges((previous) =>
+        previous.map((item) =>
+          item.reply ? item : { ...item, reply: replyFor(item.tokens) },
+        ),
+      );
+    };
+
     document.addEventListener("pointerenter", onEnter);
     document.addEventListener("pointerleave", onLeave);
     document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("message", onMessage);
 
     return () => {
       document.removeEventListener("pointerenter", onEnter);
       document.removeEventListener("pointerleave", onLeave);
       document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("message", onMessage);
     };
   }, []);
 
@@ -161,10 +205,33 @@ export default function TerminalUI() {
                   </p>
                 </div>
               </div>
-              {sent.map((line) => (
-                <div className={styles.turn} key={line}>
-                  <span className={styles.speaker}>user</span>
-                  <span>{line}</span>
+              {exchanges.map((item) => (
+                <div key={item.id}>
+                  <div className={styles.turn}>
+                    <span className={styles.speaker}>user</span>
+                    <span>{item.question}</span>
+                  </div>
+                  <div className={styles.turn}>
+                    <span className={styles.speaker}>model</span>
+                    {item.reply ? (
+                      <div className={styles.answer}>
+                        {item.reply.map((line, index) => (
+                          <p
+                            className={styles.replyLine}
+                            key={line}
+                            style={{ animationDelay: `${index * 260}ms` }}
+                          >
+                            {line}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className={styles.waiting}>
+                        前向计算中 · {item.tokens} tokens in flight
+                        <span aria-hidden="true" className={styles.caret} />
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
               <p className={styles.status}>
@@ -242,9 +309,17 @@ export default function TerminalUI() {
           event.preventDefault();
           const line = draft.trim();
           if (!line) return;
+          const tokens = tokenCount(line);
           setTab("chat");
-          setSent((previous) => [...previous, line]);
+          // 单独打开这个路由时外面没有场景跑这趟，答案直接给出来，
+          // 不然页面会永远停在"前向计算中"。
+          const standalone = !embeddedRef.current;
+          setExchanges((previous) => [
+            ...previous,
+            { id: previous.length, question: line, tokens, reply: standalone ? replyFor(tokens) : null },
+          ]);
           setDraft("");
+          if (!standalone) postRef.current({ type: "submit", tokens });
         }}
       >
         <span aria-hidden="true" className={styles.promptMark}>

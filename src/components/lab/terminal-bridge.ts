@@ -9,11 +9,20 @@
  * 外层要的本来就是状态而不是像素，少一层坐标换算就少一处会错位的地方。
  * 协议走 postMessage 而不是同源直接读 contentDocument，这样内层页将来换到
  * 别的域名单独部署也不用改外层。
+ *
+ * 第四阶段起这条通道是双向的：内层把提交上报给外层，外层把前向传播的相位回报
+ * 给内层。两个方向共用同一套消息格式和同一个解析函数——方向不同但面临的问题
+ * 一样（window 上什么消息都有），没必要维护两份校验。
  */
 
 import { type StageKey, stageOnEscape, stageOnPanelHover } from "./camera-rig";
 
 export const BRIDGE_SOURCE = "latent-terminal";
+
+/** 外层发回内层的两个节点：出发、带着结果回到屏幕。 */
+export type FlightSignal = "launched" | "returned";
+
+const FLIGHT_SIGNALS: readonly string[] = ["launched", "returned"];
 
 export type BridgeMessage =
   /** 内层页挂载完成。 */
@@ -23,7 +32,11 @@ export type BridgeMessage =
   /** 指针离开屏幕区域。 */
   | { type: "pointerleave" }
   /** 内层按键，只转发对镜头有意义的那几个。 */
-  | { type: "key"; key: string };
+  | { type: "key"; key: string }
+  /** 内层提交了一句话，外层据此派出相应数量的 token。 */
+  | { type: "submit"; tokens: number }
+  /** 外层回报前向传播走到了哪一步，内层据此决定什么时候开始吐字。 */
+  | { type: "flight"; phase: FlightSignal };
 
 /** 外层只认这几个按键，其余的留给内层页自己处理。 */
 export const FORWARDED_KEYS: readonly string[] = ["Escape"];
@@ -50,6 +63,16 @@ export function parseBridgeMessage(data: unknown): BridgeMessage | null {
       return { type: payload.type };
     case "key":
       return typeof payload.key === "string" ? { type: "key", key: payload.key } : null;
+    case "submit": {
+      const tokens = payload.tokens;
+      // 数量会直接拿去开缓冲区，非整数或负数必须在进场前就挡掉。
+      if (typeof tokens !== "number" || !Number.isInteger(tokens) || tokens <= 0) return null;
+      return { type: "submit", tokens };
+    }
+    case "flight":
+      return typeof payload.phase === "string" && FLIGHT_SIGNALS.includes(payload.phase)
+        ? { type: "flight", phase: payload.phase as FlightSignal }
+        : null;
     default:
       return null;
   }
@@ -70,6 +93,10 @@ export function stageOnBridgeMessage(current: StageKey, message: BridgeMessage):
     case "key":
       // 终端里敲回车是在跟终端说话，不该把镜头推走，所以只认退出键。
       return message.key === "Escape" ? stageOnEscape(current) : current;
+    case "submit":
+      // 提交时镜头退开，让人看见这句话要穿过去的是什么。前向传播进行中再提交
+      // 不改变机位，由场景那边决定要不要受理。
+      return current === "terminal" ? "forward" : current;
     default:
       return current;
   }

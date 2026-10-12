@@ -22,7 +22,22 @@ import {
 import { type BootState, advanceBoot, createBootState } from "./boot-sequence";
 import { BootOverlay } from "./boot-overlay";
 import { GrainOverlay } from "./grain-overlay";
-import { parseBridgeMessage, stageOnBridgeMessage } from "./terminal-bridge";
+import {
+  type BridgeMessage,
+  encodeBridgeMessage,
+  parseBridgeMessage,
+  stageOnBridgeMessage,
+} from "./terminal-bridge";
+import {
+  FLIGHT,
+  FLIGHT_DURATION,
+  type FlightPath,
+  flightPhase,
+  planFlight,
+  samplePath,
+  tokenProgress,
+  travelProgress,
+} from "./token-flight";
 import styles from "./latent-scene.module.css";
 
 const FOV = 35;
@@ -54,8 +69,23 @@ const LAYERS = [
  */
 const SHARD_INTERVAL = 300;
 
+/** 层上节点建好后的亮度。压暗时按比例缩，所以它要有个名字。 */
+const LAYER_OPACITY = 0.9;
+
 const PULSE_COUNT = 280;
 const DUST_COUNT = 900;
+
+const EDGE_OPACITY = 0.22;
+const PULSE_OPACITY = 0.95;
+
+/**
+ * 前向传播时整叠结构压暗多少。
+ *
+ * 不压暗的话那趟 token 会直接消失在七层连线织成的网里——试过，什么也看不见。
+ * 一次提问进来，模型其余部分安静下来，只剩这句话在走，这既解决了对比度，
+ * 也正好是这个交互想说的事。
+ */
+const FLIGHT_DIM = 0.78;
 
 type Edge = { from: THREE.Vector3; to: THREE.Vector3 };
 
@@ -80,7 +110,13 @@ function createLayerBuilder(random: () => number) {
   const group = new THREE.Group();
   const nodesByLayer: THREE.Vector3[][] = [];
   const disposables: Array<{ dispose: () => void }> = [];
-  const materials: THREE.PointsMaterial[] = [];
+  /**
+   * 淡入进度和实际透明度要分开记。
+   *
+   * 前向传播时整叠结构会被压暗，如果直接去改 material.opacity，淡入那段逻辑
+   * 会以为这一层还没淡完，每帧再给推回去，两边来回拉扯。
+   */
+  const entries: Array<{ material: THREE.PointsMaterial; level: number }> = [];
   let built = 0;
 
   const buildNext = () => {
@@ -125,24 +161,26 @@ function createLayerBuilder(random: () => number) {
     });
     group.add(new THREE.Points(geometry, material));
     disposables.push(geometry, material);
-    materials.push(material);
+    entries.push({ material, level: 0 });
     nodesByLayer.push(nodes);
     return true;
   };
 
-  /** 新建的层淡入到满。全部到位后返回 true，之后就不用再管了。 */
-  const fade = (delta: number) => {
-    let settled = true;
-    for (const material of materials) {
-      if (material.opacity >= 0.9) continue;
-      material.opacity = Math.min(0.9, material.opacity + delta * 3.4);
-      settled = false;
+  /** 新建的层淡入到满，再按 dim 统一压暗。dim 为 0 时就是原来的亮度。 */
+  const fade = (delta: number, dim = 0) => {
+    for (const entry of entries) {
+      if (entry.level < LAYER_OPACITY) {
+        entry.level = Math.min(LAYER_OPACITY, entry.level + delta * 3.4);
+      }
+      entry.material.opacity = entry.level * (1 - dim);
     }
-    return settled;
   };
 
   const reveal = () => {
-    for (const material of materials) material.opacity = 0.9;
+    for (const entry of entries) {
+      entry.level = LAYER_OPACITY;
+      entry.material.opacity = LAYER_OPACITY;
+    }
   };
 
   return {
@@ -190,7 +228,7 @@ function buildEdges(nodesByLayer: THREE.Vector3[][], random: () => number) {
   const material = new THREE.LineBasicMaterial({
     vertexColors: true,
     transparent: true,
-    opacity: 0.22,
+    opacity: EDGE_OPACITY,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
   });
@@ -226,7 +264,7 @@ function buildPulses(edges: Edge[], random: () => number) {
     sizeAttenuation: true,
     vertexColors: true,
     transparent: true,
-    opacity: 0.95,
+    opacity: PULSE_OPACITY,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
   });
@@ -318,6 +356,97 @@ function createScreen() {
     dimmer,
     dimmerMaterial,
     disposables: [occluder.geometry, occluderMaterial, dimmer.geometry, dimmerMaterial],
+  };
+}
+
+/**
+ * token 用的圆形贴图。
+ *
+ * PointsMaterial 不给贴图就是方块，叠加混合下一堆小方块看着像渲染坏了。
+ * 64×64 的径向渐变足够——它在屏幕上最多也就几十像素。
+ */
+function createTokenSprite() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 64;
+  canvas.height = 64;
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+  const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+  gradient.addColorStop(0.35, "rgba(255, 255, 255, 0.55)");
+  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 64, 64);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+/**
+ * 一次前向传播要画的两样东西：在跑的 token，和它们走过的那条路。
+ *
+ * 路是一次性全画出来的静态线段，靠整体透明度随进度起落；没有逐段点亮，因为
+ * 那需要每帧改顶点色，而这条线本来就只亮两秒，多出来的开销换不到看得见的差别。
+ */
+function buildFlight(paths: readonly FlightPath[], sprite: THREE.Texture | null) {
+  const count = paths.length;
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  const color = new THREE.Color();
+
+  for (let index = 0; index < count; index += 1) {
+    // 每个 token 一个略不同的色相，一股光里才分得出个体。
+    color.setHSL(0.44 + (index / Math.max(1, count)) * 0.14, 0.9, 0.72);
+    colors[index * 3] = color.r;
+    colors[index * 3 + 1] = color.g;
+    colors[index * 3 + 2] = color.b;
+    const start = paths[index][0];
+    positions[index * 3] = start.x;
+    positions[index * 3 + 1] = start.y;
+    positions[index * 3 + 2] = start.z;
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  const material = new THREE.PointsMaterial({
+    // 比层上的节点（0.62）和环境流光（0.85）大一个量级：这两秒里它们是主角，
+    // 在百来单位的距离上还要看得见。
+    size: 4.5,
+    sizeAttenuation: true,
+    vertexColors: true,
+    map: sprite ?? undefined,
+    transparent: true,
+    opacity: 1,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+
+  const linePositions: number[] = [];
+  for (const path of paths) {
+    for (let index = 0; index < path.length - 1; index += 1) {
+      linePositions.push(path[index].x, path[index].y, path[index].z);
+      linePositions.push(path[index + 1].x, path[index + 1].y, path[index + 1].z);
+    }
+  }
+  const lineGeometry = new THREE.BufferGeometry();
+  lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+  const lineMaterial = new THREE.LineBasicMaterial({
+    color: 0x6ee7d4,
+    transparent: true,
+    opacity: 0,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+
+  return {
+    points: new THREE.Points(geometry, material),
+    lines: new THREE.LineSegments(lineGeometry, lineMaterial),
+    positions,
+    geometry,
+    material,
+    lineMaterial,
+    disposables: [geometry, material, lineGeometry, lineMaterial],
   };
 }
 
@@ -460,6 +589,51 @@ export default function LatentScene() {
     disposables.push(glow.geometry, glowMaterial);
     if (glowTexture) disposables.push(glowTexture);
 
+    // 一次前向传播
+    const tokenSprite = createTokenSprite();
+    if (tokenSprite) disposables.push(tokenSprite);
+
+    let flight: ReturnType<typeof buildFlight> | null = null;
+    let flightPaths: readonly FlightPath[] = [];
+    let flightStart = 0;
+    let flightReturned = false;
+    let flightDim = 0;
+
+    const postToScreen = (message: BridgeMessage) => {
+      screen.iframe.contentWindow?.postMessage(
+        encodeBridgeMessage(message),
+        window.location.origin,
+      );
+    };
+
+    const clearFlight = () => {
+      if (!flight) return;
+      scene.remove(flight.points, flight.lines);
+      for (const item of flight.disposables) item.dispose();
+      flight = null;
+    };
+
+    /** 发射成功才返回 true；没发射出去的话镜头也不该动。 */
+    const launchFlight = (tokens: number) => {
+      // 减弱动效时不派 token，也不动镜头，但答案照给——这个交互的信息
+      // 不能只存在于动画里。
+      if (reduceMotion.matches) {
+        postToScreen({ type: "flight", phase: "returned" });
+        return false;
+      }
+      // 结构还没建完就没有路可走；上一趟还没跑完也不受理，两股 token
+      // 叠在一起谁也看不清。
+      if (!layers.done || flight) return false;
+
+      const deep = layers.nodesByLayer.filter((_, index) => (LAYERS[index]?.z ?? 0) < 0);
+      flightPaths = planFlight(deep, random, tokens);
+      flight = buildFlight(flightPaths, tokenSprite);
+      scene.add(flight.points, flight.lines);
+      flightStart = performance.now();
+      flightReturned = false;
+      return true;
+    };
+
     // 相机调度
     const pointer = new THREE.Vector2(0, 0);
     const smoothedPointer = new THREE.Vector2(0, 0);
@@ -500,6 +674,20 @@ export default function LatentScene() {
             x: base.position.x + Math.sin(elapsed * 0.00008) * 7 * drift,
             y: base.position.y + Math.sin(elapsed * 0.00013) * 3 * drift,
             z: base.position.z + Math.cos(elapsed * 0.00007) * 5 * drift,
+          },
+          target: base.target,
+        };
+      }
+
+      if (key === "forward") {
+        // 传播途中镜头缓慢横移，画面不至于死住。这里不接指针视差——这两秒
+        // 归这趟传播，镜头跟着鼠标晃会把注意力从 token 身上拉走。
+        const drift = still ? 0 : 1;
+        return {
+          position: {
+            x: base.position.x + Math.sin(elapsed * 0.00022) * 5 * drift,
+            y: base.position.y + Math.cos(elapsed * 0.00017) * 2.4 * drift,
+            z: base.position.z,
           },
           target: base.target,
         };
@@ -597,6 +785,11 @@ export default function LatentScene() {
       if (event.origin !== window.location.origin) return;
       const message = parseBridgeMessage(event.data);
       if (!message) return;
+      if (message.type === "submit") {
+        // 只有贴在终端上提交才算数，而且要先确认 token 真的派出去了，
+        // 否则镜头退开后画面里什么也不会发生。
+        if (currentStage !== "terminal" || !launchFlight(message.tokens)) return;
+      }
       requestStage(stageOnBridgeMessage(currentStage, message));
     };
 
@@ -637,7 +830,12 @@ export default function LatentScene() {
       } else if (layers.done) {
         finishStructure();
       }
-      layers.fade(delta);
+      // 有 token 在跑就把其余部分压下去，跑完再缓缓亮回来。
+      const dimTarget = flight ? FLIGHT_DIM : 0;
+      flightDim += (dimTarget - flightDim) * Math.min(1, delta * 4.5);
+      layers.fade(delta, flightDim);
+      if (edges) edges.lines.material.opacity = EDGE_OPACITY * (1 - flightDim);
+      if (pulses) pulses.points.material.opacity = PULSE_OPACITY * (1 - flightDim);
 
       const resolved = resolveKeyframe(currentStage, now);
       let position = resolved.position;
@@ -686,6 +884,45 @@ export default function LatentScene() {
         glowMaterial.opacity = 0.72 + Math.sin(now * 0.0011) * 0.14;
       }
 
+      if (flight) {
+        const elapsed = now - flightStart;
+        const phase = flightPhase(elapsed);
+        const count = flightPaths.length;
+        const array = flight.positions;
+
+        for (let index = 0; index < count; index += 1) {
+          const raw = tokenProgress(elapsed, index, count);
+          // 平滑曲线让 token 冲出屏幕、在最深处放慢、再加速回来。匀速走
+          // 看着像传送带，而这趟路程中间本来就该是最吃力的一段。
+          const eased = raw * raw * (3 - 2 * raw);
+          const point = samplePath(flightPaths[index], eased);
+          array[index * 3] = point.x;
+          array[index * 3 + 1] = point.y;
+          array[index * 3 + 2] = point.z;
+        }
+        flight.geometry.attributes.position.needsUpdate = true;
+
+        // 路先亮起来给 token 引路，回程后半段退掉，免得终点一片糊光。
+        const overall = travelProgress(elapsed);
+        const rise = Math.min(1, overall / 0.3);
+        const drop = 1 - Math.min(1, Math.max(0, (overall - 0.72) / 0.28));
+        flight.lineMaterial.opacity = 0.9 * rise * drop;
+        flight.material.opacity =
+          phase === "settle" ? Math.max(0, 1 - (elapsed - FLIGHT.travel) / FLIGHT.settle) : 1;
+
+        if (!flightReturned && elapsed >= FLIGHT.travel) {
+          flightReturned = true;
+          // token 落回屏幕的这一刻终端才开始吐字，答案因此是被带回来的。
+          postToScreen({ type: "flight", phase: "returned" });
+        }
+
+        if (elapsed >= FLIGHT_DURATION) {
+          clearFlight();
+          // 中途按 Esc 走掉的人不该被拽回终端，所以只在镜头还留在传播机位时推回去。
+          if (currentStage === "forward") requestStage("terminal");
+        }
+      }
+
       // 屏幕法线朝 +Z，相机越偏离正面，可视角越差，画面压得越暗。
       const facing = Math.abs(camera.position.clone().sub(screen.occluder.position).normalize().z);
       screen.dimmerMaterial.opacity = (1 - facing) * 0.82;
@@ -709,6 +946,7 @@ export default function LatentScene() {
 
     return () => {
       cancelAnimationFrame(frameId);
+      clearFlight();
       document.removeEventListener("visibilitychange", onVisibility);
       resizeObserver.disconnect();
       window.removeEventListener("pointermove", onPointerMove);

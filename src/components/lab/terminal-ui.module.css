@@ -393,3 +393,28 @@
     opacity: 1;
   }
 }
+
+/* 回答逐行落下，和上面那排 token 用同一条 emit 曲线，节奏上是一回事。 */
+.replyLine {
+  margin: 0;
+  opacity: 0;
+  animation: emit 420ms ease forwards;
+}
+
+/* token 还在外面跑的时候占住这一行。 */
+.waiting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #44606e;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .replyLine {
+    opacity: 1;
+    animation: none;
+  }
+}

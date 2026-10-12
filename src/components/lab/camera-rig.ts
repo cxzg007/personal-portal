@@ -6,7 +6,7 @@
  * 这里把机位和状态迁移抽成纯函数，便于单独测试。
  */
 
-export type StageKey = "boot" | "idle" | "approach" | "terminal";
+export type StageKey = "boot" | "idle" | "approach" | "terminal" | "forward";
 
 export type Vec3 = { x: number; y: number; z: number };
 
@@ -44,9 +44,20 @@ export const STAGE_KEYFRAMES: Record<StageKey, Keyframe> = {
     position: { x: 0, y: 0, z: 18 },
     target: { x: 0, y: 0, z: 0 },
   },
+  // 前向传播：从侧上方看整叠层，Z 轴的进深在画面里横着铺开，token 往深处走
+  // 这件事才看得出来。正面机位下这段路程全被压在一个点上，什么也看不到。
+  forward: {
+    position: { x: 72, y: 24, z: 40 },
+    target: { x: -4, y: 0, z: -26 },
+  },
 };
 
-/** HUD 上可以直接跳的机位。boot 不在其中：它只能由接入动作离开，不能跳回去。 */
+/**
+ * HUD 上可以直接跳的机位。
+ *
+ * boot 不在其中：它只能由接入动作离开，不能跳回去。forward 也不在：它是一次
+ * 提交的过程，由前向传播自己走完，手动跳进去会让镜头和 token 对不上。
+ */
 export const STAGE_ORDER: StageKey[] = ["idle", "approach", "terminal"];
 
 /**
@@ -88,6 +99,8 @@ export function lerpVec3(from: Vec3, to: Vec3, t: number): Vec3 {
 export function stageOnClick(current: StageKey): StageKey {
   // 还没接入时，点击由引导层自己处理，镜头不动。
   if (current === "boot") return "boot";
+  // 前向传播进行中，镜头归这趟传播所有。
+  if (current === "forward") return "forward";
   if (current === "idle") return "approach";
   if (current === "approach") return "idle";
   return current;
@@ -100,6 +113,8 @@ export function stageOnClick(current: StageKey): StageKey {
  */
 export function stageOnPanelHover(current: StageKey, onPanel: boolean): StageKey {
   if (current === "boot") return "boot";
+  // 传播途中指针扫过面板不该把镜头拽回终端，否则这趟就看不完了。
+  if (current === "forward") return "forward";
   if (onPanel && current === "approach") return "terminal";
   if (!onPanel && current === "terminal") return "approach";
   return current;
@@ -107,6 +122,8 @@ export function stageOnPanelHover(current: StageKey, onPanel: boolean): StageKey
 
 /** 退出键：逐级后退。 */
 export function stageOnEscape(current: StageKey): StageKey {
+  // 留一个出口：传播看腻了可以随时退回中景。
+  if (current === "forward") return "approach";
   if (current === "terminal") return "approach";
   if (current === "approach") return "idle";
   // 远景已经是最外层，不退回未接入状态——接入是一次性的。
@@ -116,6 +133,7 @@ export function stageOnEscape(current: StageKey): StageKey {
 /** 回车或空格：逐级前进，让键盘用户走和鼠标一样的路径。 */
 export function stageOnAdvance(current: StageKey): StageKey {
   if (current === "boot") return "boot";
+  if (current === "forward") return "forward";
   if (current === "idle") return "approach";
   if (current === "approach") return "terminal";
   return current;
@@ -126,4 +144,5 @@ export const STAGE_COPY: Record<StageKey, { label: string; hint: string }> = {
   idle: { label: "远景 / Overview", hint: "点击进入结构 · Click to enter" },
   approach: { label: "中景 / Approach", hint: "移到终端上放大 · Hover the terminal" },
   terminal: { label: "终端 / Terminal", hint: "按 Esc 退出 · Press Esc to exit" },
+  forward: { label: "前向 / Forward", hint: "这句话正在穿过模型 · Running a forward pass" },
 };
