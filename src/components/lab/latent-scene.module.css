@@ -133,20 +133,6 @@
   color: rgba(207, 227, 234, 0.78);
 }
 
-.fallback {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  height: 100dvh;
-  background: #05070a;
-  color: rgba(207, 227, 234, 0.75);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  text-align: center;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stageButton {
     transition: none;

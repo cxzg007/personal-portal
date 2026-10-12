@@ -92,9 +92,20 @@
 }
 
 .main {
+  display: flex;
+  flex-direction: column;
   padding: 26px 32px;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+}
+
+/*
+ * 1440×900 的屏幕里对话只占上面三分之一，底下一大片空白，看着像没做完。
+ * 聊天记录改成贴着输入框向上堆（margin-top: auto），这也是聊天界面的常规读法：
+ * 最新一句离输入框最近。超出高度时 .main 正常滚动，旧消息仍然翻得回去。
+ */
+.chat {
+  margin-top: auto;
 }
 
 .boot {

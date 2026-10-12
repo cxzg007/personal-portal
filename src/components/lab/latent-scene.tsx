@@ -467,23 +467,11 @@ function createGlowTexture() {
   return texture;
 }
 
-function hasWebGL() {
-  try {
-    const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") ?? canvas.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
-
 export default function LatentScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cssContainerRef = useRef<HTMLDivElement>(null);
   const [stage, setStage] = useState<StageKey>("boot");
   const [boot, setBoot] = useState<BootState>(createBootState);
-  // 这个组件只在客户端挂载（ssr: false），所以可以在初始化时就探测 WebGL，
-  // 不必在 effect 里再 setState 触发一次额外渲染。
-  const [unsupported] = useState(() => !hasWebGL());
   const stageRef = useRef<StageKey>("boot");
   const requestStageRef = useRef<(next: StageKey) => void>(() => {});
 
@@ -491,7 +479,6 @@ export default function LatentScene() {
     const container = containerRef.current;
     const cssContainer = cssContainerRef.current;
     if (!container || !cssContainer) return;
-    if (unsupported) return;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const random = createRandom(20261012);
@@ -960,16 +947,7 @@ export default function LatentScene() {
       screen.object.element.remove();
       cssRenderer.domElement.remove();
     };
-  }, [unsupported]);
-
-  if (unsupported) {
-    return (
-      <div className={styles.fallback}>
-        <p>当前浏览器没有可用的 WebGL，无法渲染这个三维原型。</p>
-        <p lang="en">WebGL is unavailable in this browser.</p>
-      </div>
-    );
-  }
+  }, []);
 
   // 载入屏和终端面板各自都带着说明文字，HUD 这两行要让位，免得同屏出现两套提示。
   const dimHud = stage === "boot" || stage === "terminal";

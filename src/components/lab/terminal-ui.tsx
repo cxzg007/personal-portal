@@ -92,6 +92,15 @@ export default function TerminalUI() {
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const postRef = useRef<(message: Parameters<typeof encodeBridgeMessage>[0]) => void>(() => {});
   const embeddedRef = useRef(false);
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    // 对话贴着输入框往上长，新回答出现后要把视线拉回底部，否则它会落在可视区外。
+    const main = mainRef.current;
+    if (main && tab === "chat") {
+      main.scrollTop = main.scrollHeight;
+    }
+  }, [exchanges, tab]);
 
   useEffect(() => {
     // 顶层打开这个路由时没有父窗口可通知，直接退化成一个普通页面。
@@ -170,9 +179,9 @@ export default function TerminalUI() {
           ))}
         </nav>
 
-        <main className={styles.main}>
+        <main className={styles.main} ref={mainRef}>
           {tab === "chat" ? (
-            <>
+            <div className={styles.chat}>
               <div className={styles.boot}>
                 {BOOT.map(([left, right]) => (
                   <div className={styles.bootRow} key={left}>
@@ -237,7 +246,7 @@ export default function TerminalUI() {
               <p className={styles.status}>
                 sampling · top-p 0.92 · temp 0.7 · 已生成 {ANSWER.length * 24 + STREAM.length} tokens
               </p>
-            </>
+            </div>
           ) : null}
 
           {tab === "attn" ? (
