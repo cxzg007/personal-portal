@@ -250,7 +250,7 @@ export default function TerminalUI() {
           ) : null}
 
           {tab === "attn" ? (
-            <>
+            <div className={styles.panel}>
               <p className={styles.caption}>一次前向里各层各头的激活强度 · activation per layer × head</p>
               <div className={styles.grid}>
                 {Array.from({ length: ROWS * COLS }, (_, index) => {
@@ -275,11 +275,11 @@ export default function TerminalUI() {
                   ? `layer ${hovered.row + 1} · head ${hovered.col + 1} · w=${attentionWeight(hovered.row, hovered.col).toFixed(3)}`
                   : "悬停任意格子读取权重 · hover a cell"}
               </p>
-            </>
+            </div>
           ) : null}
 
           {tab === "logits" ? (
-            <>
+            <div className={styles.panel}>
               <p className={styles.caption}>下一个 token 的候选分布 · next-token distribution</p>
               <div className={styles.bars}>
                 {LOGITS.map((item) => (
@@ -292,11 +292,11 @@ export default function TerminalUI() {
                   </div>
                 ))}
               </div>
-            </>
+            </div>
           ) : null}
 
           {tab === "trace" ? (
-            <>
+            <div className={styles.panel}>
               <p className={styles.caption}>单次前向的耗时分解 · forward pass breakdown</p>
               <div className={styles.trace}>
                 {TRACE.map((item) => (
@@ -307,7 +307,7 @@ export default function TerminalUI() {
                   </div>
                 ))}
               </div>
-            </>
+            </div>
           ) : null}
         </main>
       </div>

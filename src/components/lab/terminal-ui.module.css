@@ -108,6 +108,15 @@
   margin-top: auto;
 }
 
+/*
+ * 另外三页内容都不长，顶对齐会在下半屏留一大片空白。上下都给 auto 外边距让它居中；
+ * 内容真的超高时 auto 会退成 0，.main 照常滚动。
+ */
+.panel {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 .boot {
   margin: 0 0 22px;
   display: grid;
