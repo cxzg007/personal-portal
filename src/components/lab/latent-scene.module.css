@@ -157,3 +157,17 @@
     transition: none;
   }
 }
+
+/* 暗角。纯 CSS 就够，没必要为了一圈渐变再开一个渲染通道。 */
+.vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(
+    118% 86% at 50% 48%,
+    rgba(5, 7, 10, 0) 42%,
+    rgba(5, 7, 10, 0.34) 78%,
+    rgba(5, 7, 10, 0.72) 100%
+  );
+}

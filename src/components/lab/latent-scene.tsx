@@ -19,6 +19,9 @@ import {
   stageOnPanelHover,
   terminalDistance,
 } from "./camera-rig";
+import { type BootState, advanceBoot, createBootState } from "./boot-sequence";
+import { BootOverlay } from "./boot-overlay";
+import { GrainOverlay } from "./grain-overlay";
 import { parseBridgeMessage, stageOnBridgeMessage } from "./terminal-bridge";
 import styles from "./latent-scene.module.css";
 
@@ -45,6 +48,12 @@ const LAYERS = [
   { z: -70, cols: 8, rows: 5, width: 48, height: 32, hue: 0.74, intensity: 0.4 },
 ];
 
+/**
+ * 两层之间间隔多久。七层加起来约两秒——再快就只剩一次闪烁，看不出结构是有厚度的；
+ * 再慢等待就开始让人不耐烦。
+ */
+const SHARD_INTERVAL = 300;
+
 const PULSE_COUNT = 280;
 const DUST_COUNT = 900;
 
@@ -59,12 +68,26 @@ function createRandom(seed: number) {
   };
 }
 
-function buildLayers(random: () => number) {
+/**
+ * 逐层建造，一次只建一层。
+ *
+ * 七层结构全部同步建完只要十几毫秒，做成进度条根本看不见。但把它摊到多帧上
+ * 是有道理的：主线程不被一口气占住，而且结构是一层层长出来的——加载过程本身
+ * 就成了可看的东西，不需要再编一个假的百分比。每层建好后淡入，节奏由
+ * SHARD_INTERVAL 控制，那是排程选择，进度条数的仍然是真建好的层数。
+ */
+function createLayerBuilder(random: () => number) {
   const group = new THREE.Group();
   const nodesByLayer: THREE.Vector3[][] = [];
   const disposables: Array<{ dispose: () => void }> = [];
+  const materials: THREE.PointsMaterial[] = [];
+  let built = 0;
 
-  for (const layer of LAYERS) {
+  const buildNext = () => {
+    const layer = LAYERS[built];
+    if (!layer) return false;
+    built += 1;
+
     const nodes: THREE.Vector3[] = [];
     const positions: number[] = [];
     const colors: number[] = [];
@@ -96,16 +119,46 @@ function buildLayers(random: () => number) {
       sizeAttenuation: true,
       vertexColors: true,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     });
     group.add(new THREE.Points(geometry, material));
     disposables.push(geometry, material);
+    materials.push(material);
     nodesByLayer.push(nodes);
-  }
+    return true;
+  };
 
-  return { group, nodesByLayer, disposables };
+  /** 新建的层淡入到满。全部到位后返回 true，之后就不用再管了。 */
+  const fade = (delta: number) => {
+    let settled = true;
+    for (const material of materials) {
+      if (material.opacity >= 0.9) continue;
+      material.opacity = Math.min(0.9, material.opacity + delta * 3.4);
+      settled = false;
+    }
+    return settled;
+  };
+
+  const reveal = () => {
+    for (const material of materials) material.opacity = 0.9;
+  };
+
+  return {
+    group,
+    nodesByLayer,
+    disposables,
+    buildNext,
+    fade,
+    reveal,
+    get built() {
+      return built;
+    },
+    get done() {
+      return built >= LAYERS.length;
+    },
+  };
 }
 
 function buildEdges(nodesByLayer: THREE.Vector3[][], random: () => number) {
@@ -297,11 +350,12 @@ function hasWebGL() {
 export default function LatentScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cssContainerRef = useRef<HTMLDivElement>(null);
-  const [stage, setStage] = useState<StageKey>("idle");
+  const [stage, setStage] = useState<StageKey>("boot");
+  const [boot, setBoot] = useState<BootState>(createBootState);
   // 这个组件只在客户端挂载（ssr: false），所以可以在初始化时就探测 WebGL，
   // 不必在 effect 里再 setState 触发一次额外渲染。
   const [unsupported] = useState(() => !hasWebGL());
-  const stageRef = useRef<StageKey>("idle");
+  const stageRef = useRef<StageKey>("boot");
   const requestStageRef = useRef<(next: StageKey) => void>(() => {});
 
   useEffect(() => {
@@ -336,15 +390,49 @@ export default function LatentScene() {
     cssContainer.appendChild(cssRenderer.domElement);
 
     const disposables: Array<{ dispose: () => void }> = [];
-    const layers = buildLayers(random);
-    const edges = buildEdges(layers.nodesByLayer, random);
-    const pulses = buildPulses(edges.edges, random);
+    /**
+     * 载入进度只认真实里程碑：字体就绪、每建好一层、屏幕里的网页加载完。
+     * advanceBoot 会吃掉重复上报，所以这里不用自己去重。
+     */
+    const reportStep = (key: Parameters<typeof advanceBoot>[1], units = 1) => {
+      setBoot((previous) => advanceBoot(previous, key, units));
+    };
+    const reportShards = (units = 1) => reportStep("weights", units);
+
+    // 结构分帧建造：每隔 SHARD_INTERVAL 长出一层，连线和光点要等所有层到齐。
+    const layers = createLayerBuilder(random);
+    scene.add(layers.group);
     const dust = buildDust(random);
-    scene.add(layers.group, edges.lines, pulses.points, dust.points);
-    disposables.push(...layers.disposables, ...edges.disposables, ...pulses.disposables, ...dust.disposables);
+    scene.add(dust.points);
+    disposables.push(...dust.disposables);
+
+    let edges: ReturnType<typeof buildEdges> | null = null;
+    let pulses: ReturnType<typeof buildPulses> | null = null;
+    let nextShardAt = 0;
+
+    const finishStructure = () => {
+      if (edges) return;
+      edges = buildEdges(layers.nodesByLayer, random);
+      pulses = buildPulses(edges.edges, random);
+      scene.add(edges.lines, pulses.points);
+      disposables.push(...layers.disposables, ...edges.disposables, ...pulses.disposables);
+    };
+
+    // 不想看动效的人直接拿到建好的场景，没有逐层生长这一段。
+    if (reduceMotion.matches) {
+      while (layers.buildNext());
+      layers.reveal();
+      finishStructure();
+      reportShards(LAYERS.length);
+    }
+
+    // 字体就绪算一个里程碑：等宽字体没加载完的话，终端里的版式会先错一拍。
+    document.fonts.ready.then(() => reportStep("tokenizer"));
 
     // 终端屏幕
     const screen = createScreen();
+    // 屏幕里那张网页加载完，才算真的可以接入。
+    screen.iframe.addEventListener("load", () => reportStep("cache"), { once: true });
     cssScene.add(screen.object);
     scene.add(screen.occluder, screen.dimmer);
     disposables.push(...screen.disposables);
@@ -378,7 +466,7 @@ export default function LatentScene() {
     const raycaster = new THREE.Raycaster();
     let pointerInside = false;
 
-    let currentStage: StageKey = "idle";
+    let currentStage: StageKey = "boot";
     let transitionFrom: { position: Vec3; target: Vec3 } | null = null;
     let transitionStart = 0;
     let transitionDuration = 1200;
@@ -392,6 +480,18 @@ export default function LatentScene() {
     const resolveKeyframe = (key: StageKey, elapsed: number): { position: Vec3; target: Vec3 } => {
       const base = STAGE_KEYFRAMES[key];
       const still = reduceMotion.matches;
+
+      if (key === "boot") {
+        const drift = still ? 0 : 1;
+        return {
+          position: {
+            x: base.position.x + Math.sin(elapsed * 0.00011) * 10 * drift,
+            y: base.position.y,
+            z: base.position.z,
+          },
+          target: base.target,
+        };
+      }
 
       if (key === "idle") {
         const drift = still ? 0 : 1;
@@ -440,7 +540,7 @@ export default function LatentScene() {
     };
     requestStageRef.current = requestStage;
 
-    const initial = resolveKeyframe("idle", 0);
+    const initial = resolveKeyframe("boot", 0);
     camera.position.set(initial.position.x, initial.position.y, initial.position.z);
     camera.lookAt(lookTarget);
 
@@ -529,6 +629,16 @@ export default function LatentScene() {
       smoothedPointer.x += (pointer.x - smoothedPointer.x) * 0.06;
       smoothedPointer.y += (pointer.y - smoothedPointer.y) * 0.06;
 
+      // 结构一层层长出来；最后一层到位后再接上连线和流动的光点。
+      if (!layers.done && now >= nextShardAt) {
+        layers.buildNext();
+        reportShards();
+        nextShardAt = now + SHARD_INTERVAL;
+      } else if (layers.done) {
+        finishStructure();
+      }
+      layers.fade(delta);
+
       const resolved = resolveKeyframe(currentStage, now);
       let position = resolved.position;
       let target = resolved.target;
@@ -548,25 +658,30 @@ export default function LatentScene() {
       lookTarget.set(target.x, target.y, target.z);
       camera.lookAt(lookTarget);
 
-      if (!reduceMotion.matches) {
+      // 先取到局部变量：连线和光点要等七层都建好才存在，在那之前是 null。
+      const wiring = edges;
+      const flow = pulses;
+      if (!reduceMotion.matches && wiring && flow) {
         // 光点沿连线流动，走完就换一条边重新开始。
-        const array = pulses.positions;
-        for (let index = 0; index < pulses.states.length; index += 1) {
-          const state = pulses.states[index];
+        const array = flow.positions;
+        for (let index = 0; index < flow.states.length; index += 1) {
+          const state = flow.states[index];
           state.progress += state.speed * delta;
           if (state.progress >= 1) {
             state.progress = 0;
-            state.edge = Math.floor(random() * edges.edges.length);
+            state.edge = Math.floor(random() * wiring.edges.length);
           }
-          const edge = edges.edges[state.edge];
+          const edge = wiring.edges[state.edge];
           if (!edge) continue;
           const t = state.progress;
           array[index * 3] = edge.from.x + (edge.to.x - edge.from.x) * t;
           array[index * 3 + 1] = edge.from.y + (edge.to.y - edge.from.y) * t;
           array[index * 3 + 2] = edge.from.z + (edge.to.z - edge.from.z) * t;
         }
-        pulses.geometry.attributes.position.needsUpdate = true;
+        flow.geometry.attributes.position.needsUpdate = true;
+      }
 
+      if (!reduceMotion.matches) {
         frameMaterial.opacity = 0.62 + Math.sin(now * 0.0016) * 0.18;
         glowMaterial.opacity = 0.72 + Math.sin(now * 0.0011) * 0.14;
       }
@@ -618,6 +733,9 @@ export default function LatentScene() {
     );
   }
 
+  // 载入屏和终端面板各自都带着说明文字，HUD 这两行要让位，免得同屏出现两套提示。
+  const dimHud = stage === "boot" || stage === "terminal";
+
   return (
     <div className={styles.root}>
       <div aria-hidden={stage !== "terminal"} className={styles.cssLayer} ref={cssContainerRef} />
@@ -629,27 +747,38 @@ export default function LatentScene() {
         tabIndex={0}
       />
       <div className={styles.hud}>
-        <div className={styles.brand} data-dim={stage === "terminal" ? "true" : undefined}>
+        <div className={styles.brand} data-dim={dimHud ? "true" : undefined}>
           <span className={styles.brandTitle}>LATENT TERMINAL</span>
           <span className={styles.brandSub}>潜空间原型 · 场景与三机位</span>
         </div>
-        <div className={styles.stages}>
-          {STAGE_ORDER.map((key) => (
-            <button
-              aria-current={stage === key ? "true" : undefined}
-              className={styles.stageButton}
-              key={key}
-              onClick={() => requestStageRef.current(key)}
-              type="button"
-            >
-              {STAGE_COPY[key].label}
-            </button>
-          ))}
-        </div>
-        <p className={styles.hint} data-dim={stage === "terminal" ? "true" : undefined}>
+        {/* 载入阶段不给机位按钮。它们直接调 requestStage，会绕过接入这一步。 */}
+        {stage === "boot" ? null : (
+          <div className={styles.stages}>
+            {STAGE_ORDER.map((key) => (
+              <button
+                aria-current={stage === key ? "true" : undefined}
+                className={styles.stageButton}
+                key={key}
+                onClick={() => requestStageRef.current(key)}
+                type="button"
+              >
+                {STAGE_COPY[key].label}
+              </button>
+            ))}
+          </div>
+        )}
+        <p className={styles.hint} data-dim={dimHud ? "true" : undefined}>
           <span className={styles.hintText}>{STAGE_COPY[stage].hint}</span>
         </p>
       </div>
+      <GrainOverlay />
+      {/* 四角压暗，视线被收到屏幕中央；也让画布边缘不再是一条死板的直边。 */}
+      <div aria-hidden="true" className={styles.vignette} />
+      <BootOverlay
+        active={stage === "boot"}
+        boot={boot}
+        onAttach={() => requestStageRef.current("idle")}
+      />
     </div>
   );
 }

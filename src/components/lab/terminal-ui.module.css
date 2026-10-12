@@ -347,3 +347,49 @@
   font-size: 13px;
   letter-spacing: 0.04em;
 }
+
+/* 这块屏幕是整个场景里唯一一处真界面，静止不动时它会立刻露出是张贴图。
+   下面两组动效都压得很轻——只在明度上，不动尺寸也不动位置，读数时不会分心。 */
+
+@keyframes cellBreathe {
+  0%, 100% { opacity: 0.82; }
+  50% { opacity: 1; }
+}
+
+/* 用 nth-child 错开相位，热力图因此像在呼吸，而不是整块一起闪。 */
+.cell {
+  animation: cellBreathe 3800ms ease-in-out infinite;
+}
+
+.cell:nth-child(3n) { animation-delay: -1300ms; }
+.cell:nth-child(5n) { animation-delay: -2500ms; }
+.cell:nth-child(7n) { animation-delay: -700ms; }
+
+/* 悬停的那一格要读准数值，这时停下来。 */
+.cell:hover,
+.cell:focus-visible {
+  animation: none;
+  opacity: 1;
+}
+
+@keyframes logitFlicker {
+  0%, 100% { opacity: 1; }
+  42% { opacity: 0.86; }
+  46% { opacity: 1; }
+  74% { opacity: 0.92; }
+}
+
+.fill {
+  animation: logitFlicker 2600ms ease-in-out infinite;
+}
+
+.bar:nth-child(2n) .fill { animation-delay: -900ms; }
+.bar:nth-child(3n) .fill { animation-delay: -1700ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cell,
+  .fill {
+    animation: none;
+    opacity: 1;
+  }
+}

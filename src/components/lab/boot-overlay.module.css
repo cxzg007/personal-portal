@@ -1,0 +1,167 @@
+/* 载入屏盖在 HUD 之上（HUD 是 z-index 3），接入后淡出并让出指针事件。 */
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: clamp(24px, 5vw, 72px);
+  /* 不是纯色遮罩：压暗集中在左下的文字区，右上留给正在生长的结构。 */
+  background:
+    radial-gradient(
+      96% 86% at 20% 80%,
+      rgba(5, 7, 10, 0.95) 18%,
+      rgba(5, 7, 10, 0.6) 58%,
+      rgba(5, 7, 10, 0.24) 100%
+    );
+  /* 轻微模糊当作景深：结构还在远处，此刻本来就不该是清楚的。 */
+  backdrop-filter: blur(2px);
+  font-family: var(--font-mono);
+  opacity: 1;
+  transition: opacity 620ms ease, backdrop-filter 620ms ease;
+}
+
+.root[data-hidden="true"] {
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(0);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: min(420px, 100%);
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  color: #6ee7d4;
+}
+
+.titleSub {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: rgba(207, 227, 234, 0.5);
+}
+
+.log {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.logRow {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(207, 227, 234, 0.34);
+  transition: color 300ms ease;
+}
+
+.logRow[data-done="true"] {
+  color: rgba(207, 227, 234, 0.78);
+}
+
+.logMark {
+  color: rgba(110, 231, 212, 0.35);
+  transition: color 300ms ease;
+}
+
+.logRow[data-done="true"] .logMark {
+  color: #6ee7d4;
+}
+
+.logLabel {
+  /* 等宽字下这一行容易被状态列挤动，固定靠左并允许收缩。 */
+  min-width: 0;
+}
+
+.logStatus {
+  color: rgba(110, 231, 212, 0.62);
+  font-variant-numeric: tabular-nums;
+}
+
+.meter {
+  position: relative;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(110, 231, 212, 0.14);
+  overflow: hidden;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #6ee7d4;
+  transform-origin: left center;
+  /* 用 transform 而不是 width：进度每帧都在变，缩放不会反复触发布局。 */
+  transition: transform 420ms ease;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.percent {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: rgba(207, 227, 234, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.attach {
+  padding: 9px 20px;
+  border: 1px solid rgba(110, 231, 212, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(207, 227, 234, 0.4);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  cursor: not-allowed;
+  transition: color 260ms ease, border-color 260ms ease, background-color 260ms ease;
+}
+
+.attach:not(:disabled) {
+  border-color: #6ee7d4;
+  background: #6ee7d4;
+  color: #05070a;
+  cursor: pointer;
+}
+
+.attach:not(:disabled):hover {
+  background: #8ff2e1;
+  border-color: #8ff2e1;
+}
+
+.attach:focus-visible {
+  outline: 2px solid #6ee7d4;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .logRow,
+  .logMark,
+  .meterFill,
+  .attach {
+    transition: none;
+  }
+}

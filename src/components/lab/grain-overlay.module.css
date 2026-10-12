@@ -1,0 +1,11 @@
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  /* soft-light 只扰动明度，不会把青色压灰；叠加模式下暗部会整体抬亮，不合适。 */
+  mix-blend-mode: soft-light;
+  opacity: 0.11;
+  pointer-events: none;
+}

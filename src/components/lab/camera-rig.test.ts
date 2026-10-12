@@ -43,6 +43,20 @@ describe("stage transitions", () => {
     expect(stageOnAdvance("approach")).toBe("terminal");
     expect(stageOnAdvance("terminal")).toBe("terminal");
   });
+
+  it("ignores every navigation input before the model is attached", () => {
+    // 载入还没走完时镜头必须钉住，否则点一下就会飞进一个还没建好的场景。
+    expect(stageOnClick("boot")).toBe("boot");
+    expect(stageOnAdvance("boot")).toBe("boot");
+    expect(stageOnPanelHover("boot", true)).toBe("boot");
+    expect(stageOnEscape("boot")).toBe("boot");
+  });
+
+  it("never falls back into the unattached state", () => {
+    // 接入是一次性的，退到远景就到头了，不该再看见加载屏。
+    expect(stageOnEscape("idle")).toBe("idle");
+    expect(stageOnClick("idle")).not.toBe("boot");
+  });
 });
 
 describe("terminalDistance", () => {

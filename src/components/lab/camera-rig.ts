@@ -6,7 +6,7 @@
  * 这里把机位和状态迁移抽成纯函数，便于单独测试。
  */
 
-export type StageKey = "idle" | "approach" | "terminal";
+export type StageKey = "boot" | "idle" | "approach" | "terminal";
 
 export type Vec3 = { x: number; y: number; z: number };
 
@@ -21,6 +21,14 @@ export type Keyframe = {
 export const PANEL_SIZE = { width: 16, height: 10 } as const;
 
 export const STAGE_KEYFRAMES: Record<StageKey, Keyframe> = {
+  // 接入前：停在结构外面，雾把细节滤掉，只剩一团在暗处发光的东西。
+  // 距离是跟着雾算的——FogExp2 密度 0.0062 下超过两百单位就全被吃成底色，
+  // 所以停在一百三左右：雾滤掉约一半，既看不清，又确实看得见有东西正在长出来。
+  // 注视点比结构中心更靠左下，于是结构落在画面右上，左下留给载入屏的文字。
+  boot: {
+    position: { x: -70, y: 34, z: 100 },
+    target: { x: -20, y: -4, z: -14 },
+  },
   // 远景：斜侧方俯视整叠网络层，看清结构的厚度。
   idle: {
     position: { x: -46, y: 21, z: 64 },
@@ -38,6 +46,7 @@ export const STAGE_KEYFRAMES: Record<StageKey, Keyframe> = {
   },
 };
 
+/** HUD 上可以直接跳的机位。boot 不在其中：它只能由接入动作离开，不能跳回去。 */
 export const STAGE_ORDER: StageKey[] = ["idle", "approach", "terminal"];
 
 /**
@@ -77,6 +86,8 @@ export function lerpVec3(from: Vec3, to: Vec3, t: number): Vec3 {
  * 贴近终端后点击属于终端内部的操作，不应该把镜头拉走。
  */
 export function stageOnClick(current: StageKey): StageKey {
+  // 还没接入时，点击由引导层自己处理，镜头不动。
+  if (current === "boot") return "boot";
   if (current === "idle") return "approach";
   if (current === "approach") return "idle";
   return current;
@@ -88,6 +99,7 @@ export function stageOnClick(current: StageKey): StageKey {
  * 只有已经走到中景才会被吸进终端，远景时掠过不触发，避免误操作。
  */
 export function stageOnPanelHover(current: StageKey, onPanel: boolean): StageKey {
+  if (current === "boot") return "boot";
   if (onPanel && current === "approach") return "terminal";
   if (!onPanel && current === "terminal") return "approach";
   return current;
@@ -97,17 +109,20 @@ export function stageOnPanelHover(current: StageKey, onPanel: boolean): StageKey
 export function stageOnEscape(current: StageKey): StageKey {
   if (current === "terminal") return "approach";
   if (current === "approach") return "idle";
+  // 远景已经是最外层，不退回未接入状态——接入是一次性的。
   return current;
 }
 
 /** 回车或空格：逐级前进，让键盘用户走和鼠标一样的路径。 */
 export function stageOnAdvance(current: StageKey): StageKey {
+  if (current === "boot") return "boot";
   if (current === "idle") return "approach";
   if (current === "approach") return "terminal";
   return current;
 }
 
 export const STAGE_COPY: Record<StageKey, { label: string; hint: string }> = {
+  boot: { label: "接入 / Attach", hint: "正在载入模型 · Loading model" },
   idle: { label: "远景 / Overview", hint: "点击进入结构 · Click to enter" },
   approach: { label: "中景 / Approach", hint: "移到终端上放大 · Hover the terminal" },
   terminal: { label: "终端 / Terminal", hint: "按 Esc 退出 · Press Esc to exit" },
