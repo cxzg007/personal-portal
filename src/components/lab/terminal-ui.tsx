@@ -35,11 +35,13 @@ import styles from "./terminal-ui.module.css";
  * 界面上的说法因此一律是"检索命中"而不是"生成"。
  */
 
-type TabKey = "ask" | "work" | "open-source" | "writing" | "index";
+type TabKey = "ask" | LatentDomain | "index";
 
 const TABS: Array<{ key: TabKey; label: string }> = [
   { key: "ask", label: "提问 ask" },
-  { key: "work", label: "经历 work" },
+  { key: "profile", label: "身份 profile" },
+  { key: "internship", label: "实习 internship" },
+  { key: "system", label: "系统 systems" },
   { key: "open-source", label: "开源 oss" },
   { key: "writing", label: "博客 writing" },
   { key: "index", label: "索引 index" },
@@ -124,11 +126,16 @@ export default function TerminalUI({ index }: { index: LatentEntry[] }) {
      */
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
+      if (event.source !== parentWindow) return;
       const message = parseBridgeMessage(event.data);
-      if (message?.type !== "flight" || message.phase !== "returned") return;
-      setExchanges((previous) =>
-        previous.map((item) => (item.revealed ? item : { ...item, revealed: true })),
-      );
+      if (message?.type === "open-domain") {
+        setTab(message.domain);
+        if (mainRef.current) mainRef.current.scrollTop = 0;
+      } else if (message?.type === "flight" && message.phase === "returned") {
+        setExchanges((previous) =>
+          previous.map((item) => (item.revealed ? item : { ...item, revealed: true })),
+        );
+      }
     };
 
     document.addEventListener("pointerenter", onEnter);
@@ -273,7 +280,7 @@ export default function TerminalUI({ index }: { index: LatentEntry[] }) {
                       item.hits.length === 0 ? (
                         <div className={styles.answer}>
                           <p className={styles.replyLine}>
-                            索引里没有这一条。这里只放了实习、系统、开源和博客四类内容，
+                            索引里没有这一条。这里只放了身份、实习、系统、开源和博客五类内容，
                             换个说法或者直接点下面一个问题试试。
                           </p>
                           <div className={styles.chips}>
@@ -346,25 +353,37 @@ export default function TerminalUI({ index }: { index: LatentEntry[] }) {
             </div>
           ) : null}
 
-          {tab === "work" ? (
+          {tab === "profile" ? (
             <div className={styles.panel}>
-              <p className={styles.caption}>实习与系统 · internships &amp; systems</p>
-              <div className={styles.cards}>
-                {[...grouped.internship, ...grouped.system].map(entryCard)}
-              </div>
+              <p className={styles.caption}>关于我 · profile · L{DOMAIN_LAYER.profile}</p>
+              <div className={styles.cards}>{grouped.profile.map(entryCard)}</div>
+            </div>
+          ) : null}
+
+          {tab === "internship" ? (
+            <div className={styles.panel}>
+              <p className={styles.caption}>实习经历 · internships · L{DOMAIN_LAYER.internship}</p>
+              <div className={styles.cards}>{grouped.internship.map(entryCard)}</div>
+            </div>
+          ) : null}
+
+          {tab === "system" ? (
+            <div className={styles.panel}>
+              <p className={styles.caption}>系统实践 · systems · L{DOMAIN_LAYER.system}</p>
+              <div className={styles.cards}>{grouped.system.map(entryCard)}</div>
             </div>
           ) : null}
 
           {tab === "open-source" ? (
             <div className={styles.panel}>
-              <p className={styles.caption}>开源维护与贡献 · open source</p>
+              <p className={styles.caption}>开源维护与贡献 · open source · L{DOMAIN_LAYER["open-source"]}</p>
               <div className={styles.cards}>{grouped["open-source"].map(entryCard)}</div>
             </div>
           ) : null}
 
           {tab === "writing" ? (
             <div className={styles.panel}>
-              <p className={styles.caption}>技术博客 · writing</p>
+              <p className={styles.caption}>技术博客 · writing · L{DOMAIN_LAYER.writing}</p>
               <div className={styles.cards}>{grouped.writing.map(entryCard)}</div>
             </div>
           ) : null}

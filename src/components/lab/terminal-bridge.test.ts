@@ -37,6 +37,20 @@ describe("parseBridgeMessage", () => {
 });
 
 describe("stageOnBridgeMessage", () => {
+  it("选择内容域只切内层页面，不移动外层机位", () => {
+    expect(
+      parseBridgeMessage(encodeBridgeMessage({ type: "open-domain", domain: "internship" })),
+    ).toEqual({ type: "open-domain", domain: "internship" });
+    expect(
+      parseBridgeMessage({ source: BRIDGE_SOURCE, type: "open-domain", domain: "unknown" }),
+    ).toBeNull();
+    expect(
+      parseBridgeMessage({ source: BRIDGE_SOURCE, type: "open-domain", domain: "__proto__" }),
+    ).toBeNull();
+    expect(stageOnBridgeMessage("terminal", { type: "open-domain", domain: "writing" })).toBe(
+      "terminal",
+    );
+  });
   it("指针进出屏幕和外层射线检测得出同样的机位", () => {
     expect(stageOnBridgeMessage("approach", { type: "pointerenter" })).toBe("terminal");
     expect(stageOnBridgeMessage("terminal", { type: "pointerleave" })).toBe("approach");

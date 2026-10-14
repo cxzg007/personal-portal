@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 
-import { DOMAIN_LABEL, DOMAIN_LAYER, type LatentDomain } from "@/lib/latent-index";
+import { DOMAIN_LABEL, DOMAIN_LAYER, LATENT_DOMAINS, type LatentDomain } from "@/lib/latent-index";
 
 import {
   PANEL_SIZE,
@@ -527,6 +527,11 @@ export default function LatentScene() {
   const [boot, setBoot] = useState<BootState>(createBootState);
   /** 这次提问命中了哪几个内容域、走到第几层，前向传播时在 HUD 上说出来。 */
   const [hitReadout, setHitReadout] = useState<string | null>(null);
+  const [hoveredDomain, setHoveredDomain] = useState<LatentDomain | null>(null);
+  const labelRefs = useRef<Partial<Record<LatentDomain, HTMLButtonElement>>>({});
+  const selectDomainRef = useRef<(domain: LatentDomain) => void>(() => {});
+  const hoverLabelRef = useRef<(domain: LatentDomain | null) => void>(() => {});
+  const hoverDomainRef = useRef<LatentDomain | null>(null);
   const stageRef = useRef<StageKey>("boot");
   const requestStageRef = useRef<(next: StageKey) => void>(() => {});
 
@@ -545,6 +550,7 @@ export default function LatentScene() {
     const cssScene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 2000);
+    const labelCamera = camera.clone();
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -642,6 +648,9 @@ export default function LatentScene() {
     let flightDim = 0;
     /** 这趟要点亮的层。为 null 时所有层一视同仁地压暗。 */
     let flightLit: ReadonlySet<number> | null = null;
+    let hoverLit: ReadonlySet<number> | null = null;
+    let screenReady = false;
+    let pendingDomain: LatentDomain | null = null;
 
     const postToScreen = (message: BridgeMessage) => {
       screen.iframe.contentWindow?.postMessage(
@@ -649,6 +658,17 @@ export default function LatentScene() {
         window.location.origin,
       );
     };
+
+    const selectDomain = (domain: LatentDomain) => {
+      if (currentStage === "boot" || currentStage === "forward") return;
+      pendingDomain = domain;
+      requestStage("terminal");
+      if (screenReady) {
+        postToScreen({ type: "open-domain", domain });
+        pendingDomain = null;
+      }
+    };
+    selectDomainRef.current = selectDomain;
 
     const clearFlight = () => {
       if (!flight) return;
@@ -774,11 +794,25 @@ export default function LatentScene() {
       transitionDuration = reduceMotion.matches ? 320 : 1200;
       currentStage = next;
       stageRef.current = next;
+      if (next === "terminal" || next === "forward") {
+        hoverLit = null;
+        hoverDomainRef.current = null;
+        setHoveredDomain(null);
+      }
       // 贴近后网页接管指针，退出后交还给镜头。
       screen.iframe.style.pointerEvents = next === "terminal" ? "auto" : "none";
       setStage(next);
     };
     requestStageRef.current = requestStage;
+
+    const onLabelHover = (domain: LatentDomain | null) => {
+      if (currentStage !== "idle" && currentStage !== "approach") return;
+      if (hoverDomainRef.current === domain) return;
+      hoverDomainRef.current = domain;
+      hoverLit = domain ? new Set([DOMAIN_LAYER[domain] - 1]) : null;
+      setHoveredDomain(domain);
+    };
+    hoverLabelRef.current = onLabelHover;
 
     const initial = resolveKeyframe("boot", 0);
     camera.position.set(initial.position.x, initial.position.y, initial.position.z);
@@ -797,6 +831,8 @@ export default function LatentScene() {
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       pointer.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
       pointerInside = true;
+      // 标签属于结构本身；移到它上面不能同时触发屏幕的射线检测。
+      if (event.target instanceof Element && event.target.closest("[data-layer-nav]")) return;
       requestStage(stageOnPanelHover(currentStage, isPointerOnPanel()));
     };
 
@@ -837,6 +873,14 @@ export default function LatentScene() {
       if (event.origin !== window.location.origin) return;
       const message = parseBridgeMessage(event.data);
       if (!message) return;
+      if (event.source !== screen.iframe.contentWindow) return;
+      if (message.type === "ready") {
+        screenReady = true;
+        if (pendingDomain) {
+          postToScreen({ type: "open-domain", domain: pendingDomain });
+          pendingDomain = null;
+        }
+      }
       if (message.type === "navigate") {
         // 屏幕里的链接要换掉整个窗口。留在 iframe 里跳的话，访客会得到一个
         // 套在三维壳子里的普通页面，而外面的场景还停在原处。
@@ -894,9 +938,11 @@ export default function LatentScene() {
         finishStructure();
       }
       // 有 token 在跑就把其余部分压下去，跑完再缓缓亮回来。
-      const dimTarget = flight ? FLIGHT_DIM : 0;
-      flightDim += (dimTarget - flightDim) * Math.min(1, delta * 4.5);
-      layers.fade(delta, flightDim, flightLit);
+      const dimTarget = flight ? FLIGHT_DIM : hoverLit ? 0.66 : 0;
+      flightDim = reduceMotion.matches
+        ? dimTarget
+        : flightDim + (dimTarget - flightDim) * Math.min(1, delta * 4.5);
+      layers.fade(delta, flightDim, flightLit ?? hoverLit);
       if (edges) edges.lines.material.opacity = EDGE_OPACITY * (1 - flightDim);
       if (pulses) pulses.points.material.opacity = PULSE_OPACITY * (1 - flightDim);
 
@@ -918,6 +964,34 @@ export default function LatentScene() {
       camera.position.set(position.x, position.y, position.z);
       lookTarget.set(target.x, target.y, target.z);
       camera.lookAt(lookTarget);
+
+      // 标签是可操作的 HTML，坐标来自层的世界位置，而不是另一套手写像素布局。
+      // 停在机位后使用固定机位投影：背景的轻微漂移和指针视差仍在，
+      // 但可点击的标签不会永远移动，让鼠标和键盘都能准确命中。
+      const staticStage = !transitionFrom && (currentStage === "idle" || currentStage === "approach");
+      if (staticStage) {
+        const base = STAGE_KEYFRAMES[currentStage];
+        labelCamera.projectionMatrix.copy(camera.projectionMatrix);
+        labelCamera.position.set(base.position.x, base.position.y, base.position.z);
+        labelCamera.lookAt(base.target.x, base.target.y, base.target.z);
+        labelCamera.updateMatrixWorld();
+      }
+      const projectionCamera = staticStage ? labelCamera : camera;
+      // 仅更新五个按钮的 transform，不触发 React 每帧重新渲染。
+      for (const domain of LATENT_DOMAINS) {
+        const label = labelRefs.current[domain];
+        if (!label) continue;
+        const layer = LAYERS[DOMAIN_LAYER[domain] - 1];
+        // 从每层右侧的不同高度取锚点。透视会把后方层压向同一点，
+        // 沿高度分散后仍锚在各层的边缘，同时保留足够的点击间距。
+        const vertical = Math.max(-0.32, (DOMAIN_LAYER[domain] - 5) * 0.23);
+        const point = new THREE.Vector3(layer.width * 0.34, layer.height * vertical, layer.z).project(projectionCamera);
+        const x = (point.x * 0.5 + 0.5) * container.clientWidth;
+        const y = (-point.y * 0.5 + 0.5) * container.clientHeight;
+        label.style.visibility = point.z < 1 && x > 36 && x < container.clientWidth - 150 &&
+          y > 105 && y < container.clientHeight - 80 ? "visible" : "hidden";
+        label.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      }
 
       // 先取到局部变量：连线和光点要等七层都建好才存在，在那之前是 null。
       const wiring = edges;
@@ -1008,6 +1082,8 @@ export default function LatentScene() {
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
+      selectDomainRef.current = () => {};
+      hoverLabelRef.current = () => {};
       cancelAnimationFrame(frameId);
       clearFlight();
       document.removeEventListener("visibilitychange", onVisibility);
@@ -1058,6 +1134,32 @@ export default function LatentScene() {
               </button>
             ))}
           </div>
+        )}
+        {(stage === "idle" || stage === "approach") && (
+          <nav aria-label="按内容层浏览" className={styles.layerNav} data-layer-nav>
+            {LATENT_DOMAINS.map((domain) => (
+              <button
+                aria-label={`第 ${DOMAIN_LAYER[domain]} 层：${DOMAIN_LABEL[domain]}，打开内容`}
+                className={styles.layerButton}
+                data-active={hoveredDomain === domain ? "true" : undefined}
+                key={domain}
+                onBlur={() => hoverLabelRef.current(null)}
+                onFocus={() => hoverLabelRef.current(domain)}
+                onMouseEnter={() => hoverLabelRef.current(domain)}
+                onMouseLeave={() => hoverLabelRef.current(null)}
+                onClick={() => selectDomainRef.current(domain)}
+                ref={(node) => {
+                  if (node) labelRefs.current[domain] = node;
+                  else delete labelRefs.current[domain];
+                }}
+                type="button"
+              >
+                <span className={styles.layerNumber}>L{DOMAIN_LAYER[domain]}</span>
+                <span>{DOMAIN_LABEL[domain]}</span>
+                <span aria-hidden="true" className={styles.layerArrow}>↗</span>
+              </button>
+            ))}
+          </nav>
         )}
         <p className={styles.hint} data-dim={dimHud ? "true" : undefined}>
           {/*

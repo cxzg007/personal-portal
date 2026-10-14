@@ -110,6 +110,64 @@
   border-color: #6ee7d4;
 }
 
+/* 标签的坐标逐帧从网络层投影而来，导航本身不占画面布局。 */
+.layerNav {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.layerButton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 138px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid rgba(110, 231, 212, 0.34);
+  border-radius: 4px;
+  background: rgba(5, 13, 18, 0.86);
+  box-shadow: 0 0 22px rgba(5, 7, 10, 0.55), inset 0 0 14px rgba(110, 231, 212, 0.035);
+  backdrop-filter: blur(10px);
+  color: #e4f4f6;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
+  visibility: hidden;
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.layerButton:hover,
+.layerButton[data-active="true"],
+.layerButton:focus-visible {
+  border-color: #6ee7d4;
+  background: rgba(12, 43, 48, 0.96);
+  box-shadow: 0 0 28px rgba(110, 231, 212, 0.2);
+}
+
+.layerButton:focus-visible,
+.stageButton:focus-visible {
+  outline: 2px solid #b6fff1;
+  outline-offset: 3px;
+}
+
+.layerNumber {
+  color: #6ee7d4;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.layerArrow {
+  margin-left: auto;
+  color: #6ee7d4;
+}
+
 .hint {
   margin: 0;
   align-self: center;
@@ -134,7 +192,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stageButton {
+  .stageButton,
+  .layerButton {
     transition: none;
   }
 

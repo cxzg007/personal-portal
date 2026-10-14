@@ -40,6 +40,8 @@ export type BridgeMessage =
    * 检索在内层做完才上报，外层不需要再认识内容，只负责把这条路走出来。
    */
   | { type: "submit"; tokens: number; domains: LatentDomain[] }
+  /** 空间标签被选中后，外层要求屏幕打开对应的内容域。 */
+  | { type: "open-domain"; domain: LatentDomain }
   /**
    * 内层的链接要跳转。
    *
@@ -96,6 +98,11 @@ export function parseBridgeMessage(data: unknown): BridgeMessage | null {
       if (!href.startsWith("/") || href.startsWith("//")) return null;
       return { type: "navigate", href };
     }
+    case "open-domain":
+      return typeof payload.domain === "string" &&
+        LATENT_DOMAINS.some((domain) => domain === payload.domain)
+        ? { type: "open-domain", domain: payload.domain as LatentDomain }
+        : null;
     case "flight":
       return typeof payload.phase === "string" && FLIGHT_SIGNALS.includes(payload.phase)
         ? { type: "flight", phase: payload.phase as FlightSignal }
