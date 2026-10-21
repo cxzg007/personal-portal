@@ -40,6 +40,7 @@ type PostModule = { default: ComponentType };
 type PostLoaderMap = Record<string, () => Promise<PostModule>>;
 
 const postLoaders = {
+  "agent-context-engineering": () => import("../../content/posts/agent-context-engineering.mdx"),
   "service-availability-governance": () => import("../../content/posts/service-availability-governance.mdx"),
   "high-concurrency-read-write-design": () => import("../../content/posts/high-concurrency-read-write-design.mdx"),
   "semantica-reasoning-engineering": () => import("../../content/posts/semantica-reasoning-engineering.mdx"),

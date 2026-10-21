@@ -30,14 +30,14 @@ describe("OpenSourceShowcase", () => {
 
     const statistic = screen.getByText("已合并 PR").closest("p");
     expect(statistic).not.toBeNull();
-    expect(statistic).toHaveTextContent("18");
+    expect(statistic).toHaveTextContent("19");
     expect(screen.getByRole("heading", { name: /我的关键贡献/ })).toBeVisible();
   });
 
   it("renders every contribution exactly once across the map and remaining records", () => {
     const { container } = renderShowcase();
     const map = screen.getByRole("figure", { name: "贡献落点图" });
-    expect(within(map).getAllByRole("link", { name: /^已合并 · PR #/ })).toHaveLength(7);
+    expect(within(map).getAllByRole("link", { name: /^已合并 · PR #/ })).toHaveLength(8);
     expect(within(map).getByRole("link", { name: /^进行中 · PR #1731/ })).toBeVisible();
     expect(screen.queryByRole("list", { name: "Semantica 贡献主题" })).toBeNull();
     expect(screen.queryByRole("region", { name: "正在推进" })).toBeNull();
@@ -66,7 +66,7 @@ describe("OpenSourceShowcase", () => {
     const ongoing = screen.getByRole("region", { name: "正在推进" });
     expect(within(ongoing).getByRole("link", { name: /^进行中 · PR #2000/ })).toBeVisible();
     expect(within(ongoing).queryByRole("link", { name: /PR #1731/ })).toBeNull();
-    expect(screen.getByText("已合并 PR").closest("p")).toHaveTextContent("19");
+    expect(screen.getByText("已合并 PR").closest("p")).toHaveTextContent("20");
     expect(screen.getByText("查看其他 12 个已合并 PR")).toBeVisible();
     for (const pr of project.contributions) expect(container.querySelectorAll(`a[href="${pr.url}"]`)).toHaveLength(1);
   });
@@ -77,7 +77,7 @@ describe("OpenSourceShowcase", () => {
     const { container } = renderShowcase(project);
     expect(screen.getByRole("link", { name: /^已合并 · PR #1731/ })).toBeVisible();
     expect(screen.queryByRole("link", { name: /^进行中/ })).toBeNull();
-    expect(screen.getByText("已合并 PR").closest("p")).toHaveTextContent("19");
+    expect(screen.getByText("已合并 PR").closest("p")).toHaveTextContent("20");
     expect(container.querySelectorAll('a[href$="/pull/1731"]')).toHaveLength(1);
   });
 
@@ -90,17 +90,17 @@ describe("OpenSourceShowcase", () => {
   it("states the dated snapshot boundary computed from merged contributions", () => {
     renderShowcase();
 
-    expect(screen.getByText("截至 2026-09-28：18 个贡献已合并")).toBeVisible();
+    expect(screen.getByText("截至 2026-10-16：19 个贡献已合并")).toBeVisible();
   });
 
   it("separates sourced project recognition from the personal contribution count", () => {
     renderShowcase();
 
     const recognition = screen.getByRole("region", { name: "项目影响力与荣誉" });
-    const stars = within(recognition).getByRole("link", { name: /13,513 GitHub Stars/ });
+    const stars = within(recognition).getByRole("link", { name: /14,070 GitHub Stars/ });
     expect(stars).toHaveAttribute("href", openSource.repositoryUrl);
     expect(within(recognition).getByText(/2026-09-20/)).toBeVisible();
-    expect(within(recognition).getByText("星数快照 · 核验于 2026-09-28")).toBeVisible();
+    expect(within(recognition).getByText("星数快照 · 核验于 2026-10-16")).toBeVisible();
     expect(within(recognition).getByRole("link", { name: /#1 GitHub Trending 日榜/ }))
       .toHaveAttribute("href", "https://trendshift.io/api/badge/repositories/18986");
     expect(within(recognition).getByRole("link", { name: /#3 Trendshift · Python 周榜/ }))

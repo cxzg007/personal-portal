@@ -2,9 +2,9 @@ import { expect, test } from "@playwright/test";
 
 const title = "高并发架构：读写分工与一致性取舍";
 const articlePath = "/blog/high-concurrency-read-write-design";
-const latestTitle = "服务可用性治理：重试、故障隔离与过载保护";
+const latestTitle = "Agent 上下文工程：稳定前缀、状态管理与信息压缩";
 
-test("homepage reading button reaches the blog and its latest illustrated article", async ({ page }) => {
+test("homepage reading button reaches the blog and its latest article", async ({ page }) => {
   await page.goto("/");
   const button = page.locator("#profile").getByRole("link", { name: "阅读博客", exact: true });
   await expect(button).toHaveAttribute("href", "/blog");
@@ -15,7 +15,7 @@ test("homepage reading button reaches the blog and its latest illustrated articl
   const latest = page.locator(".blog-card").first();
   await expect(latest.getByRole("heading")).toHaveText(latestTitle);
   await latest.getByRole("link", { name: latestTitle, exact: true }).click();
-  await expect(page).toHaveURL(/\/blog\/service-availability-governance$/);
+  await expect(page).toHaveURL(/\/blog\/agent-context-engineering$/);
   await expect(page.getByRole("heading", { level: 1, name: latestTitle })).toBeVisible();
   await page.getByRole("link", { name: "返回博客" }).click();
   await page.getByRole("searchbox", { name: "搜索文章" }).fill("高并发");

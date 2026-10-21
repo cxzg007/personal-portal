@@ -1,6 +1,6 @@
 import type { OpenSourceProject } from "@/content/schema";
 
-// Source locations checked against the PR's changed files on 2026-09-29.
+// Source locations checked against the PRs' changed files (latest check: 2026-10-16).
 // Each link is pinned to its merge commit (or reviewed head for an open PR).
 const contributionAreas = [
   {
@@ -35,8 +35,9 @@ const contributionAreas = [
       },
       {
         name: "真值与时态维护",
-        summary: "追踪结论的独立支持，支持来源撤回、双时态证据与历史查询。",
+        summary: "追踪独立支持与来源撤回，支持双时态历史查询及版本化会话检查点。",
         sources: [
+          { number: 1831, file: "reasoning/_truth_maintenance_checkpoint.py", revision: "cc58d03b4b4a32071ee083d6322965f51eb525cb" },
           { number: 1675, file: "reasoning/temporal_truth_maintenance.py", revision: "b14a2b8d2f989c8c3deca107a21d1da93ee2a506" },
           { number: 1544, file: "reasoning/truth_maintenance.py", revision: "92c2578a142a3b1e6139e6ea69fea39601a212e6" },
         ],

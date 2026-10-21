@@ -147,7 +147,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
-  await expect(openSource.getByText(/截至 2026-09-28：18 个贡献已合并/)).toBeVisible();
+  await expect(openSource.getByText(/截至 2026-10-16：19 个贡献已合并/)).toBeVisible();
   await expect(openSource.getByRole("link", { name: "Semantica GitHub repository" })).toHaveAttribute(
     "href",
     "https://github.com/semantica-agi/semantica",
@@ -320,12 +320,12 @@ test("open source showcase consolidates PRs into the map with a collapsed remain
   await expect(map).toBeVisible();
   await expect(map.locator("li[data-status]")).toHaveCount(6);
   const recognition = openSource.getByRole("region", { name: "项目影响力与荣誉" });
-  await expect(recognition.getByRole("link", { name: "13,513 GitHub Stars" })).toHaveAttribute(
+  await expect(recognition.getByRole("link", { name: "14,070 GitHub Stars" })).toHaveAttribute(
     "href", "https://github.com/semantica-agi/semantica",
   );
   await expect(recognition.getByRole("link", { name: /#1 GitHub Trending 日榜/ })).toBeVisible();
   await expect(recognition.getByRole("link", { name: /#3 Trendshift · Python 周榜/ })).toBeVisible();
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(7);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(8);
   await expect(openSource.getByText("MERGED", { exact: true })).toHaveCount(0);
   await expect(openSource.getByText("OPEN", { exact: true })).toHaveCount(0);
   await expect(openSource.locator("button")).toHaveCount(0);
@@ -339,12 +339,12 @@ test("open source showcase consolidates PRs into the map with a collapsed remain
   await expect(details).not.toHaveAttribute("open");
 
   await details.locator("summary").click();
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(18);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(19);
   const otherLinks = details.getByRole("link", { name: /^已合并 · PR #/ });
   await expect(otherLinks).toHaveCount(11);
   const allPrHrefs = await openSource.locator('a[href*="/pull/"]').evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  expect(allPrHrefs).toHaveLength(19);
-  expect(new Set(allPrHrefs).size).toBe(19);
+  expect(allPrHrefs).toHaveLength(20);
+  expect(new Set(allPrHrefs).size).toBe(20);
   for (const [index, number] of [
     1364, 1360, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1094, 1081,
   ].entries()) {
@@ -356,7 +356,7 @@ test("open source showcase consolidates PRs into the map with a collapsed remain
   await details.locator("summary").focus();
   await page.keyboard.press("Enter");
   await expect(details).not.toHaveAttribute("open");
-  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(7);
+  await expect(openSource.getByRole("link", { name: /^已合并 · PR #/ })).toHaveCount(8);
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {
@@ -383,11 +383,11 @@ test("writing stage renders the public articles with full-read destinations", as
     writing.getByRole("link", { name: "阅读文章：Semantica 开源实践：让推理有依据，让变化可追溯" }),
   ).toHaveAttribute("href", "/blog/semantica-reasoning-engineering");
   await expect(
-    writing.getByRole("heading", { name: "图工程之后：多智能体系统缺的是一层语义" }),
+    writing.getByRole("heading", { name: "Agent 上下文工程：稳定前缀、状态管理与信息压缩" }),
   ).toBeVisible();
   await expect(
-    writing.getByRole("link", { name: "阅读文章：图工程之后：多智能体系统缺的是一层语义" }),
-  ).toHaveAttribute("href", "/blog/graph-engineering-ontology");
+    writing.getByRole("link", { name: "阅读文章：Agent 上下文工程：稳定前缀、状态管理与信息压缩" }),
+  ).toHaveAttribute("href", "/blog/agent-context-engineering");
   await expect(
     writing.getByRole("heading", { name: "Palantir 本体论：把业务语义做成可执行的操作层" }),
   ).toHaveCount(0);

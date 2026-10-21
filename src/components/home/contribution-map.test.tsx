@@ -16,7 +16,7 @@ describe("ContributionMap", () => {
       [1226, "pipeline/execution_engine.py", "cce5ea177cbac29a526effa546219c48f8ec36f4"],
       [1243, "reasoning/sparql_reasoner.py", "7996d1ab4bd0c96ea7e3d91a4ce70fe5881d224b"],
       [1077, "reasoning/rete_engine.py", "0384a8de306477332fabbd2de82d7de157a2c5f0"],
-      [1675, "reasoning/temporal_truth_maintenance.py", "b14a2b8d2f989c8c3deca107a21d1da93ee2a506"],
+      [1831, "reasoning/_truth_maintenance_checkpoint.py", "cc58d03b4b4a32071ee083d6322965f51eb525cb"],
       [1556, "context/truth_maintenance_filter.py", "d46529adb316829bdc75b8467278f3f0ccb310f7"],
       [1731, "context/grounded_context.py", "340eb0c31cca25029cbf8bb5fbbec6703645b06b"],
     ] as const;
@@ -35,6 +35,8 @@ describe("ContributionMap", () => {
         expect(link).toHaveAttribute("rel", "noreferrer");
       }
     }
+    const checkpoint = within(map).getByRole("link", { name: /^已合并 · PR #1831 ·/ }).closest<HTMLElement>("[data-status]")!;
+    expect(within(checkpoint).getByRole("link", { name: /^已合并 · PR #1675 ·/ })).toBeVisible();
     expect(within(map).getByText(/连线表示贡献归类/)).toBeVisible();
   });
 

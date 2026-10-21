@@ -18,18 +18,19 @@ describe("public resume content", () => {
   it("supports two evidence-backed homepage metrics", () => {
     expect(content.metrics.map(({ value, label }: { value: number; label: string }) => ({ value, label }))).toEqual([
       { value: 3, label: "实习经历" },
-      { value: 18, label: "已合并 PR" },
+      { value: 19, label: "已合并 PR" },
     ]);
   });
 
-  it("exposes eighteen merged contributions and one open PR without private fields", () => {
-    expect(content.openSource.snapshotDate).toBe("2026-09-28");
-    expect(content.openSource.recognition.stars).toBe(13513);
+  it("exposes nineteen merged contributions and one open PR without private fields", () => {
+    expect(content.openSource.snapshotDate).toBe("2026-10-16");
+    expect(content.openSource.recognition.stars).toBe(14070);
+    expect(content.openSource.recognition.checkedAt).toBe("2026-10-16");
     expect(content.openSource.recognition.honorsCheckedAt).toBe("2026-09-20");
     expect(content.openSource.identity).toBe("项目维护者 · Maintainer / Collaborator · cxzg007");
     const contributions = content.openSource.contributions;
     expect(contributions.map((pr: { number: number }) => pr.number)).toEqual([
-      1731, 1675, 1556, 1544, 1364, 1360, 1243, 1226, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1096, 1094,
+      1831, 1731, 1675, 1556, 1544, 1364, 1360, 1243, 1226, 1217, 1215, 1208, 1160, 1153, 1143, 1113, 1096, 1094,
       1081, 1077,
     ]);
     for (const contribution of contributions) {
