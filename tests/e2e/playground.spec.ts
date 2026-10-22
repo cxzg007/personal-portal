@@ -5,22 +5,51 @@ test.beforeEach(async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 900 });
 });
 
-test("the homepage offers the local experiment without loading its 3D runtime", async ({ page }) => {
+test("the detailed portfolio stays independent of the room runtime", async ({ page }) => {
   const sceneRequests: string[] = [];
   page.on("request", (request) => {
     if (/\.(glb|wasm)(\?|$)|experiments\/henry\/(room|desktop)\//.test(request.url())) {
       sceneRequests.push(request.url());
     }
   });
-  await page.goto("/");
-  const experiment = page.getByRole("article", { name: "复古电脑房间" });
-  await expect(experiment).toBeVisible();
-  await expect(page.getByRole("link", { name: "进入实验 · Enter the prototype" })).toHaveAttribute("href", "/lab/latent");
-  await expect(experiment).not.toContainText(/Henry|Heffernan|Credits/i);
-  await expect(experiment.getByRole("link", { name: "进入 3D 空间" })).toHaveAttribute("href", "/playground");
-  await experiment.getByRole("img").scrollIntoViewIfNeeded();
-  await expect.poll(() => experiment.getByRole("img").evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+  await page.goto("/about");
+  await expect(page.getByRole("heading", { name: "cxzg007", exact: true })).toBeVisible();
+  await expect(page.getByText("潜空间", { exact: true })).toHaveCount(0);
+  await expect(page.locator("#lab")).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: "主导航" }).getByRole("link", { name: "房间" })).toHaveAttribute("href", "/");
   expect(sceneRequests).toEqual([]);
+});
+
+test("learn more is usable while the entrance is still loading", async ({ page }) => {
+  await page.route("**/models/World/environment.glb", () => {});
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("status")).toBeVisible();
+  await page.getByRole("link", { name: "了解更多" }).click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(page.getByRole("heading", { name: "cxzg007", exact: true })).toBeVisible();
+});
+
+test("learn more works without JavaScript", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
+  try {
+    const page = await context.newPage();
+    await page.goto("/");
+    await page.getByRole("link", { name: "了解更多" }).click();
+    await expect(page).toHaveURL(/\/about$/);
+    await expect(page.getByRole("heading", { name: "cxzg007", exact: true })).toBeVisible();
+    await expect(page.locator("#internships")).toContainText("京东");
+  } finally {
+    await context.close();
+  }
+});
+
+test("the old experiment redirects and latent routes are removed", async ({ request }) => {
+  const oldRoom = await request.get("/playground", { maxRedirects: 0 });
+  expect(oldRoom.status()).toBe(308);
+  expect(oldRoom.headers().location).toBe("/");
+  for (const path of ["/lab/latent", "/lab/latent/terminal", "/lab/latent-poster.webp"]) {
+    expect((await request.get(path)).status()).toBe(404);
+  }
 });
 
 test("the room boots before downloading monitor videos and plays them after START", async ({ page }) => {
@@ -28,7 +57,7 @@ test("the room boots before downloading monitor videos and plays them after STAR
   page.on("request", (request) => {
     if (request.url().includes("/textures/monitor/video/")) videos.add(request.url());
   });
-  await page.goto("/playground");
+  await page.goto("/");
   const room = page.frameLocator("iframe");
   await expect(page.getByRole("status")).toHaveCount(0, { timeout: 20000 });
   await expect(room.getByRole("button", { name: "START", exact: true })).toBeEnabled();
@@ -42,7 +71,7 @@ test("the room boots before downloading monitor videos and plays them after STAR
 
 test("the experiment switches between locally hosted room and desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/playground");
+  await page.goto("/");
   await expect(page.getByRole("button", { name: "3D 房间" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("iframe")).toHaveAttribute("src", "/experiments/henry/room/index.html");
   await expect(page.getByRole("status")).toHaveCount(0, { timeout: 20000 });
@@ -52,13 +81,13 @@ test("the experiment switches between locally hosted room and desktop", async ({
   await expect(page.frameLocator("iframe").getByText("Jiang Junjie", { exact: true }).first()).toBeVisible({ timeout: 30000 });
   await expect(page.frameLocator("iframe").getByText("Credits", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("status")).toHaveCount(0);
-  await page.getByRole("link", { name: "返回主页" }).click();
-  await expect(page).toHaveURL(/\/#playground$/);
+  await page.getByRole("link", { name: "了解更多" }).click();
+  await expect(page).toHaveURL(/\/about$/);
 });
 
 test("reduced motion opens the 2D desktop first", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/playground");
+  await page.goto("/");
   await expect(page.getByRole("button", { name: "2D 桌面" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("status")).toHaveCount(0);
 });
@@ -66,7 +95,7 @@ test("reduced motion opens the 2D desktop first", async ({ page }) => {
 test("a failed 3D asset offers a working 2D fallback", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.route("**/models/World/environment.glb", (route) => route.abort());
-  await page.goto("/playground");
+  await page.goto("/");
   await expect(page.locator("main").getByRole("alert")).toContainText("暂时无法打开房间", { timeout: 15000 });
   await page.getByRole("button", { name: "进入 2D 桌面" }).click();
   await expect(page.frameLocator("iframe").getByText("Jiang Junjie", { exact: true })).toBeVisible();
@@ -76,7 +105,7 @@ test("a failed 3D asset offers a working 2D fallback", async ({ page }) => {
 test("a failed desktop inside the monitor also offers recovery", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.route("**/desktop/app.js", (route) => route.abort());
-  await page.goto("/playground");
+  await page.goto("/");
   await expect(page.locator("main").getByRole("alert")).toContainText("暂时无法打开房间", { timeout: 10000 });
   await page.unroute("**/desktop/app.js");
   await page.getByRole("button", { name: "进入 2D 桌面" }).click();

@@ -18,6 +18,12 @@
 NEXT_PUBLIC_SITE_URL=https://your-preview-origin.example
 ```
 
+## 站点入口
+
+`/` 是复古电脑房间，顶部「了解更多」通往 `/about` 的完整个人主页。博客保留在 `/blog`。旧 `/playground` 永久跳转到 `/`，潜空间及其资源已移除。
+
+房间的上游许可证、来源记录和原版 Credits 保存在 `vendor/henry` 与 `public/experiments/henry`，前端不展示署名入口。修改桌面内的个人内容或链接后，运行 `pnpm build:playground` 更新提交的静态产物，再执行站点构建。
+
 ## 本地运行
 
 ```bash

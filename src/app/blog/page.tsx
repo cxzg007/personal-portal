@@ -37,8 +37,8 @@ export default function BlogPage() {
       <Header />
       <main id="main-content" tabIndex={-1}>
         <header className="blog-hero">
-          <Link className="blog-back-link" href="/#top">
-            <span aria-hidden="true">←</span> 返回首页
+          <Link className="blog-back-link" href="/about#top">
+            <span aria-hidden="true">←</span> 返回个人主页
           </Link>
           <p className="eyebrow">ENGINEERING NOTES</p>
           <h1>技术博客</h1>

@@ -3,7 +3,7 @@ import { expectNoRotation } from "./helpers/css";
 
 test("content cards stay horizontal and pointer hover moves at most two pixels", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 1000 });
-  await page.goto("/");
+  await page.goto("/about");
   const cards = page.locator(
     ".sticky-internship-card, .system-project-panel, .open-source-showcase, #writing article, #contact > div, .blog-card",
   );

@@ -393,12 +393,11 @@ describe("page motion controller", () => {
     render(<Header />);
 
     const expected: Record<string, string> = {
-      "/#internships": "internships",
-      "/#systems": "systems",
-      "/#open-source": "open-source",
-      "/#writing": "writing",
-      "/#lab": "lab",
-      "/#contact": "contact",
+      "/about#internships": "internships",
+      "/about#systems": "systems",
+      "/about#open-source": "open-source",
+      "/about#writing": "writing",
+      "/about#contact": "contact",
     };
 
     for (const [href, section] of Object.entries(expected)) {
@@ -408,7 +407,7 @@ describe("page motion controller", () => {
       expect(link).not.toHaveAttribute("aria-current");
     }
 
-    expect(document.querySelectorAll("a[data-nav-section]")).toHaveLength(6);
+    expect(document.querySelectorAll("a[data-nav-section]")).toHaveLength(5);
     expect(document.querySelector('a[href="https://github.com/cxzg007"]')).not.toHaveAttribute(
       "data-nav-section",
     );

@@ -107,7 +107,7 @@ for (const width of [320, 390, 768, 1440]) {
   test(`homepage reflows at 200% text size in a ${width}px viewport`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
+    await page.goto("/about");
     await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
     await expect(page.locator("html")).toHaveCSS("font-size", "32px");
 
@@ -140,7 +140,7 @@ for (const viewport of viewports) {
   }) => {
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
+    await page.goto("/about");
 
     await expectNoHorizontalOverflow(page);
     await expect(
@@ -265,7 +265,7 @@ test("homepage reference profile keeps visible geometry at 1920x1080", async ({ 
 
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about");
 
   await expectNoHorizontalOverflow(page);
 

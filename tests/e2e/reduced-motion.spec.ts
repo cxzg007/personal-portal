@@ -8,7 +8,7 @@ const NAV_SECTIONS = ["internships", "systems", "open-source", "writing", "conta
 
 test("reduced motion preference keeps the layout static without hiding content", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about");
 
   await expect(page.locator("html")).toHaveAttribute("data-profile-motion", "static");
   await expect(page.locator("[data-in-view]")).toHaveCount(0);
@@ -51,7 +51,7 @@ test("enhanced motion marks one active navigation link after scrolling each sect
     testInfo.project.name === "mobile",
     "enhanced motion requires a viewport wider than 760px",
   );
-  await page.goto("/");
+  await page.goto("/about");
 
   await expect(page.locator("html")).toHaveAttribute("data-profile-motion", "enhanced");
 
@@ -82,7 +82,7 @@ test("enhanced motion marks one active navigation link after scrolling each sect
 
 test("layout stays static at 390px and restores enhanced motion above the 760px breakpoint", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/about");
 
   await expect(page.locator("html")).toHaveAttribute("data-profile-motion", "static");
   await expect(page.locator("[data-in-view]")).toHaveCount(0);
@@ -94,7 +94,7 @@ test("layout stays static at 390px and restores enhanced motion above the 760px 
 
 test("reduced motion removes reveal transitions while keeping section content visible", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about");
 
   const reveals = await page.evaluate(() =>
     Array.from(document.querySelectorAll<HTMLElement>(".profile-reveal")).map((element) => {

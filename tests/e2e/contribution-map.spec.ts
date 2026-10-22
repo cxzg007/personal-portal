@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("contribution map exposes source and PR evidence without clipped content", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const map = page.getByRole("figure", { name: "贡献落点图" });
   await expect(map).toBeVisible();
   await expect(map.getByRole("link")).toHaveCount(15);
@@ -26,7 +26,7 @@ test("contribution map exposes source and PR evidence without clipped content", 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
   test("all contribution details and links remain available", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/about");
     const map = page.getByRole("figure", { name: "贡献落点图" });
     await expect(map.getByRole("heading", { name: "RAG 上下文组装" })).toBeVisible();
     await expect(map.getByRole("link", { name: /进行中 · PR #1731/ })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/1731");

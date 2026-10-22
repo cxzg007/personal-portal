@@ -72,7 +72,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     mainEntityOfPage: new URL(`/blog/${post.slug}`, siteUrl).toString(),
     author: {
       "@type": "Person",
-      "@id": new URL("/#person", siteUrl).toString(),
+      "@id": new URL("/about#person", siteUrl).toString(),
       name: siteContent.profile.name,
     },
   };

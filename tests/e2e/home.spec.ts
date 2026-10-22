@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("homepage exposes the campus recruiting identity and primary actions", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
-  await page.goto("/");
+  await page.goto("/about");
 
   const hero = page.locator("#profile");
 
@@ -79,7 +79,7 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
 test("internships, system cases, and contact form a keyboard-accessible recruiting narrative", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
   const internships = page.locator("main > section#internships");
   const internshipArticles = internships.getByRole("article");
@@ -173,7 +173,7 @@ test("internships, system cases, and contact form a keyboard-accessible recruiti
 });
 
 test("homepage navigation remains usable without horizontal overflow", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
   const menuToggle = page.getByRole("button", { name: "打开导航菜单" });
   if (await menuToggle.isVisible()) {
@@ -195,7 +195,7 @@ test("homepage navigation remains usable without horizontal overflow", async ({ 
 
 test("mobile navigation resets cleanly across the desktop breakpoint", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/about");
 
   const menuToggle = page.getByRole("button", { name: "打开导航菜单" });
   await menuToggle.click();
@@ -213,18 +213,18 @@ test("mobile navigation resets cleanly across the desktop breakpoint", async ({ 
 });
 
 test("homepage exposes the reference-style section order", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
-  await expect(page.locator("main > section")).toHaveCount(7);
+  await expect(page.locator("main > section")).toHaveCount(6);
   expect(await page.locator("main > section").evaluateAll((sections) => sections.map(({ id }) => id))).toEqual([
-    "profile", "internships", "systems", "open-source", "writing", "lab", "contact",
+    "profile", "internships", "systems", "open-source", "writing", "contact",
   ]);
 });
 
 test("internship cards keep a static editorial layout with controllable engineering illustrations", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
   const internships = page.locator("main > section#internships");
   const logos = ["京东品牌标志", "智元机器人 AGIBOT 品牌标志", "中国船舶集团 CSSC 品牌标志"];
@@ -250,7 +250,7 @@ test("internship cards keep a static editorial layout with controllable engineer
 test("expanding any internship disclosure keeps detail items unobstructed and cards non-overlapping", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
   const internships = page.locator("main > section#internships");
   const internshipCards = internships.getByRole("article");
@@ -313,7 +313,7 @@ test("expanding any internship disclosure keeps detail items unobstructed and ca
 });
 
 test("open source showcase consolidates PRs into the map with a collapsed remainder", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
   const openSource = page.locator("main > section#open-source");
   const map = openSource.getByRole("figure", { name: "贡献落点图" });
@@ -360,7 +360,7 @@ test("open source showcase consolidates PRs into the map with a collapsed remain
 });
 
 test("honors section and its navigation entry are fully removed", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   await expect(page.locator("section#honors")).toHaveCount(0);
   await expect(page.getByText("荣誉与长期积累")).toHaveCount(0);
   await expect(page.getByText("国家励志奖学金")).toHaveCount(0);
@@ -369,7 +369,7 @@ test("honors section and its navigation entry are fully removed", async ({ page 
 });
 
 test("writing stage renders the public articles with full-read destinations", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
   const writing = page.locator("main > section#writing");
   await expect(writing.getByRole("article")).toHaveCount(4);
@@ -395,7 +395,7 @@ test("writing stage renders the public articles with full-read destinations", as
 });
 
 test("brand marks load eagerly and never shift page height after load", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
   const marks = page.locator("main .brand-mark img");
   await expect(marks).toHaveCount(7);

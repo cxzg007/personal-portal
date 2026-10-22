@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const siteOrigin = "https://portfolio.example.test";
+const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfolio.example.test";
 const articleSlug = "graph-engineering-ontology";
 const articleTitle = "图工程之后：多智能体系统缺的是一层语义";
 // 详情页 meta description 与 BlogPosting JSON-LD 均取 front-matter 的 seoDescription（非 description）。
@@ -9,9 +9,9 @@ const articleDescription =
 const blogDescription = "关于 AI Agent、后端系统、知识图谱与工程协作的公开技术文章。";
 
 test("homepage publishes canonical, share metadata, and validated ProfilePage JSON-LD", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", siteOrigin);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `${siteOrigin}/about`);
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
     "content",
     `${siteOrigin}/social-card.svg`,
@@ -35,7 +35,7 @@ test("homepage publishes canonical, share metadata, and validated ProfilePage JS
     email: "mailto:jiangjunjie_tj@foxmail.com",
     sameAs: ["https://github.com/cxzg007"],
   });
-  expect(profile).toMatchObject({ url: siteOrigin, name: "江俊杰｜AI Agent / 后端开发" });
+  expect(profile).toMatchObject({ url: `${siteOrigin}/about`, name: "江俊杰｜AI Agent / 后端开发" });
   await expect(page.locator("#writing").getByRole("article")).toHaveCount(4);
 });
 
@@ -91,6 +91,9 @@ test("sitemap, robots, and RSS expose every public article with absolute URLs", 
   expect(sitemap.ok()).toBe(true);
   const sitemapXml = await sitemap.text();
   expect(sitemapXml).toContain(`<loc>${siteOrigin}</loc>`);
+  expect(sitemapXml).toContain(`<loc>${siteOrigin}/about</loc>`);
+  expect(sitemapXml).not.toContain("/lab/latent");
+  expect(sitemapXml).not.toContain("/playground");
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog</loc>`);
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/${articleSlug}</loc>`);
   expect(sitemapXml).toContain(`<loc>${siteOrigin}/blog/semantica-reasoning-engineering</loc>`);

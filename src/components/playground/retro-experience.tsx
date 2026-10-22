@@ -60,19 +60,25 @@ function ExperienceFrame({ mode, onDesktop }: { mode: Mode; onDesktop: () => voi
   );
 }
 
+function ExperienceToolbar({ mode, onMode }: { mode?: Mode; onMode?: (mode: Mode) => void }) {
+  return (
+    <header className={styles.toolbar}>
+      <Link className={styles.more} href="/about">了解更多 <span aria-hidden="true">↗</span></Link>
+      <h1>cxzg007<span> / PERSONAL SPACE</span></h1>
+      <div aria-label="体验模式" className={styles.modes} role="group">
+        <button aria-pressed={mode === "room"} disabled={!onMode} onClick={() => onMode?.("room")} type="button">3D 房间</button>
+        <button aria-pressed={mode === "desktop"} disabled={!onMode} onClick={() => onMode?.("desktop")} type="button">2D 桌面</button>
+      </div>
+    </header>
+  );
+}
+
 function MountedExperience() {
   const [mode, setSelectedMode] = useState<Mode>(() => window.matchMedia(simpleViewQuery).matches ? "desktop" : "room");
 
   return (
     <main className={styles.experience} id="main-content" tabIndex={-1}>
-      <header className={styles.toolbar}>
-        <Link className={styles.back} href="/#playground"><span aria-hidden="true">←</span> 返回主页</Link>
-        <h1>cxzg007<span> / PERSONAL SPACE</span></h1>
-        <div aria-label="体验模式" className={styles.modes} role="group">
-          <button aria-pressed={mode === "room"} onClick={() => setSelectedMode("room")} type="button">3D 房间</button>
-          <button aria-pressed={mode === "desktop"} onClick={() => setSelectedMode("desktop")} type="button">2D 桌面</button>
-        </div>
-      </header>
+      <ExperienceToolbar mode={mode} onMode={setSelectedMode} />
       <ExperienceFrame key={mode} mode={mode} onDesktop={() => setSelectedMode("desktop")} />
       <footer className={styles.footer}>
         <span>{mode === "room" ? "点击 START 开始 · 点击电脑进入 · 左下角切换自由视角" : "双击图标打开应用 · 拖动标题栏移动窗口"}</span>
@@ -84,7 +90,16 @@ function MountedExperience() {
 export function RetroExperience() {
   const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   if (!hydrated) {
-    return <main className={styles.experience} id="main-content"><p role="status">正在准备体验…</p></main>;
+    return (
+      <main className={styles.experience} id="main-content" tabIndex={-1}>
+        <ExperienceToolbar />
+        <div className={styles.preparing}>
+          <p role="status">正在准备体验…</p>
+          <noscript>交互房间需要启用 JavaScript，也可以点击「了解更多」阅读我的经历与项目。</noscript>
+        </div>
+        <footer className={styles.footer}>点击「了解更多」查看我的经历、项目与技术文章</footer>
+      </main>
+    );
   }
   return <MountedExperience />;
 }

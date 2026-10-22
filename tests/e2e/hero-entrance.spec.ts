@@ -8,7 +8,7 @@ async function freezeEntrance(page: Page) {
   const time = new Date("2026-09-30T03:00:00Z");
   await page.clock.install({ time });
   await page.clock.pauseAt(time);
-  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.goto("/about", { waitUntil: "domcontentloaded" });
   await expect(page.locator(hero)).toHaveAttribute("data-hero-entrance", "running");
   const animations = await page.locator(hero).evaluateHandle((element) => {
     const animations = element.getAnimations({ subtree: true });
@@ -73,7 +73,7 @@ test.describe("desktop entrance", () => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.goto("/about", { waitUntil: "domcontentloaded" });
     await expect(page.locator(hero)).toHaveAttribute("data-hero-entrance", "complete");
     await expectStatic(page);
     await page.reload();
@@ -111,7 +111,7 @@ test.describe("desktop entrance", () => {
 
   test("the entrance completes even when Next client scripts cannot load", async ({ page }) => {
     await page.route("**/_next/static/**/*.js", (route) => route.abort());
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.goto("/about", { waitUntil: "domcontentloaded" });
     await expect(page.locator(hero)).toHaveAttribute("data-hero-entrance", "complete");
     await expectStatic(page);
     await page.getByRole("link", { name: "查看实习", exact: true }).click();
@@ -121,13 +121,13 @@ test.describe("desktop entrance", () => {
 
 test("reduced motion shows the complete hero immediately", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about");
   await expectStatic(page);
 });
 
 test("a narrow viewport shows the complete hero immediately", async ({ page }) => {
   await page.setViewportSize({ width: 760, height: 900 });
-  await page.goto("/");
+  await page.goto("/about");
   await expectStatic(page);
 });
 
@@ -135,12 +135,12 @@ test("blocked session storage keeps the homepage readable", async ({ page }) => 
   await page.addInitScript(() => {
     Object.defineProperty(window, "sessionStorage", { get() { throw new Error("Storage unavailable"); } });
   });
-  await page.goto("/");
+  await page.goto("/about");
   await expectStatic(page);
 });
 
 test("direct anchors and arriving from the blog stay static", async ({ page }) => {
-  await page.goto("/#internships");
+  await page.goto("/about#internships");
   await expectStatic(page);
   await page.evaluate(() => sessionStorage.clear());
   await page.goto("/blog");
@@ -152,7 +152,7 @@ test("direct anchors and arriving from the blog stay static", async ({ page }) =
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
   test("the hero and its links remain available", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/about");
     await expectStatic(page);
     await page.getByRole("link", { name: "查看实习", exact: true }).click();
     await expect(page).toHaveURL(/#internships$/);

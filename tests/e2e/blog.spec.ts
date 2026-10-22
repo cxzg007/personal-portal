@@ -147,7 +147,7 @@ async function expectRouteBundlesWithoutThree(page: Page, route: string) {
 }
 
 for (const route of [
-  "/",
+  "/about",
   "/blog",
   "/blog/graph-engineering-ontology",
   "/blog/palantir-ontology-notes",
@@ -217,7 +217,7 @@ test("blog index uses the blue portfolio palette with readable article rows", as
   expect(values.cardBackground).toBe("rgba(0, 0, 0, 0)");
   expect(values.cardMetaFont).toContain("system-ui");
 
-  await expect(page.locator(".blog-card h2")).toHaveText([availabilityTitle, concurrencyTitle, semanticaTitle, graphOntologyTitle, ontologyTitle]);
+  await expect(page.locator(".blog-card h2")).toHaveText(["Agent 上下文工程：稳定前缀、状态管理与信息压缩", availabilityTitle, concurrencyTitle, semanticaTitle, graphOntologyTitle, ontologyTitle]);
   const originalCard = page.locator(".blog-card").filter({ hasText: ontologyTitle });
   await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(4);
   await expect(page.getByRole("link", { exact: true, name: graphOntologyTitle })).toBeVisible();
@@ -323,9 +323,9 @@ test("navigates back to home sections from the blog index", async ({ page }, tes
   }
 
   const heroBackLink = page.locator(".blog-back-link");
-  await expect(heroBackLink).toHaveAttribute("href", "/#top");
+  await expect(heroBackLink).toHaveAttribute("href", "/about#top");
   await heroBackLink.click();
-  await expect(page).toHaveURL(/\/#top$/);
+  await expect(page).toHaveURL(/\/about#top$/);
   await expect(page.locator("main > section#writing")).toBeVisible();
 
   await page.goto("/blog");
@@ -333,7 +333,7 @@ test("navigates back to home sections from the blog index", async ({ page }, tes
     await openMobileMenu();
   }
   await nav.getByRole("link", { name: "实习", exact: true }).click();
-  await expect(page).toHaveURL(/\/#internships$/);
+  await expect(page).toHaveURL(/\/about#internships$/);
   await expect(page.locator("main > section#internships")).toBeVisible();
 });
 

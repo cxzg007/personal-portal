@@ -4,6 +4,7 @@ import content from '../../../../../../content/site-content.json';
 export function About() {
     return <article className="site-page-content portal-copy">
         <h1>About me</h1>
+        <p><a href="/about" target="_top">了解更多 ↗</a></p>
         <h2>{content.profile.name} / Jiang Junjie</h2>
         <p>{content.profile.positioning}</p>
         {content.about.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
@@ -49,6 +50,6 @@ export function Contact() {
         <p>一起构建可靠的 AI 系统。</p>
         <p><a href={`mailto:${content.profile.email}`}>{content.profile.email}</a></p>
         <p><a href={content.profile.github} rel="noreferrer" target="_blank">GitHub / {content.profile.technicalId} ↗</a></p>
-        <p><a href="/#contact" target="_top">联系我 ↗</a></p>
+        <p><a href="/about#contact" target="_top">联系我 ↗</a></p>
     </article>;
 }

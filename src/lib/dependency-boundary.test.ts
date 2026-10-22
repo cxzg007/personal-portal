@@ -3,20 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-/**
- * 首页必须保持轻。
- *
- * 之前首页上过一版 WebGL，为了性能又撤了下来（见 commit「perf: remove homepage
- * webgl runtime」），于是留了这条守卫。它原本的写法是禁止 three 出现在
- * dependencies 里，但那管得太宽：只要有任何一个独立路由想用三维，整条规则就得
- * 删掉，守卫也就没了。
- *
- * 真正要守的是首页那棵树。所以这里从 src/app/page.tsx 出发把本地导入全部走一遍，
- * 确认这些运行时不在里面。实验路由 /lab/latent 用 next/dynamic 懒加载，不在这条
- * 路径上，也就进不了首页的包。
- */
-
-/** 这些包一旦进首页，首屏的 JS 体积和解析时间都会明显变差。 */
+/** The detailed portfolio must stay independent of the iframe room runtime. */
 const BANNED = ["three", "@react-three/fiber", "@react-three/drei", "motion", "framer-motion"];
 
 const SOURCE_ROOT = path.join(import.meta.dirname, "..");
@@ -64,9 +51,9 @@ function collectImports(file: string): string[] {
   return [...source.matchAll(IMPORT_PATTERN)].map((match) => match[1]);
 }
 
-/** 从首页出发遍历本地模块，返回走到的文件和一路上引用过的裸包名。 */
+/** 从详细主页出发遍历本地模块，返回走到的文件和一路上引用过的裸包名。 */
 function walkFromHomepage() {
-  const entry = path.join(SOURCE_ROOT, "app/page.tsx");
+  const entry = path.join(SOURCE_ROOT, "app/about/page.tsx");
   const visited = new Set<string>();
   const packages = new Map<string, string>();
   const queue = [entry];
@@ -94,14 +81,14 @@ function walkFromHomepage() {
   return { files: visited, packages };
 }
 
-describe("首页的依赖边界", () => {
-  it("遍历得到的首页模块树是非空的", () => {
+describe("详细主页的依赖边界", () => {
+  it("遍历得到的详细主页模块树是非空的", () => {
     // 解析一旦失效，下面那条断言会变成永远通过的空检查，所以先确认真的走到了东西。
     const { files } = walkFromHomepage();
     expect(files.size).toBeGreaterThan(5);
   });
 
-  it("首页不引入 WebGL 和动画运行时", () => {
+  it("详细主页不引入 WebGL 和动画运行时", () => {
     const { packages } = walkFromHomepage();
     const found = BANNED.filter((name) => packages.has(name)).map(
       (name) => `${name}（经由 ${packages.get(name)}）`,
@@ -109,10 +96,9 @@ describe("首页的依赖边界", () => {
     expect(found).toEqual([]);
   });
 
-  it("三维实验只待在 lab 目录里", () => {
-    // 这些模块是 /lab/latent 专用的，不该被站点其他地方引用。
+  it("详细主页不引入交互房间组件", () => {
     const { files } = walkFromHomepage();
-    const leaked = [...files].filter((file) => file.includes(`${path.sep}components${path.sep}lab${path.sep}`));
+    const leaked = [...files].filter((file) => file.includes(`${path.sep}components${path.sep}playground${path.sep}`));
     expect(leaked).toEqual([]);
   });
 });

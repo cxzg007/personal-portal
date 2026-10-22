@@ -7,7 +7,7 @@ const internships = [
 ];
 
 test("experience index links to each actual internship without obscuring its heading", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const index = page.getByRole("navigation", { name: "经历索引" });
   await expect(index.getByRole("link")).toHaveCount(3);
 
@@ -25,7 +25,7 @@ test("experience index links to each actual internship without obscuring its hea
 });
 
 test("experience index stays usable across motion preference and route changes", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   await expect(page.locator("[data-hero-network]")).toHaveCount(0);
   const hero = page.locator(".profile-hero-copy");
   const before = await hero.boundingBox();
@@ -49,7 +49,7 @@ test.describe("server-rendered homepage", () => {
   test.use({ javaScriptEnabled: false });
 
   test("experience index and expanded details work without JavaScript", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/about");
     await page.getByRole("link", { name: "查看京东实习经历", exact: true }).click();
     await expect(page).toHaveURL(/#internship-jd-ontology-platform$/);
     const article = page.locator("#internship-jd-ontology-platform");
