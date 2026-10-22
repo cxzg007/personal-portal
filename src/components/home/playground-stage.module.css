@@ -1,0 +1,26 @@
+.stage { margin-top: 2.5rem; scroll-margin-top: 6rem; }
+.heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.75rem; }
+.heading h3 { margin: 0; font-family: var(--font-display); font-size: clamp(1.25rem, 1.8vw, 1.5rem); font-weight: 600; line-height: 1.5; }
+.heading > span { color: var(--profile-muted); font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em; }
+.room { overflow: hidden; border: 1px solid var(--profile-line); border-radius: 1rem; background: #e3e2e3; }
+.topline { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.05rem 1.5rem; background: #302f2f; color: #f6f3ec; font-size: 0.75rem; }
+.topline > span:first-child { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; }
+.topline i { height: 6px; width: 6px; border-radius: 50%; background: #b8cfac; }
+.preview { position: relative; display: block; overflow: hidden; }
+.image { display: block; width: 100%; height: auto; aspect-ratio: 1507 / 768; object-fit: cover; transition: transform 500ms ease; }
+.preview:hover .image { transform: scale(1.025); }
+.enter { position: absolute; bottom: 1.75rem; left: 50%; display: flex; align-items: center; gap: 2rem; padding: 0.9rem 1.2rem; transform: translateX(-50%); border: 1px solid rgb(255 255 255 / 55%); border-radius: 0.4rem; background: #faf7ef; box-shadow: 0 4px 16px rgb(0 0 0 / 14%); color: #30261f; font-size: 0.85rem; white-space: nowrap; transition: background 160ms ease; }
+.preview:hover .enter { background: #fff; }
+.preview:focus-visible { outline-offset: -4px; outline: 3px solid #b65335; }
+.caption { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.5rem; border-top: 1px solid rgb(0 0 0 / 9%); background: var(--profile-panel); }
+.caption p { margin: 0; color: var(--profile-ink); font-size: 0.88rem; }
+.caption > span { color: var(--profile-muted); font-size: 0.72rem; }
+@media (max-width: 760px) {
+  .heading { align-items: flex-start; flex-direction: column; gap: 0.55rem; }
+  .topline { padding: 0.9rem 1rem; }
+  .topline > span:last-child { font-size: 0.65rem; }
+  .image { aspect-ratio: 1.2; object-position: 50% 50%; }
+  .enter { bottom: 1.25rem; }
+  .caption { align-items: flex-start; flex-direction: column; gap: 0.5rem; padding: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) { .image, .enter { transition: none; } .preview:hover .image { transform: none; } }

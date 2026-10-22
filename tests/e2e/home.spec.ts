@@ -62,7 +62,7 @@ test("homepage exposes the campus recruiting identity and primary actions", asyn
   await expect(page.locator("section#info")).toHaveCount(0);
   await expect(page.locator('header a[href="#info"]')).toHaveCount(0);
   await expect(page.getByRole("link", { name: "教育" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "信息" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "信息", exact: true })).toHaveCount(0);
 
   const duplicateIds = await page.evaluate(() => {
     const seen = new Set<string>();
@@ -215,9 +215,9 @@ test("mobile navigation resets cleanly across the desktop breakpoint", async ({ 
 test("homepage exposes the reference-style section order", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator("main > section")).toHaveCount(6);
+  await expect(page.locator("main > section")).toHaveCount(7);
   expect(await page.locator("main > section").evaluateAll((sections) => sections.map(({ id }) => id))).toEqual([
-    "profile", "internships", "systems", "open-source", "writing", "contact",
+    "profile", "internships", "systems", "open-source", "writing", "lab", "contact",
   ]);
 });
 

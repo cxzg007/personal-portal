@@ -23,6 +23,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.5,
     },
+    {
+      url: new URL("/playground", siteUrl).toString(),
+      changeFrequency: "yearly",
+      priority: 0.5,
+    },
     ...posts.map((post) => ({
       url: new URL(`/blog/${post.slug}`, siteUrl).toString(),
       lastModified: post.updatedAt,

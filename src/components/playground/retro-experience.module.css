@@ -1,0 +1,25 @@
+.experience { position: fixed; inset: 0; display: grid; grid-template-rows: 52px minmax(0, 1fr) 32px; width: 100%; height: 100dvh; margin: 0; overflow: hidden; background: #101010; color: #f4f1e9; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.25rem; border-bottom: 1px solid #343434; background: #242424; }
+.back { display: inline-flex; align-items: center; gap: 0.65rem; min-height: 36px; font-size: 0.75rem; }
+.toolbar h1 { margin: 0; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; }
+.toolbar h1 span { color: #b9b9b6; font-size: 0.65rem; letter-spacing: 0.07em; }
+.modes { display: flex; gap: 3px; padding: 3px; border: 1px solid #4b4b4b; border-radius: 5px; }
+.modes button { min-height: 30px; padding: 0 0.85rem; border: 0; border-radius: 2px; background: transparent; color: #c7c7c4; font-size: 0.72rem; cursor: pointer; }
+.modes button[aria-pressed="true"] { background: #eeebe4; color: #222; }
+.viewport { position: relative; min-height: 0; overflow: hidden; }
+.frame { display: block; width: 100%; height: 100%; border: 0; background: #000; }
+.loading { position: absolute; right: 1rem; bottom: 0.75rem; margin: 0; padding: 0.65rem 0.8rem; border: 1px solid #444; border-radius: 4px; background: #242424; color: #eee; font-size: 0.75rem; pointer-events: none; }
+.error { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 2rem; background: #191919; text-align: center; }
+.error h2 { margin: 0; font-size: 1.3rem; }
+.error p { margin: 0; color: #c6c6c6; font-size: 0.85rem; }
+.error > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+.error button { min-height: 44px; padding: 0.6rem 1rem; border: 1px solid #777; border-radius: 4px; background: #eeeae2; color: #222; font-size: 0.8rem; cursor: pointer; }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0 1.25rem; border-top: 1px solid #343434; background: #242424; color: #bdbdbb; font-size: 0.65rem; }
+.experience :focus-visible { outline: 2px solid #f5ca80; outline-offset: 3px; }
+@media (max-width: 760px) {
+  .experience { grid-template-rows: 52px minmax(0, 1fr) 44px; }
+  .toolbar { gap: 0.5rem; padding-inline: 0.65rem; }
+  .toolbar h1 { display: none; }
+  .modes button { padding-inline: 0.7rem; }
+  .footer { align-items: flex-start; justify-content: center; flex-direction: column; gap: 0.2rem; padding-inline: 0.7rem; font-size: 0.6rem; }
+}

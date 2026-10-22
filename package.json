@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "tsx scripts/validate-content.ts && next build",
+    "build:playground": "npm ci --prefix vendor/henry --ignore-scripts --no-audit --no-fund && npm run build --prefix vendor/henry",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

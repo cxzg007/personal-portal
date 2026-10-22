@@ -2,6 +2,7 @@ import { ContactStage } from "@/components/home/contact-stage";
 import { LabEntry } from "@/components/home/lab-entry";
 import { OpenSourceShowcase } from "@/components/home/open-source-showcase";
 import { PageMotionController } from "@/components/home/page-motion-controller";
+import { PlaygroundStage } from "@/components/home/playground-stage";
 import { ProfileHero } from "@/components/home/profile-hero";
 import { StickyInternshipStack } from "@/components/home/sticky-internship-stack";
 import { SystemProjectTabs } from "@/components/home/system-project-tabs";
@@ -93,6 +94,7 @@ export default async function HomePage() {
             <p lang="en">LAB</p>
           </header>
           <LabEntry />
+          <PlaygroundStage />
         </section>
         <section aria-labelledby="contact-heading" className="profile-stage profile-stage--contact" id="contact">
           <header className="profile-section-heading profile-reveal">
