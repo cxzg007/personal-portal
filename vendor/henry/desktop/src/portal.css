@@ -1,0 +1,15 @@
+/* Host integration; original desktop chrome and colors are retained. */
+.showcase-header, .toolbar-text { font-family: MSSerif, monospace; }
+h1 { font-family: gastromond, Georgia, 'Times New Roman', serif; }
+.portal-copy { box-sizing: border-box; color: #202020; line-height: 1.8; font-family: Millennium, 'PingFang SC', sans-serif; }
+.portal-copy h1 { margin: 0 0 32px; line-height: 1.1; }
+.portal-copy h2 { margin: 20px 0 12px; font-size: 28px; }
+.portal-copy h3 { margin: 12px 0; font-size: 20px; }
+.portal-copy p { margin: 0 0 18px; overflow-wrap: anywhere; }
+.portal-copy section { display: block; margin-bottom: 36px; }
+.portal-copy ul { padding-left: 24px; }
+.portal-copy .portal-stack { color: #555; font-size: 15px; }
+.portal-copy a { color: #551a8b; }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

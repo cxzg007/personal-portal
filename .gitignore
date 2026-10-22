@@ -9,3 +9,4 @@ test-results/
 next-env.d.ts
 .vercel
 .env*
+vendor/henry/*-build.json

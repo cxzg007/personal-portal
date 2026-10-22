@@ -8,3 +8,5 @@ tests/
 test-results/
 playwright-report/
 *.tsbuildinfo
+vendor/henry/node_modules/
+vendor/henry/*-build.json

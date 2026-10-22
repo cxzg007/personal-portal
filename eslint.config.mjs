@@ -15,5 +15,7 @@ export default defineConfig([
     "test-results/**",
     "**/test-results/**",
     ".worktrees/**",
+    "vendor/**",
+    "public/experiments/henry/**",
   ]),
 ]);
