@@ -5,6 +5,7 @@ import type { Locator, Page } from "@playwright/test";
 const auditedRoutes = [
   "/",
   "/blog",
+  "/blog/agent-context-engineering",
   "/blog/palantir-ontology-notes",
   "/blog/graph-engineering-ontology",
   "/blog/semantica-reasoning-engineering",

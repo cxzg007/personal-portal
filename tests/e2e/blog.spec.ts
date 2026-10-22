@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
+const agentTitle = "Agent 上下文工程：稳定前缀、状态管理与信息压缩";
 const ontologyTitle = "Palantir 本体论：把业务语义做成可执行的操作层";
 const graphOntologyTitle = "图工程之后：多智能体系统缺的是一层语义";
 const semanticaTitle = "Semantica 开源实践：让推理有依据，让变化可追溯";
@@ -217,7 +218,7 @@ test("blog index uses the blue portfolio palette with readable article rows", as
   expect(values.cardBackground).toBe("rgba(0, 0, 0, 0)");
   expect(values.cardMetaFont).toContain("system-ui");
 
-  await expect(page.locator(".blog-card h2")).toHaveText([availabilityTitle, concurrencyTitle, semanticaTitle, graphOntologyTitle, ontologyTitle]);
+  await expect(page.locator(".blog-card h2")).toHaveText([agentTitle, availabilityTitle, concurrencyTitle, semanticaTitle, graphOntologyTitle, ontologyTitle]);
   const originalCard = page.locator(".blog-card").filter({ hasText: ontologyTitle });
   await expect(originalCard.locator('[aria-label="文章标签"] li')).toHaveCount(4);
   await expect(page.getByRole("link", { exact: true, name: graphOntologyTitle })).toBeVisible();
@@ -296,7 +297,7 @@ test("article keeps a comfortable reading measure and type size", async ({ page 
   expect(reading.proseRatio).toBeCloseTo(1.85, 2);
   expect(reading.fontSize).toBeGreaterThanOrEqual(17);
   expect(reading.proseMaxWidth).toBe("720px");
-  expect(reading.headerBackground).toBe("rgba(0, 0, 0, 0)");
+  expect(reading.headerBackground).toBe("rgb(244, 247, 251)");
   expect(reading.tocBackground).toBe("rgba(0, 0, 0, 0)");
   expect(reading.metaFont).toContain("system-ui");
 });

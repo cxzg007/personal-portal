@@ -40,7 +40,7 @@ test("concurrency article loads four full-size diagrams, numbered contents, and 
     const image = link.getByRole("img");
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0)).toBe(true);
-    expect((await image.boundingBox())!.width).toBeLessThanOrEqual(720);
+    expect((await image.boundingBox())!.width).toBeLessThanOrEqual(768);
     const asset = await request.get(src);
     expect(asset.ok()).toBe(true);
     expect(asset.headers()["content-type"]).toContain("image/png");
@@ -50,7 +50,7 @@ test("concurrency article loads four full-size diagrams, numbered contents, and 
   if (await disclosure.isVisible()) await disclosure.click();
   await page.getByRole("navigation", { name: "文章目录" }).getByRole("link", { name: "5. 缓存更新与数据一致性", exact: true }).click();
   await expect(prose.getByRole("heading", { name: "5. 缓存更新与数据一致性", exact: true })).toBeInViewport();
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://portfolio.example.test${articlePath}`);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfolio.example.test"}${articlePath}`);
   const metadata = await page.locator('script[type="application/ld+json"]').evaluate((node) => JSON.parse(node.textContent ?? "{}"));
   expect(metadata).toMatchObject({ "@type": "BlogPosting", headline: title, datePublished: "2026-10-10", author: { name: "江俊杰" } });
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);

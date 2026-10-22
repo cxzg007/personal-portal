@@ -92,7 +92,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         <article className="article-layout">
           <header className="article-header">
-            <p className="eyebrow">工程笔记 / ENGINEERING NOTES</p>
+            <p className="eyebrow">工程笔记 · ENGINEERING NOTES</p>
             <h1 aria-label={post.title}>
               {titleBreak >= 0 ? (
                 <>
@@ -104,7 +104,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <p className="article-deck">{post.description}</p>
             <div className="article-meta">
               <time dateTime={post.publishedAt}>发布于 {post.publishedAt}</time>
-              <time dateTime={post.updatedAt}>更新于 {post.updatedAt}</time>
+              {post.updatedAt !== post.publishedAt ? (
+                <time dateTime={post.updatedAt}>更新于 {post.updatedAt}</time>
+              ) : null}
               <span>{post.readingMinutes} 分钟阅读</span>
             </div>
             <ul aria-label="文章标签" className="blog-tag-list">
