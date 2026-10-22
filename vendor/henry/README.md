@@ -71,6 +71,8 @@ metadata. The regular Next compiler and ESLint exclude `vendor`.
   timer is cleaned up on unmount. The retained Credits source records Henry's attribution.
 - Monitor noise videos begin loading on START, after room and desktop readiness,
   so their large downloads do not compete with the models and textures during boot.
+  They use low-priority fetches and local blob URLs instead of long media range
+  streams; leaving the room aborts pending downloads and releases the blob URLs.
 
 ## Verify
 

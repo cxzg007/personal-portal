@@ -45,6 +45,8 @@ test("the experiment switches between locally hosted room and desktop", async ({
   await page.goto("/playground");
   await expect(page.getByRole("button", { name: "3D 房间" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("iframe")).toHaveAttribute("src", "/experiments/henry/room/index.html");
+  await expect(page.getByRole("status")).toHaveCount(0, { timeout: 20000 });
+  await page.frameLocator("iframe").getByRole("button", { name: "START", exact: true }).click();
   await page.getByRole("button", { name: "2D 桌面" }).click();
   await expect(page.locator("iframe")).toHaveAttribute("src", "/experiments/henry/desktop/index.html");
   await expect(page.frameLocator("iframe").getByText("Jiang Junjie", { exact: true }).first()).toBeVisible({ timeout: 30000 });

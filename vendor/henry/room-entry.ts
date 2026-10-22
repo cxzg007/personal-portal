@@ -3,13 +3,36 @@ import Application from './room/src/Application/Application';
 import { DefaultLoadingManager } from 'three';
 
 // Keep the decorative videos from competing with the room's boot resources.
-// Starting them on the user's click also supplies a media playback gesture.
+// Fetch complete clips at low priority instead of leaving media range streams
+// open across iframe removal. This keeps mode changes responsive over HTTP/2.
+const videoDownloads = new AbortController();
+const videoUrls: string[] = [];
 document.addEventListener('loadingScreenDone', () => {
-    document.querySelectorAll<HTMLVideoElement>('#monitor-videos video[data-src]').forEach((video) => {
-        video.src = video.dataset.src!;
+    document.querySelectorAll<HTMLVideoElement>('#monitor-videos video[data-src]').forEach(async (video) => {
+        const source = video.dataset.src!;
         delete video.dataset.src;
-        void video.play().catch(() => {});
+        try {
+            const response = await fetch(source, { signal: videoDownloads.signal, priority: 'low' });
+            if (!response.ok) return;
+            const clip = await response.blob();
+            if (videoDownloads.signal.aborted) return;
+            const url = URL.createObjectURL(clip);
+            videoUrls.push(url);
+            video.src = url;
+            await video.play();
+        } catch {
+            // Noise is decorative; an interrupted clip must not stop the room.
+        }
     });
+}, { once: true });
+window.addEventListener('pagehide', () => {
+    videoDownloads.abort();
+    document.querySelectorAll<HTMLVideoElement>('#monitor-videos video').forEach((video) => {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+    });
+    videoUrls.forEach((url) => URL.revokeObjectURL(url));
 }, { once: true });
 
 const report = (type: string) => window.parent.postMessage({ type }, window.location.origin);
