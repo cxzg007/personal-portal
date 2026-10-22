@@ -2,6 +2,16 @@ import './room/src/style.css';
 import Application from './room/src/Application/Application';
 import { DefaultLoadingManager } from 'three';
 
+// Keep the decorative videos from competing with the room's boot resources.
+// Starting them on the user's click also supplies a media playback gesture.
+document.addEventListener('loadingScreenDone', () => {
+    document.querySelectorAll<HTMLVideoElement>('#monitor-videos video[data-src]').forEach((video) => {
+        video.src = video.dataset.src!;
+        delete video.dataset.src;
+        void video.play().catch(() => {});
+    });
+}, { once: true });
+
 const report = (type: string) => window.parent.postMessage({ type }, window.location.origin);
 let state = 'loading';
 const updateState = (next: string) => { state = next; report(next); };

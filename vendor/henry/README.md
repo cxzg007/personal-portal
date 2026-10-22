@@ -69,6 +69,8 @@ metadata. The regular Next compiler and ESLint exclude `vendor`.
   this portal. No requests are made to the original analytics or email endpoint.
 - DOSBox and game bundles load only when a game is opened. The original taskbar
   timer is cleaned up on unmount. The retained Credits source records Henry's attribution.
+- Monitor noise videos begin loading on START, after room and desktop readiness,
+  so their large downloads do not compete with the models and textures during boot.
 
 ## Verify
 

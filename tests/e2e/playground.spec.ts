@@ -23,6 +23,23 @@ test("the homepage offers the local experiment without loading its 3D runtime", 
   expect(sceneRequests).toEqual([]);
 });
 
+test("the room boots before downloading monitor videos and plays them after START", async ({ page }) => {
+  const videos = new Set<string>();
+  page.on("request", (request) => {
+    if (request.url().includes("/textures/monitor/video/")) videos.add(request.url());
+  });
+  await page.goto("/playground");
+  const room = page.frameLocator("iframe");
+  await expect(page.getByRole("status")).toHaveCount(0, { timeout: 20000 });
+  await expect(room.getByRole("button", { name: "START", exact: true })).toBeEnabled();
+  expect(videos.size).toBe(0);
+  await room.getByRole("button", { name: "START", exact: true }).click();
+  await expect.poll(() => videos.size).toBe(2);
+  await expect.poll(() => room.locator("video").evaluateAll((elements) =>
+    elements.every((element) => (element as HTMLVideoElement).readyState >= 2 && !(element as HTMLVideoElement).paused),
+  )).toBe(true);
+});
+
 test("the experiment switches between locally hosted room and desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/playground");
