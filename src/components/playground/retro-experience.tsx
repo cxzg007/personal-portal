@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import styles from "./retro-experience.module.css";
 
@@ -63,7 +62,13 @@ function ExperienceFrame({ mode, onDesktop }: { mode: Mode; onDesktop: () => voi
 function ExperienceToolbar({ mode, onMode }: { mode?: Mode; onMode?: (mode: Mode) => void }) {
   return (
     <header className={styles.toolbar}>
-      <Link className={styles.more} href="/about">了解更多 <span aria-hidden="true">↗</span></Link>
+      {/* A document navigation lets the portfolio's pre-paint entrance run. */}
+      <a className={styles.more} href="/about">
+        <span className={styles.moreLabel}>了解更多</span>
+        <svg aria-hidden="true" className={styles.moreArrow} viewBox="0 0 24 24" fill="none">
+          <path d="M4 12h15m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </a>
       <h1>cxzg007<span> / PERSONAL SPACE</span></h1>
       <div aria-label="体验模式" className={styles.modes} role="group">
         <button aria-pressed={mode === "room"} disabled={!onMode} onClick={() => onMode?.("room")} type="button">3D 房间</button>

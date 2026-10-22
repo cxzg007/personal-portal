@@ -111,3 +111,19 @@ test("a failed desktop inside the monitor also offers recovery", async ({ page }
   await page.getByRole("button", { name: "进入 2D 桌面" }).click();
   await expect(page.frameLocator("iframe").getByText("Jiang Junjie", { exact: true })).toBeVisible();
 });
+
+test("Projects presents the open-source contribution record", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const desktop = page.frameLocator("iframe");
+  await desktop.getByRole("link", { name: "PROJECTS", exact: true }).click();
+  const projects = desktop.getByRole("article");
+  await expect(projects.getByRole("heading", { name: "Semantica", exact: true })).toBeVisible();
+  await expect(projects).toContainText("项目维护者");
+  await expect(projects).toContainText("截至 2026-10-16 · 19 个 PR 已合并 · 1 个 PR 进行中");
+  await expect(projects.getByRole("heading", { name: "真值维护与时态一致性" })).toBeVisible();
+  await expect(projects.getByRole("link", { name: "PR #1831", exact: false })).toHaveAttribute("href", "https://github.com/semantica-agi/semantica/pull/1831");
+  await expect(projects.locator('a[href*="/pull/"]')).toHaveCount(20);
+  await expect(projects).not.toContainText("机器人多传感器数据流式回放平台");
+  await expect(projects).not.toContainText("本体驱动的数据资产治理与 Agent 动作平台");
+});

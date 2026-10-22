@@ -1,7 +1,19 @@
 .experience { position: fixed; inset: 0; display: grid; grid-template-rows: 52px minmax(0, 1fr) 32px; width: 100%; height: 100dvh; margin: 0; overflow: hidden; background: #101010; color: #f4f1e9; }
 .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.25rem; border-bottom: 1px solid #343434; background: #242424; }
-.more { display: inline-flex; align-items: center; gap: 0.65rem; min-height: 34px; padding: 0 0.85rem; border: 1px solid #d2bc97; border-radius: 4px; background: #eee5d5; color: #242424; font-size: 0.75rem; }
-.more:hover { background: #fff3dc; }
+.more { display: inline-flex; align-items: center; gap: 0.75rem; min-height: 40px; padding: 0 0.25rem; color: #d5d3ce; font-family: var(--font-body); font-size: 0.75rem; letter-spacing: 0.08em; text-decoration: none; }
+.moreLabel { position: relative; }
+.moreLabel::after { content: ""; position: absolute; left: 0; right: 0; bottom: -5px; height: 1px; background: currentColor; opacity: 0.28; transition: opacity 180ms ease; }
+.moreArrow { width: 18px; height: 18px; opacity: 0.65; transition: opacity 180ms ease; }
+.more:focus-visible { color: #f4f1e9; }
+.more:focus-visible .moreLabel::after, .more:focus-visible .moreArrow { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .more:hover { color: #f4f1e9; }
+  .more:hover .moreLabel::after, .more:hover .moreArrow { opacity: 1; }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .moreArrow { transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1), opacity 180ms ease; }
+  .more:hover .moreArrow { transform: translateX(3px); }
+}
 .preparing { align-self: center; padding: 2rem; text-align: center; }
 .toolbar h1 { margin: 0; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; }
 .toolbar h1 span { color: #b9b9b6; font-size: 0.65rem; letter-spacing: 0.07em; }
