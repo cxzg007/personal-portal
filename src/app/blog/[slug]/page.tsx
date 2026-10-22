@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleToc } from "@/components/blog/article-toc";
 import { ReadingProgress } from "@/components/blog/reading-progress";
-import { Header } from "@/components/shell/header";
+import { BlogClouds } from "@/components/blog/blog-clouds";
 import { loadSiteContent } from "@/content/load-site-content";
 import { getAllPosts, getPost } from "@/content/posts";
 import { serializeJsonLd } from "@/lib/discovery";
@@ -57,7 +57,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const previous = posts[postIndex + 1];
   const next = posts[postIndex - 1];
   const { Content } = post;
-  const titleBreak = post.title.indexOf("：");
   const siteContent = loadSiteContent();
   const siteUrl = getSiteUrl();
   const jsonLd = {
@@ -80,28 +79,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   return (
     <div className="page-shell article-page-shell">
       <ReadingProgress />
-      <Header />
       <main id="main-content" tabIndex={-1}>
         <script
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
           type="application/ld+json"
         />
-        <Link className="article-back-link" href="/blog">
-          <span aria-hidden="true">←</span> 返回博客
-        </Link>
-
         <article className="article-layout">
           <header className="article-header">
-            <p className="eyebrow">工程笔记 · ENGINEERING NOTES</p>
-            <h1 aria-label={post.title}>
-              {titleBreak >= 0 ? (
-                <>
-                  <span className="article-title-prefix">{post.title.slice(0, titleBreak + 1)}</span>
-                  {post.title.slice(titleBreak + 1)}
-                </>
-              ) : post.title}
-            </h1>
-            <p className="article-deck">{post.description}</p>
+            <Link className="article-back-link" href="/blog"><span aria-hidden="true">←</span> 返回博客</Link>
+            <h1>{post.title}</h1>
             <div className="article-meta">
               <time dateTime={post.publishedAt}>发布于 {post.publishedAt}</time>
               {post.updatedAt !== post.publishedAt ? (
@@ -109,11 +95,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               ) : null}
               <span>{post.readingMinutes} 分钟阅读</span>
             </div>
-            <ul aria-label="文章标签" className="blog-tag-list">
-              {post.tags.map((tag) => (
-                <li key={tag}>{tag}</li>
-              ))}
-            </ul>
+            <p className="article-category"><em>分类</em> {post.tags.join(" · ")}</p>
+            <BlogClouds />
           </header>
 
           <ArticleToc headings={post.headings} />

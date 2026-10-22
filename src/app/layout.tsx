@@ -38,7 +38,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="zh-CN" data-scroll-behavior="smooth">
+    <html lang="zh-CN" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem("portal-blog-theme");if(t==="light"||t==="dark")document.documentElement.dataset.blogPreference=t}catch(e){}})()` }} />
+      </head>
       <body className="app-shell">
         <a className="skip-link" href="#main-content">
           跳到主要内容

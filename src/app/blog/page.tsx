@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { BlogFilter } from "@/components/blog/blog-filter";
-import { Header } from "@/components/shell/header";
+import { BlogClouds } from "@/components/blog/blog-clouds";
 import { loadSiteContent } from "@/content/load-site-content";
 import { getAllPosts } from "@/content/posts";
 
@@ -34,17 +33,10 @@ export default function BlogPage() {
 
   return (
     <div className="page-shell blog-page-shell">
-      <Header />
       <main id="main-content" tabIndex={-1}>
         <header className="blog-hero">
-          <Link className="blog-back-link" href="/#top">
-            <span aria-hidden="true">←</span> 返回首页
-          </Link>
-          <p className="eyebrow">ENGINEERING NOTES</p>
-          <h1>技术博客</h1>
-          <p>
-            关于 Agent、业务语义与系统设计。记录一个问题的来由、推敲过程与工程取舍。
-          </p>
+          <h1 className="blog-visually-hidden">技术博客</h1>
+          <BlogClouds variant="home" />
         </header>
         <BlogFilter posts={posts} />
       </main>

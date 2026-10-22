@@ -13,7 +13,7 @@ export function ArticleToc({ headings }: Pick<PostMeta, "headings">) {
       const element = document.getElementById(id);
       return element ? [element] : [];
     });
-    const header = document.querySelector(".site-header");
+    const header = document.querySelector(".blog-header");
     const prose = document.querySelector(".article-prose");
     const update = () => {
       cancelAnimationFrame(frame);

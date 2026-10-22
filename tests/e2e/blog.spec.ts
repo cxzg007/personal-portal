@@ -41,11 +41,11 @@ test("articles remain readable with 200 percent text at narrow and wide widths",
     await page.goto(`/blog/${slug}`);
     await expect(page.locator(".article-prose")).toBeVisible();
     await page.addStyleTag({ content: "html { font-size: 200%; }" });
-    for (const width of [320, 390, 768, 1024, 1440]) {
+    for (const width of [320, 390, 768, 851, 900, 960, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       const geometry = await page.evaluate(() => {
         const elements = document.querySelectorAll<HTMLElement>(
-          ".article-header, .article-toc, .article-prose, .article-prose p, .article-prose h2, .code-frame, .header-inner, .site-mark, .desktop-navigation, .navigation-list a",
+          ".article-header, .article-toc, .article-prose, .article-prose p, .article-prose h2, .code-frame, .blog-header-inner, .blog-brand, .blog-desktop-nav, .blog-desktop-nav a, .blog-header-tools, .blog-icon-button",
         );
         return {
           overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -55,11 +55,11 @@ test("articles remain readable with 200 percent text at narrow and wide widths",
           }).map((node) => node.className || node.tagName),
           proseSize: parseFloat(getComputedStyle(document.querySelector(".article-prose")!).fontSize),
           navOverlap: (() => {
-            const mark = document.querySelector(".site-mark")!.getBoundingClientRect();
-            const nav = document.querySelector(".desktop-navigation")!.getBoundingClientRect();
+            const mark = document.querySelector(".blog-brand")!.getBoundingClientRect();
+            const nav = document.querySelector(".blog-desktop-nav")!.getBoundingClientRect();
             return nav.width > 0 && mark.right > nav.left && mark.bottom > nav.top;
           })(),
-          splitNavigation: [...document.querySelectorAll(".desktop-navigation a")].some((link) => {
+          splitNavigation: [...document.querySelectorAll(".blog-desktop-nav a")].some((link) => {
             const range = document.createRange();
             range.selectNodeContents(link);
             return new Set([...range.getClientRects()].map((rect) => rect.top)).size > 1;
@@ -83,8 +83,8 @@ test("expanded mobile navigation fits and scrolls at 200 percent text", async ({
     await page.addStyleTag({ content: "html { font-size: 200%; }" });
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 568 });
-      await page.getByRole("button", { name: "打开导航菜单" }).click();
-      const menu = page.locator(".mobile-menu-shell");
+      await page.locator(".blog-mobile-nav summary").click();
+      const menu = page.locator(".blog-mobile-nav nav");
       const bounds = (await menu.boundingBox())!;
       expect(bounds.y + bounds.height).toBeLessThanOrEqual(568);
       for (const link of await menu.getByRole("link").all()) {
@@ -100,7 +100,7 @@ test("expanded mobile navigation fits and scrolls at 200 percent text", async ({
         expect(fits, (await link.textContent()) ?? "navigation link").toBe(true);
       }
       await page.keyboard.press("Escape");
-      await expect(page.getByRole("button", { name: "打开导航菜单" })).toBeFocused();
+      await expect(page.locator(".blog-mobile-nav summary")).toBeFocused();
     }
   }
 });
@@ -187,7 +187,7 @@ test("server-renders the public blog and filters without losing the empty-state 
   await expect(page.getByRole("link", { exact: true, name: graphOntologyTitle })).toBeVisible();
 });
 
-test("blog index uses the blue portfolio palette with readable article rows", async ({
+test("blog index uses cloud colors and unboxed article rows", async ({
   page,
 }) => {
   await page.goto("/blog");
@@ -211,8 +211,8 @@ test("blog index uses the blue portfolio palette with readable article rows", as
     };
   });
 
-  expect(values.heroFont).toContain("Noto Serif SC");
-  expect(values.activeTagBackground).toBe("rgb(36, 88, 166)");
+  expect(values.heroFont).toContain("Avenir");
+  expect(values.activeTagBackground).toBe("rgb(88, 59, 255)");
   expect(values.filterPanelBackground).toBe("rgba(0, 0, 0, 0)");
   expect(values.searchFieldFont).toContain("system-ui");
   expect(values.cardBackground).toBe("rgba(0, 0, 0, 0)");
@@ -276,7 +276,7 @@ test("article keeps a comfortable reading measure and type size", async ({ page 
   await expect(prose).toBeVisible();
   await expect(prose).toHaveCSS("font-family", /Inter|PingFang|Microsoft YaHei/);
   expect((await prose.boundingBox())!.width).toBeLessThanOrEqual(720);
-  await expect(page.locator(".article-header h1")).toHaveCSS("font-family", /Noto Serif SC/);
+  await expect(page.locator(".article-header h1")).toHaveCSS("font-family", /Avenir/);
 
   const reading = await page.evaluate(() => {
     const prose = document.querySelector<HTMLElement>(".article-prose")!;
@@ -296,44 +296,20 @@ test("article keeps a comfortable reading measure and type size", async ({ page 
 
   expect(reading.proseRatio).toBeCloseTo(1.85, 2);
   expect(reading.fontSize).toBeGreaterThanOrEqual(17);
-  expect(reading.proseMaxWidth).toBe("720px");
-  expect(reading.headerBackground).toBe("rgb(244, 247, 251)");
+  expect(reading.proseMaxWidth).toBe("686px");
+  expect(reading.headerBackground).toBe("rgba(0, 0, 0, 0)");
   expect(reading.tocBackground).toBe("rgba(0, 0, 0, 0)");
   expect(reading.metaFont).toContain("system-ui");
 });
 
-test("navigates back to home sections from the blog index", async ({ page }, testInfo) => {
+test("navigates back to home sections from the blog footer", async ({ page }) => {
   await page.goto("/blog");
-
-  // 小屏下桌面导航不可达，需先展开汉堡菜单，断言/点击均走“移动导航”。
-  const isMobile = testInfo.project.name === "mobile";
-  const openMobileMenu = async () => {
-    await page.getByRole("button", { name: "打开导航菜单" }).click();
-  };
-  const nav = page.getByRole("navigation", { name: isMobile ? "移动导航" : "主导航" });
-
-  if (isMobile) {
-    await openMobileMenu();
-  }
-  const blogLink = nav.getByRole("link", { name: "博客", exact: true });
-  await expect(blogLink).toHaveAttribute("href", "/blog");
-  await expect(blogLink).toHaveAttribute("aria-current", "page");
-
-  if (isMobile) {
-    await page.getByRole("button", { name: "关闭导航菜单" }).click();
-  }
-
-  const heroBackLink = page.locator(".blog-back-link");
-  await expect(heroBackLink).toHaveAttribute("href", "/#top");
-  await heroBackLink.click();
+  const footer = page.getByRole("navigation", { name: "博客页脚导航" });
+  await footer.getByRole("link", { name: "返回个人首页" }).click();
   await expect(page).toHaveURL(/\/#top$/);
   await expect(page.locator("main > section#writing")).toBeVisible();
-
   await page.goto("/blog");
-  if (isMobile) {
-    await openMobileMenu();
-  }
-  await nav.getByRole("link", { name: "实习", exact: true }).click();
+  await footer.getByRole("link", { name: "实习经历" }).click();
   await expect(page).toHaveURL(/\/#internships$/);
   await expect(page.locator("main > section#internships")).toBeVisible();
 });

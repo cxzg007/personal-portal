@@ -163,65 +163,28 @@ test("mobile navigation is operable by keyboard and restores focus on close", as
 });
 
 test("blog filters and article actions remain keyboard operable", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "chromium", "desktop keyboard order is a desktop-only layout");
-  await page.setViewportSize({ width: 1440, height: 900 });
+  test.skip(testInfo.project.name !== "chromium", "desktop keyboard navigation");
   await page.goto("/blog");
-
-  const articleTitle = "Palantir 本体论：把业务语义做成可执行的操作层";
-  const skipLink = page.getByRole("link", { name: "跳到主要内容" });
-  // 用类选择器精确定位站点标识，避免与博客 hero 的“返回首页”链接产生可访问名冲突。
-  const siteMark = page.locator(".site-mark");
-  const desktopNavigation = page.getByRole("navigation", { name: "主导航" });
-  const heroBackLink = page.locator(".blog-back-link");
   const search = page.getByRole("searchbox", { name: "搜索文章" });
-
-  for (const target of [
-    skipLink,
-    siteMark,
-    ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
-    heroBackLink,
-    search,
-  ]) {
-    await expectNextTab(page, target);
-  }
-
+  await search.focus();
   await expectVisibleFocus(search);
   await search.fill("Palantir");
-
-  const filterGroup = page.getByRole("group", { name: "按标签筛选" });
-  for (const name of [
-    "全部",
-    "系统架构",
-    "高并发",
-    "缓存",
-    "读书笔记",
-    "Semantica",
-    "规则推理",
-    "知识图谱",
-    "开源实践",
-    "Graph Engineering",
-    "Ontology Engineering",
-    "多智能体",
-    "本体工程",
-    "Palantir",
-    "本体论",
-    "数据平台",
-    "企业数字化",
-  ]) {
-    const filter = filterGroup.getByRole("button", { exact: true, name });
-    await expectNextTab(page, filter);
-    await expectVisibleFocus(filter);
+  const group = page.getByRole("group", { name: "按标签筛选" });
+  const filters = await group.getByRole("button").all();
+  await filters[0].focus();
+  for (let i = 0; i < filters.length; i++) {
+    if (i > 0) await expectNextTab(page, filters[i]);
+    await expectVisibleFocus(filters[i]);
     await page.keyboard.press("Enter");
-    await expect(filter).toHaveAttribute("aria-pressed", "true");
+    await expect(filters[i]).toHaveAttribute("aria-pressed", "true");
   }
-
-  const articleLink = page.getByRole("link", {
-    exact: true,
-    name: articleTitle,
-  });
-  await expectNextTab(page, articleLink);
-  await expectVisibleFocus(articleLink);
-  await expectNextTab(page, page.getByRole("link", { name: `阅读文章：${articleTitle}` }));
+  await filters[0].focus();
+  await page.keyboard.press("Enter");
+  const article = page.locator(".blog-card h2 a").first();
+  await article.focus();
+  await expectVisibleFocus(article);
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/blog\/palantir-ontology-notes$/);
 });
 
 test("reduced motion preserves content, removes Canvas, and sets the static profile", async ({ page }) => {

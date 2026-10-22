@@ -1,4 +1,5 @@
 import type { MDXComponents } from "mdx/types";
+import { CodeBlock } from "./code-block";
 
 export const blogMdxComponents = {
   a: ({ href = "", children, ...props }) => {
@@ -15,14 +16,7 @@ export const blogMdxComponents = {
       </a>
     );
   },
-  pre: ({ children, ...props }) => (
-    <div className="code-frame">
-      <span aria-hidden="true" className="code-frame-label">
-        代码示例
-      </span>
-      <pre {...props} tabIndex={0}>{children}</pre>
-    </div>
-  ),
+  pre: CodeBlock,
   table: ({ children, ...props }) => (
     <div className="table-scroll" tabIndex={0}>
       <table {...props}>{children}</table>
