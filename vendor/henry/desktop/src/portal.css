@@ -10,6 +10,12 @@ h1 { font-family: gastromond, Georgia, 'Times New Roman', serif; }
 .portal-copy ul { padding-left: 24px; }
 .portal-copy .portal-stack { color: #555; font-size: 15px; }
 .portal-copy a { color: #551a8b; }
+.portal-copy .contribution-kicker { margin: -12px 0 8px; font-family: MSSerif, monospace; font-size: 14px; letter-spacing: 0.1em; }
+.portal-copy .contribution-role { margin-bottom: 8px; font-weight: 700; }
+.portal-copy .contribution-snapshot { padding: 12px 0; border-block: 1px solid #aaa; font-size: 14px; }
+.portal-copy .contribution-chapter { margin-block: 24px 32px; }
+.portal-copy .contribution-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.portal-copy .contribution-note { color: #555; font-size: 13px; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

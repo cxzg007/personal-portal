@@ -14,8 +14,8 @@ export function BlogFooter() {
       </div>
       <nav aria-label="博客页脚导航">
         <div><h2>阅读 <span lang="en">READ</span></h2><Link href="/blog">全部文章</Link><Link href="/blog#categories">文章分类</Link><a href="/rss.xml">RSS 订阅</a></div>
-        <div><h2>探索 <span lang="en">EXPLORE</span></h2><Link href="/playground">交互空间</Link><Link href="/#open-source">开源贡献</Link><a href="https://github.com/cxzg007" target="_blank" rel="noreferrer">GitHub ↗</a></div>
-        <div><h2>关于 <span lang="en">ABOUT</span></h2><Link className="blog-back-link" href="/#top">返回个人首页</Link><Link href="/#internships">实习经历</Link><Link href="/#profile">关于我</Link></div>
+        <div><h2>探索 <span lang="en">EXPLORE</span></h2><Link href="/">交互空间</Link><Link href="/about#open-source">开源贡献</Link><a href="https://github.com/cxzg007" target="_blank" rel="noreferrer">GitHub ↗</a></div>
+        <div><h2>关于 <span lang="en">ABOUT</span></h2><Link className="blog-back-link" href="/about#top">返回个人首页</Link><Link href="/about#internships">实习经历</Link><Link href="/about#profile">关于我</Link></div>
       </nav>
       <p className="blog-colophon">© {new Date().getFullYear()} 江俊杰 <span>保持好奇，持续构建。</span></p>
     </div>

@@ -4,7 +4,7 @@ const title = "Semantica 开源实践：让推理有依据，让变化可追溯"
 const articlePath = "/blog/semantica-reasoning-engineering";
 
 test("Semantica article is discoverable from the homepage, contribution section, and blog search", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const readingLink = page.locator("#writing").getByRole("link", { name: `阅读文章：${title}` });
   await expect(readingLink).toHaveAttribute("href", articlePath);
   await expect(page.locator("#open-source").getByRole("link", { name: "阅读相关技术文章" })).toHaveAttribute("href", articlePath);

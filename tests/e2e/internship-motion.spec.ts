@@ -13,7 +13,7 @@ async function animationTime(figure: Locator) {
 
 test("each diagram moves, pauses at its current frame, and resumes from keyboard", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
+  await page.goto("/about");
   for (const figure of await page.locator(figures).all()) {
     await figure.scrollIntoViewIfNeeded();
     await expect(figure).toHaveAttribute("data-motion", "running");
@@ -35,7 +35,7 @@ test("each diagram moves, pauses at its current frame, and resumes from keyboard
 });
 
 test("offscreen figures stop and a manual pause survives scrolling away and back", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const figure = page.locator(figures).first();
   await expect(figure).toHaveAttribute("data-motion", "paused");
   await figure.scrollIntoViewIfNeeded();
@@ -52,7 +52,7 @@ test("offscreen figures stop and a manual pause survives scrolling away and back
 
 test("reduced motion gives complete diagrams without running animations", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about");
   for (const figure of await page.locator(figures).all()) {
     await figure.scrollIntoViewIfNeeded();
     await expect(figure.getByRole("img")).toBeVisible();

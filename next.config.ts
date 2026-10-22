@@ -2,6 +2,9 @@ import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  redirects: async () => [
+    { source: "/playground", destination: "/", permanent: true },
+  ],
   allowedDevOrigins: ["127.0.0.1"],
   images: {
     remotePatterns: [

@@ -24,7 +24,7 @@ test("search traps focus, closes with Escape and opens a matching article", asyn
   await expect(dialog).not.toBeVisible();
 });
 
-test("theme persists between articles and reloads without changing the homepage", async ({ page }) => {
+test("theme persists between articles and reloads without changing the portfolio", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/blog");
   const shell = page.locator(".blog-theme-shell");

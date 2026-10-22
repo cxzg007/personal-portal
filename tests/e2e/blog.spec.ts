@@ -148,7 +148,7 @@ async function expectRouteBundlesWithoutThree(page: Page, route: string) {
 }
 
 for (const route of [
-  "/",
+  "/about",
   "/blog",
   "/blog/graph-engineering-ontology",
   "/blog/palantir-ontology-notes",
@@ -306,11 +306,11 @@ test("navigates back to home sections from the blog footer", async ({ page }) =>
   await page.goto("/blog");
   const footer = page.getByRole("navigation", { name: "博客页脚导航" });
   await footer.getByRole("link", { name: "返回个人首页" }).click();
-  await expect(page).toHaveURL(/\/#top$/);
+  await expect(page).toHaveURL(/\/about#top$/);
   await expect(page.locator("main > section#writing")).toBeVisible();
   await page.goto("/blog");
   await footer.getByRole("link", { name: "实习经历" }).click();
-  await expect(page).toHaveURL(/\/#internships$/);
+  await expect(page).toHaveURL(/\/about#internships$/);
   await expect(page.locator("main > section#internships")).toBeVisible();
 });
 

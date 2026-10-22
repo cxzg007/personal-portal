@@ -10,8 +10,8 @@ type SearchPost = Pick<PostMeta, "slug" | "title" | "description">;
 const navigation = [
   { href: "/blog#categories", label: "分类", english: "Categories" },
   { href: "/blog", label: "文章", english: "Articles" },
-  { href: "/playground", label: "实验", english: "Playground" },
-  { href: "/#profile", label: "关于", english: "About" },
+  { href: "/", label: "实验", english: "Playground" },
+  { href: "/about#profile", label: "关于", english: "About" },
 ];
 export function BlogWordmark() {
   return <span className="blog-wordmark">Jiang<span className="blog-wordmark-j">J<span aria-hidden="true">⌃</span></span>Junjie</span>;
@@ -77,8 +77,8 @@ export function BlogHeader({ posts }: { posts: SearchPost[] }) {
         <summary aria-label="博客导航菜单"><span /><span /><span /></summary>
         <nav aria-label="博客移动导航">
           {navigation.map(item => <Link key={item.label} href={item.href} onClick={() => { if (menu.current) menu.current.open = false; }}>{item.label}<span lang="en">{item.english}</span></Link>)}
-          <Link href="/#internships">实习经历</Link>
-          <Link href="/#top">返回个人首页</Link>
+          <Link href="/about#internships">实习经历</Link>
+          <Link href="/about#top">返回个人首页</Link>
         </nav>
       </details>
     </div>

@@ -7,12 +7,18 @@ export const HERO_ENTRANCE_SCRIPT = `(() => {
   let finish = () => {};
   try {
     const key = 'portal:hero-entrance:v1';
-    if (window.sessionStorage.getItem(key)) return;
+    const navigation = window.performance.getEntriesByType('navigation')[0];
+    const referrer = document.referrer ? new URL(document.referrer) : null;
+    const internal = referrer?.origin === window.location.origin;
+    const fromRoom = internal && navigation?.type === 'navigate' &&
+      ['/', '/experiments/henry/desktop/index.html', '/experiments/henry/room/index.html'].includes(referrer.pathname);
+    // Learn-more is an explicit introduction; reloads and history keep their
+    // existing state. The document link runs this bootstrap before first paint.
+    if (window.sessionStorage.getItem(key) && !fromRoom) return;
     window.sessionStorage.setItem(key, 'seen');
     const eligible = window.matchMedia('(min-width: 761px) and (prefers-reduced-motion: no-preference)');
-    const navigation = window.performance.getEntriesByType('navigation')[0];
     if (!eligible.matches || document.hidden || window.location.hash || window.scrollY > 8 || navigation?.type === 'back_forward') return;
-    if (document.referrer && new URL(document.referrer).origin === window.location.origin) return;
+    if (internal && !fromRoom) return;
 
     const lifetime = new window.AbortController();
     const options = { passive: true, capture: true, signal: lifetime.signal };

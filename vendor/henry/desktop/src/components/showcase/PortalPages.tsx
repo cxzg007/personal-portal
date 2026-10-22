@@ -4,6 +4,7 @@ import content from '../../../../../../content/site-content.json';
 export function About() {
     return <article className="site-page-content portal-copy">
         <h1>About me</h1>
+        <p><a href="/about" target="_top">了解更多 ↗</a></p>
         <h2>{content.profile.name} / Jiang Junjie</h2>
         <p>{content.profile.positioning}</p>
         {content.about.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
@@ -29,16 +30,42 @@ export function Experience() {
 }
 
 export function Projects() {
+    const project = content.openSource;
+    const merged = project.contributions.filter((item) => item.status === 'merged');
+    const pending = project.contributions.filter((item) => item.status === 'open');
+
     return <article className="site-page-content portal-copy">
         <h1>Projects</h1>
-        {content.caseStudies.map((item) => <section key={item.id}>
-            <h2>{item.title}</h2><p>{item.problem}</p><p>{item.result}</p>
-            <p className="portal-stack">{item.stack.join(' / ')}</p>
+        <p className="contribution-kicker">OPEN SOURCE / 开源贡献</p>
+        <h2>{project.name}</h2>
+        <p>{project.background}</p>
+        <p className="contribution-role">{project.identity}</p>
+        <p>{project.roleSummary}</p>
+        <p className="contribution-snapshot">截至 {project.snapshotDate} · {merged.length} 个 PR 已合并 · {pending.length} 个 PR 进行中</p>
+
+        <h2>我的贡献</h2>
+        {project.contributionThemes.map((theme) => <section className="contribution-chapter" key={theme.id}>
+            <h3>{theme.name}</h3>
+            <p>{theme.summary}</p>
+            <ul className="contribution-links" aria-label={`${theme.name}的公开 PR`}>
+                {theme.prNumbers.map((number) => {
+                    const contribution = merged.find((item) => item.number === number);
+                    return contribution ? <li key={number}>
+                        <a href={contribution.url} title={contribution.title} target="_blank" rel="noreferrer">PR #{number} ↗</a>
+                    </li> : null;
+                })}
+            </ul>
         </section>)}
-        <h2>Writing</h2>
-        <p><a href="/blog" target="_top">阅读我的技术博客 ↗</a></p>
-        <h2>Open source</h2>
-        <p><a href={content.openSource.repositoryUrl} target="_blank" rel="noreferrer">{content.openSource.name} ↗</a></p>
+        {pending.length > 0 ? <section className="contribution-chapter">
+            <h2>正在推进</h2>
+            {pending.map((item) => <p key={item.number}>
+                {item.title}<br />
+                <a href={item.url} target="_blank" rel="noreferrer">PR #{item.number} · 进行中 ↗</a>
+            </p>)}
+            <p className="contribution-note">状态记录于 {project.snapshotDate}，后续进展见公开 PR。</p>
+        </section> : null}
+        <p><a href={project.repositoryUrl} target="_blank" rel="noreferrer">访问 {project.name} 仓库 ↗</a></p>
+        <p><a href={project.articlePath} target="_top">阅读我的开源工程复盘 ↗</a></p>
     </article>;
 }
 
@@ -49,6 +76,6 @@ export function Contact() {
         <p>一起构建可靠的 AI 系统。</p>
         <p><a href={`mailto:${content.profile.email}`}>{content.profile.email}</a></p>
         <p><a href={content.profile.github} rel="noreferrer" target="_blank">GitHub / {content.profile.technicalId} ↗</a></p>
-        <p><a href="/#contact" target="_top">联系我 ↗</a></p>
+        <p><a href="/about#contact" target="_top">联系我 ↗</a></p>
     </article>;
 }

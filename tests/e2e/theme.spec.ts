@@ -2,7 +2,7 @@ import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 test("homepage uses the cool white and blue design tokens", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const tokens = await page.evaluate(() => {
     const shell = document.querySelector<HTMLElement>(".profile-shell");
     const styles = getComputedStyle(shell!);
@@ -18,7 +18,7 @@ test("homepage uses the cool white and blue design tokens", async ({ page }) => 
 });
 
 test("homepage paints a solid editorial surface without gradients or card shadows", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   await expect(page.locator(".profile-shell")).toHaveCSS("background-color", "rgb(244, 247, 251)");
   await expect(page.locator("#internships article").first()).toHaveCSS("box-shadow", "none");
   const font = await page
@@ -28,7 +28,7 @@ test("homepage paints a solid editorial surface without gradients or card shadow
 });
 
 test("homepage keeps readable contrast on the light theme", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   // Contrast is measured in the fully revealed reading state, not mid-fade.
   await expect(page.locator("#profile")).not.toHaveAttribute("data-hero-entrance", "running");
   const results = await new AxeBuilder({ page }).include("main").analyze();
@@ -37,7 +37,7 @@ test("homepage keeps readable contrast on the light theme", async ({ page }) => 
 });
 
 test("homepage keeps its scoped blue type system", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const values = await page.evaluate(() => {
     const root = getComputedStyle(document.documentElement);
     const heading = getComputedStyle(document.querySelector(".profile-stage h2")!);
@@ -56,7 +56,7 @@ test("homepage keeps its scoped blue type system", async ({ page }) => {
 });
 
 test("root document background is light, not dark", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const pageColor = await page.evaluate(() =>
     getComputedStyle(document.documentElement).getPropertyValue("--page").trim(),
   );
@@ -64,7 +64,7 @@ test("root document background is light, not dark", async ({ page }) => {
 });
 
 test("page canvas paints the warm paper token as a solid background", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const colors = await page.evaluate(() => {
     const probe = document.createElement("div");
     probe.style.color = "var(--page)";
@@ -104,7 +104,7 @@ test("blog navigation uses the same white and blue surface as the homepage", asy
 });
 
 test("focused navigation and call-to-action links show a blue ring of at least 2px", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   // 移动视口（<=760px）下桌面主导航被隐藏，链接只存在于汉堡菜单抽屉中，
   // 需先打开菜单并改用「移动导航」定位，否则 Tab 无法聚焦到目标链接。
   const desktopNav = page.getByRole("navigation", { name: "主导航" });
@@ -141,7 +141,7 @@ test("focused navigation and call-to-action links show a blue ring of at least 2
 });
 
 test("homepage sections use the same undecorated reading surface", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   for (const id of ["internships", "systems", "open-source", "writing", "contact"]) {
     const section = page.locator(`#${id}`);
     await expect(section).toBeVisible();

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 
 const auditedRoutes = [
-  "/",
+  "/about",
   "/blog",
   "/blog/agent-context-engineering",
   "/blog/palantir-ontology-notes",
@@ -13,7 +13,7 @@ const auditedRoutes = [
   "/blog/service-availability-governance",
 ] as const;
 const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
-const primaryNavItems = ["实习", "系统", "开源", "博客", "联系", "GitHub"] as const;
+const primaryNavItems = ["实习", "系统", "开源", "博客", "房间", "联系", "GitHub"] as const;
 
 async function expectNextTab(page: Page, target: Locator) {
   await page.keyboard.press("Tab");
@@ -37,7 +37,7 @@ for (const route of auditedRoutes) {
   test(`${route} has no WCAG 2.1 A/AA axe violations`, async ({ page }) => {
     await page.goto(route);
     // Audit the reading state after the first-visit fade has naturally settled.
-    if (route === "/") {
+    if (route === "/about") {
       await expect(page.locator("#profile")).not.toHaveAttribute("data-hero-entrance", "running");
     }
 
@@ -47,13 +47,13 @@ for (const route of auditedRoutes) {
   });
 }
 
-test("desktop keyboard order covers skip navigation, six nav links, hero actions, and contact", async (
+test("desktop keyboard order covers skip navigation, seven nav links, hero actions, and contact", async (
   { page },
   testInfo,
 ) => {
   test.skip(testInfo.project.name !== "chromium", "desktop keyboard order is a desktop-only layout");
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
+  await page.goto("/about");
 
   const skipLink = page.getByRole("link", { name: "跳到主要内容" });
   await page.keyboard.press("Tab");
@@ -62,7 +62,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
   await page.keyboard.press("Enter");
   await expect(page.locator("#main-content")).toBeFocused();
 
-  await page.goto("/");
+  await page.goto("/about");
   const desktopNavigation = page.getByRole("navigation", { name: "主导航" });
   await expect(desktopNavigation).toBeVisible();
 
@@ -78,7 +78,7 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
 
   const keyboardOrder = [
     skipLink,
-    page.getByRole("link", { name: "返回首页" }),
+    page.getByRole("link", { name: "返回房间" }),
     ...primaryNavItems.map((name) => desktopNavigation.getByRole("link", { exact: true, name })),
     hero.getByRole("link", { name: "查看实习", exact: true }),
     hero.getByRole("link", { name: "阅读博客", exact: true }),
@@ -127,10 +127,10 @@ test("desktop keyboard order covers skip navigation, six nav links, hero actions
 
 test("mobile navigation is operable by keyboard and restores focus on close", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/about");
 
   const skipLink = page.getByRole("link", { name: "跳到主要内容" });
-  const siteMark = page.getByRole("link", { name: "返回首页" });
+  const siteMark = page.getByRole("link", { name: "返回房间" });
   const menuToggle = page.getByRole("button", { name: "打开导航菜单" });
   await expectNextTab(page, skipLink);
   await expectNextTab(page, siteMark);
@@ -189,7 +189,7 @@ test("blog filters and article actions remain keyboard operable", async ({ page 
 
 test("reduced motion preserves content, removes Canvas, and sets the static profile", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about");
 
   await expect(page.locator("canvas")).toHaveCount(0);
   await expect(page.locator("html[data-profile-motion='static']")).toHaveCount(1);
@@ -199,7 +199,7 @@ test("reduced motion preserves content, removes Canvas, and sets the static prof
 });
 
 test("Semantica open-source showcase stays static and PR links keep visible focus", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
 
   const openSource = page.locator("main > section#open-source");
   await expect(openSource.locator("button")).toHaveCount(0);

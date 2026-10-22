@@ -109,6 +109,36 @@ describe("hero entrance bootstrap", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
+  it.each(["/", "/experiments/henry/desktop/index.html", "/experiments/henry/room/index.html"])("replays the entrance when explicitly arriving from %s", (path) => {
+    window.sessionStorage.setItem("portal:hero-entrance:v1", "seen");
+    vi.spyOn(document, "referrer", "get").mockReturnValue(`${location.origin}${path}`);
+    vi.spyOn(window.performance, "getEntriesByType").mockReturnValue([{ type: "navigate" } as PerformanceNavigationTiming]);
+    start();
+    expect(hero.dataset.heroEntrance).toBe("running");
+    finishLastRow();
+    expect(hero.dataset.heroEntrance).toBe("complete");
+  });
+
+  it.each(["reload", "back_forward"])("does not replay a room-origin %s", (type) => {
+    window.sessionStorage.setItem("portal:hero-entrance:v1", "seen");
+    vi.spyOn(document, "referrer", "get").mockReturnValue(`${location.origin}/`);
+    vi.spyOn(window.performance, "getEntriesByType").mockReturnValue([{ type } as PerformanceNavigationTiming]);
+    start();
+    expect(hero).not.toHaveAttribute("data-hero-entrance");
+  });
+
+  it("keeps reduced-motion and anchored room arrivals static", () => {
+    vi.spyOn(document, "referrer", "get").mockReturnValue(`${location.origin}/`);
+    vi.spyOn(window.performance, "getEntriesByType").mockReturnValue([{ type: "navigate" } as PerformanceNavigationTiming]);
+    media.matches = false;
+    start();
+    expect(hero).not.toHaveAttribute("data-hero-entrance");
+    media.matches = true;
+    window.history.replaceState({}, "", "/about#contact");
+    start();
+    expect(hero).not.toHaveAttribute("data-hero-entrance");
+  });
+
   it("leaves the content visible when session storage is unavailable", () => {
     vi.spyOn(window, "sessionStorage", "get").mockImplementation(() => { throw new Error("unavailable"); });
     expect(start).not.toThrow();

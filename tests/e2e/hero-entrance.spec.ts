@@ -8,7 +8,7 @@ async function freezeEntrance(page: Page) {
   const time = new Date("2026-09-30T03:00:00Z");
   await page.clock.install({ time });
   await page.clock.pauseAt(time);
-  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.goto("/about", { waitUntil: "domcontentloaded" });
   await expect(page.locator(hero)).toHaveAttribute("data-hero-entrance", "running");
   const animations = await page.locator(hero).evaluateHandle((element) => {
     const animations = element.getAnimations({ subtree: true });
@@ -73,14 +73,14 @@ test.describe("desktop entrance", () => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.goto("/about", { waitUntil: "domcontentloaded" });
     await expect(page.locator(hero)).toHaveAttribute("data-hero-entrance", "complete");
     await expectStatic(page);
     await page.reload();
     await expectStatic(page);
     await page.locator("#writing").getByRole("link", { name: "全部文章", exact: true }).click();
     await expect(page).toHaveURL(/\/blog$/);
-    await page.locator(".site-mark").click();
+    await page.locator(".blog-back-link").click();
     await expect(page.locator(hero)).toBeVisible();
     await expectStatic(page);
     expect(errors).toEqual([]);
@@ -111,7 +111,7 @@ test.describe("desktop entrance", () => {
 
   test("the entrance completes even when Next client scripts cannot load", async ({ page }) => {
     await page.route("**/_next/static/**/*.js", (route) => route.abort());
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.goto("/about", { waitUntil: "domcontentloaded" });
     await expect(page.locator(hero)).toHaveAttribute("data-hero-entrance", "complete");
     await expectStatic(page);
     await page.getByRole("link", { name: "查看实习", exact: true }).click();
@@ -121,13 +121,13 @@ test.describe("desktop entrance", () => {
 
 test("reduced motion shows the complete hero immediately", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/about");
   await expectStatic(page);
 });
 
 test("a narrow viewport shows the complete hero immediately", async ({ page }) => {
   await page.setViewportSize({ width: 760, height: 900 });
-  await page.goto("/");
+  await page.goto("/about");
   await expectStatic(page);
 });
 
@@ -135,16 +135,16 @@ test("blocked session storage keeps the homepage readable", async ({ page }) => 
   await page.addInitScript(() => {
     Object.defineProperty(window, "sessionStorage", { get() { throw new Error("Storage unavailable"); } });
   });
-  await page.goto("/");
+  await page.goto("/about");
   await expectStatic(page);
 });
 
 test("direct anchors and arriving from the blog stay static", async ({ page }) => {
-  await page.goto("/#internships");
+  await page.goto("/about#internships");
   await expectStatic(page);
   await page.evaluate(() => sessionStorage.clear());
   await page.goto("/blog");
-  await page.locator(".site-mark").click();
+  await page.locator(".blog-back-link").click();
   await expect(page.locator(hero)).toBeVisible();
   await expectStatic(page);
 });
@@ -152,9 +152,65 @@ test("direct anchors and arriving from the blog stay static", async ({ page }) =
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
   test("the hero and its links remain available", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/about");
     await expectStatic(page);
     await page.getByRole("link", { name: "查看实习", exact: true }).click();
     await expect(page).toHaveURL(/#internships$/);
   });
+});
+
+// Observe actual CSS animation events across document navigations. This catches
+// the inert inline bootstrap on a client-side route transition.
+async function recordEntrance(page: Page) {
+  await page.addInitScript(() => {
+    document.addEventListener("animationstart", (event) => {
+      if (event.animationName === "hero-entrance-title") {
+        document.documentElement.dataset.heroEntranceObserved = "true";
+      }
+    }, true);
+  });
+}
+
+test("learn more plays the normal entrance on every explicit room visit", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "Desktop entrance");
+  await recordEntrance(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  // This check covers navigation while the room is still loading.
+  await page.route("**/experiments/henry/**", (route) => route.abort());
+  for (let visit = 0; visit < 2; visit += 1) {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(() => sessionStorage.setItem("portal:hero-entrance:v1", "seen"));
+    await page.getByRole("link", { name: "了解更多", exact: true }).click();
+    await expect(page).toHaveURL(/\/about$/);
+    await expect(page.locator("html")).toHaveAttribute("data-hero-entrance-observed", "true");
+    await expect(page.locator(hero)).toHaveAttribute("data-hero-entrance", "complete");
+    await expectStatic(page);
+    await page.reload();
+    await expect(page.locator("html")).not.toHaveAttribute("data-hero-entrance-observed");
+    await expectStatic(page);
+  }
+});
+
+test("learn more honors reduced motion", async ({ page }) => {
+  await recordEntrance(page);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.getByRole("link", { name: "了解更多", exact: true }).click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expectStatic(page);
+  await expect(page.locator("html")).not.toHaveAttribute("data-hero-entrance-observed");
+});
+
+test("the desktop about link also plays the portfolio entrance", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "Desktop entrance");
+  await recordEntrance(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "2D 桌面", exact: true }).click();
+  const desktop = page.frameLocator("iframe");
+  await desktop.getByRole("link", { name: "ABOUT", exact: true }).click();
+  await desktop.getByRole("link", { name: "了解更多", exact: false }).click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(page.locator("html")).toHaveAttribute("data-hero-entrance-observed", "true");
+  await expect(page.locator(hero)).toHaveAttribute("data-hero-entrance", "complete");
 });

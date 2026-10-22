@@ -5,7 +5,7 @@ const articlePath = "/blog/high-concurrency-read-write-design";
 const latestTitle = "Agent 上下文工程：稳定前缀、状态管理与信息压缩";
 
 test("homepage reading button reaches the blog and its latest article", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const button = page.locator("#profile").getByRole("link", { name: "阅读博客", exact: true });
   await expect(button).toHaveAttribute("href", "/blog");
   await button.focus();

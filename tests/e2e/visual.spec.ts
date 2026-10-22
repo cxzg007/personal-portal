@@ -41,14 +41,14 @@ async function combinedRegion(page: Page, locators: Locator[]) {
 test("profile hero visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 
-  await prepareStablePage(page, "/");
+  await prepareStablePage(page, "/about");
   await expect(page.locator("section.profile-hero")).toHaveScreenshot("profile-hero-1440.png");
 });
 
 test("internship story stack visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 
-  await prepareStablePage(page, "/");
+  await prepareStablePage(page, "/about");
   const clip = await combinedRegion(page, [page.locator("main > section#internships")]);
   await expect(page).toHaveScreenshot("sticky-internships-1440.png", { fullPage: true, clip });
 });
@@ -56,7 +56,7 @@ test("internship story stack visual at 1440", async ({ page }, testInfo) => {
 test("system project tabs visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 
-  await prepareStablePage(page, "/");
+  await prepareStablePage(page, "/about");
   const clip = await combinedRegion(page, [page.locator("main > section#systems")]);
   await expect(page).toHaveScreenshot("system-tabs-1440.png", { fullPage: true, clip });
 });
@@ -64,7 +64,7 @@ test("system project tabs visual at 1440", async ({ page }, testInfo) => {
 test("open source showcase visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 
-  await prepareStablePage(page, "/");
+  await prepareStablePage(page, "/about");
   const openSource = page.locator("main > section#open-source");
   const clip = await combinedRegion(page, [openSource]);
 
@@ -74,7 +74,7 @@ test("open source showcase visual at 1440", async ({ page }, testInfo) => {
 test("writing stage and contact visual at 1440", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "chromium-only 1440 baseline");
 
-  await prepareStablePage(page, "/");
+  await prepareStablePage(page, "/about");
   const writing = page.locator("main > section#writing");
   const contact = page.locator("main > section#contact");
   const clip = await combinedRegion(page, [writing, contact]);
@@ -87,7 +87,7 @@ test("full homepage visual at 1280x800", async ({ page }, testInfo) => {
 
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await prepareStablePage(page, "/");
+  await prepareStablePage(page, "/about");
 
   await expect(page).toHaveScreenshot("homepage-1280.png", { fullPage: true });
 });
@@ -97,7 +97,7 @@ test("full homepage narrative visual at 1920x1080", async ({ page }, testInfo) =
 
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await prepareStablePage(page, "/");
+  await prepareStablePage(page, "/about");
 
   await expect(page).toHaveScreenshot("homepage-narrative-1920.png", { fullPage: true });
 });
@@ -105,7 +105,7 @@ test("full homepage narrative visual at 1920x1080", async ({ page }, testInfo) =
 test("tablet and mobile homepage overflow regression", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "chromium", "tablet/mobile-only overflow regression baseline");
 
-  await prepareStablePage(page, "/");
+  await prepareStablePage(page, "/about");
 
   await expect(page).toHaveScreenshot("homepage-overflow-regression.png", { fullPage: true });
 });

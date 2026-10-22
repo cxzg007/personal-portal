@@ -4,14 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// 锚点统一带 "/" 前缀：首页上仍为页内滚动，博客页/文章页上则跳回首页对应分区。
+// 详细主页与博客共用导航，分区链接统一指向 /about。
 const navigation = [
-  { label: "实习", href: "/#internships" },
-  { label: "系统", href: "/#systems" },
-  { label: "开源", href: "/#open-source" },
-  { label: "博客", href: "/#writing", blogHref: "/blog" },
-  { label: "实验", href: "/#lab" },
-  { label: "联系", href: "/#contact" },
+  { label: "实习", href: "/about#internships" },
+  { label: "系统", href: "/about#systems" },
+  { label: "开源", href: "/about#open-source" },
+  { label: "博客", href: "/about#writing", blogHref: "/blog" },
+  { label: "房间", href: "/" },
+  { label: "联系", href: "/about#contact" },
   { label: "GitHub", href: "https://github.com/cxzg007" },
 ] as const;
 
@@ -28,7 +28,7 @@ function NavigationLinks({
   return (
     <ul className="navigation-list">
       {navigation
-        .filter((item) => showWriting || item.href !== "/#writing")
+        .filter((item) => showWriting || item.href !== "/about#writing")
         .map((item) => {
           const isBlogItem = "blogHref" in item;
           const href = isBlogItem && onBlogPage ? item.blogHref : item.href;
@@ -97,7 +97,7 @@ export function Header({ showWriting = true }: HeaderProps) {
   return (
     <header className="site-header" id="top">
       <div className="header-inner">
-        <Link className="site-mark" href="/#top" aria-label="返回首页">
+        <Link className="site-mark" href="/" aria-label="返回房间">
           <span aria-hidden="true">⌁</span>
           <span>cxzg007.</span>
         </Link>
